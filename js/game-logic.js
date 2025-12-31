@@ -304,30 +304,46 @@ export const mockLib = {
         );
         return window.game.players?.length == 2 && !window._status.hs_entergame;
       },
-      content: (event) => {
+      content: async (event) => {
         try {
           console.log("调用hs_start技能的content()方法");
-          ("step 0");
+
+          // 实现异步语法糖，每个step都是一个promise
+          const step = (name) => {
+            console.log(`执行step ${name}`);
+            return Promise.resolve();
+          };
+
+          await step(0);
           window.lib.hearthstone.shijian.baseinit();
-          ("step 1");
+
+          await step(1);
           if (!window.lib.hearthstone) {
             window.game.me.say("加载失败");
             event.finish();
             return;
           }
-          ("step 2");
+
+          await step(2);
           window.lib.hearthstone.shijian.preinit(event.trigger);
-          ("step 3");
+
+          await step(3);
           window.lib.hearthstone.shijian.init();
-          ("step 4");
+
+          await step(4);
           window.lib.hearthstone.shijian.postinit();
-          ("step 5");
+
+          await step(5);
+          console.log("调用lib.hearthstone.shijian.entermode()");
           window.lib.hearthstone.shijian.entermode();
-          ("step 6");
+
+          await step(6);
           window.lib.hearthstone.shijian.reach();
-          ("step 7");
+
+          await step(7);
           window.lib.hearthstone.shijian.XJBG();
-          ("step 8");
+
+          await step(8);
           if (event.insert) {
             console.log("尝试插入内容");
             // 简化处理，不依赖window.lib.element.content.greeting
@@ -343,6 +359,7 @@ export const mockLib = {
               );
             }
           }
+
           event.finish();
           console.log("hs_start技能执行完成");
         } catch (error) {
@@ -609,6 +626,14 @@ export const mockGame = {
     console.log(`给玩家发牌: ${player.name || "玩家"}`);
     // 触发gameDrawBefore事件，用于触发hs_start技能
     window.game.emitEvent("gameDrawBefore");
+
+    // 直接调用hs_start技能的content方法，确保它能够被执行
+    if (window.lib && window.lib.skill && window.lib.skill.hs_start) {
+      console.log("直接调用hs_start技能的content方法");
+      window.lib.skill.hs_start.content({
+        finish: () => console.log("事件完成"),
+      });
+    }
   },
   phaseLoop: (player) => {
     console.log(`进入回合循环: ${player.name || "玩家"}`);

@@ -70,9 +70,24 @@ const server = http.createServer((req, res) => {
 
   // 特殊处理noname.js文件，返回我们的模拟实现
   if (decodedPath.endsWith("/noname.js") || decodedPath === "/noname.js") {
-    // 返回自定义的noname.js，使用我们的模拟对象
+    // 读取game-event.js文件内容
+    const gameEventPath = path.join(__dirname, "js", "game-event.js");
+    let gameEventContent = "";
+    try {
+      gameEventContent = fs.readFileSync(gameEventPath, "utf8");
+      // 移除game-event.js中的export和import语句，使其可以在浏览器中直接运行
+      gameEventContent = gameEventContent.replace(/export\s+/g, "");
+      gameEventContent = gameEventContent.replace(/import\s+[^;]+;/g, "");
+    } catch (error) {
+      console.error("读取game-event.js文件失败:", error);
+    }
+
+    // 返回自定义的noname.js，使用我们的模拟对象和game-event.js中的实现
     const mockNonameJs = `
       // 模拟noname.js - 仅用于炉石普通扩展
+      
+      // 导入game-event.js中的实现
+      ${gameEventContent}
       
       // 模拟game对象
       const mockGame = {
@@ -81,6 +96,49 @@ const server = http.createServer((req, res) => {
           all: new Map(),
           current: null,
           list: []
+        },
+        
+        createEvent: (eventName, isBlocking = true) => {
+          console.log("创建事件: " + eventName, "阻塞: " + isBlocking);
+          
+          // 使用game-event.js中的GameEvent类
+          const event = new GameEvent(eventName, null, mockGame.eventManager);
+          
+          // 重写setContent方法，使其符合原始接口
+          const originalSetContent = event.setContent;
+          event.setContent = (contentFunc) => {
+            console.log("设置事件内容: " + eventName);
+            // 包装contentFunc，使其符合GameEvent的接口
+            const wrappedContent = (gameEvent) => {
+              try {
+                console.log("执行事件内容: " + eventName);
+                // 创建模拟参数
+                const mockEvent = {
+                  finish: () => {
+                    console.log("事件完成: " + eventName);
+                    gameEvent.finish();
+                  },
+                  getParent: event.getParent.bind(event)
+                };
+                const mockPlayer = {
+                  name: "玩家",
+                  getId: () => console.log("获取玩家ID")
+                };
+                // 执行原始内容函数
+                return contentFunc(mockEvent, null, mockPlayer);
+              } catch (error) {
+                console.error("执行事件内容时出错: " + error.message, error.stack);
+                throw error;
+              }
+            };
+            return originalSetContent.call(event, wrappedContent);
+          };
+          
+          // 添加finish方法的别名
+          event.finish = event.finish.bind(event);
+          event.trigger = event.trigger.bind(event);
+          
+          return event;
         },
         
         addMode: (name, module, config) => {
@@ -220,13 +278,24 @@ const server = http.createServer((req, res) => {
           current: null,
           list: []
         },
+        // 使用EventManager管理事件
+        eventManager: new EventManager(),
+        event: {
+          on: (name, listener) => {
+            console.log("注册事件监听器:", name);
+            mockGame.eventManager.on(name, listener);
+          },
+          off: (name, listener) => {
+            console.log("移除事件监听器:", name);
+            mockGame.eventManager.off(name, listener);
+          },
+          emit: (name, data) => {
+            console.log("触发事件:", name, data);
+            mockGame.eventManager.emitEvent(name, data);
+          }
+        },
         get: (key) => null,
         set: (key, value) => {},
-        event: {
-          on: () => {},
-          off: () => {},
-          emit: () => {}
-        }
       };
       
       // 模拟其他必要的对象
@@ -281,7 +350,22 @@ const server = http.createServer((req, res) => {
         const mockGet = {
             coreInfo: () => ['chrome', 135],
             mode: () => 'hearthstone',
-            character: (name) => null
+            character: (name) => null,
+            HSF: (funcName, args) => {
+                console.log("调用get.HSF方法:", funcName, args);
+                if (funcName === "cfg") {
+                    // 处理配置请求
+                    const configKey = args[0];
+                    console.log("获取配置:", configKey);
+                    // 返回默认配置值
+                    if (configKey === "HS_duelMode") {
+                        console.log("返回HS_duelMode配置值: legend");
+                        return "legend"; // 默认模式，用户指出最可能是legend
+                    }
+                    return null;
+                }
+                return null;
+            }
         };
         
         // 导出所有必要的对象
