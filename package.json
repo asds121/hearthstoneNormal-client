@@ -1,0 +1,23 @@
+{
+  "name": "noname-extensions-client",
+  "version": "1.0.0",
+  "description": "通用无名杀扩展运行环境",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node simple-loader.js",
+    "debug": "node index.js",
+    "start-client": "node hearthstone-client.js"
+  },
+  "keywords": [
+    "noname",
+    "extension",
+    "hearthstone"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^5.2.1",
+    "ws": "^8.18.3"
+  }
+}

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>炉石普通 - 专用客户端</title>
+    <!-- 引入炉石CSS样式 -->
+    <link rel="stylesheet" href="../extension/炉石普通/experiment/style/HS.css">
+    <link rel="stylesheet" href="./styles/main.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <div id="loading">
+            <div class="loading-spinner"></div>
+            <div>正在加载炉石普通...</div>
+        </div>
+        <div id="game-area"></div>
+    </div>
+
+    <div id="controls">
+        <button id="toggle-log">显示/隐藏日志</button>
+        <button id="refresh-game">刷新游戏</button>
+    </div>
+
+    <div id="logs" style="display: none;">
+        <div class="log-entry log-info">欢迎使用炉石普通专用客户端</div>
+    </div>
+
+    <div id="status">
+        状态: 加载中
+    </div>
+
+    <!-- 应用初始化 - 使用立即执行函数确保DOM加载完成 -->
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', async () => {
+            // 动态创建并加载模块脚本
+            const script = document.createElement('script');
+            script.type = 'module';
+            script.src = './js/app-init.js';
+
+            script.onload = () => {
+                console.log('应用初始化脚本加载成功');
+            };
+
+            script.onerror = (error) => {
+                console.error('应用初始化脚本加载失败:', error);
+                const statusEl = document.getElementById('status');
+                if (statusEl) {
+                    statusEl.textContent = '状态: 加载失败';
+                }
+            };
+
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+
+</html>
