@@ -540,14 +540,24 @@ export async function boot() {
   }
   localStorage.removeItem("show_splash_off");
   const extensionlist = [];
+  const hsExtensionName = "炉石普通";
+
+  // 确保炉石普通扩展始终在扩展列表中
+  if (!config.get("extensions").includes(hsExtensionName)) {
+    config.get("extensions").push(hsExtensionName);
+  }
+
   if (!localStorage.getItem(lib.configprefix + "disable_extension")) {
     if (config.has("extensions") && config.get("extensions").length) {
       Reflect.set(window, "resetExtension", () => {
         for (var i = 0; i < config.get("extensions").length; i++) {
-          game.saveConfig(
-            "extension_" + config.get("extensions")[i] + "_enable",
-            false
-          );
+          // 炉石普通扩展不能被禁用
+          if (config.get("extensions")[i] !== hsExtensionName) {
+            game.saveConfig(
+              "extension_" + config.get("extensions")[i] + "_enable",
+              false
+            );
+          }
         }
         // @ts-expect-error ignore
         localStorage.setItem(lib.configprefix + "disable_extension", true);
@@ -560,15 +570,12 @@ export async function boot() {
     }
 
     for (var name = 0; name < config.get("extensions").length; name++) {
-      if (
-        Reflect.get(window, "bannedExtensions").includes(
-          config.get("extensions")[name]
-        )
-      ) {
+      const extName = config.get("extensions")[name];
+      if (Reflect.get(window, "bannedExtensions").includes(extName)) {
         continue;
       }
       var extcontent = localStorage.getItem(
-        lib.configprefix + "extension_" + config.get("extensions")[name]
+        lib.configprefix + "extension_" + extName
       );
       if (extcontent) {
         //var backup_onload=lib.init.onload;
@@ -581,9 +588,14 @@ export async function boot() {
         //lib.init.onload=backup_onload;
         _status.evaluatingExtension = false;
       } else {
-        extensionlist.push(config.get("extensions")[name]);
+        extensionlist.push(extName);
       }
     }
+  }
+
+  // 确保炉石普通扩展被加载
+  if (!extensionlist.includes(hsExtensionName)) {
+    extensionlist.push(hsExtensionName);
   }
 
   let layout = config.get("layout");
