@@ -1,180 +1,214 @@
-import { menuContainer, popupContainer, updateActive, setUpdateActive, updateActiveCard, setUpdateActiveCard, menux, menuxpages, menuUpdates, openMenu, clickToggle, clickSwitcher, clickContainer, clickMenuItem, createMenu, createConfig } from "../index.js";
+import {
+  menuContainer,
+  popupContainer,
+  updateActive,
+  setUpdateActive,
+  updateActiveCard,
+  setUpdateActiveCard,
+  menux,
+  menuxpages,
+  menuUpdates,
+  openMenu,
+  clickToggle,
+  clickSwitcher,
+  clickContainer,
+  clickMenuItem,
+  createMenu,
+  createConfig,
+} from "../index.js";
 import { ui, game, get, ai, lib, _status } from "../../../../../noname.js";
 import { nonameInitialized } from "../../../../util/index.js";
 import security from "../../../../util/security.js";
 import { Character } from "../../../../library/element/character.js";
 
 export const extensionMenu = function (connectMenu) {
-	if (connectMenu) {
-		return;
-	}
-	/**
-	 * 由于联机模式会创建第二个菜单，所以需要缓存一下可变的变量
-	 */
-	// const cacheMenuContainer = menuContainer;
-	// const cachePopupContainer = popupContainer;
-	// const cacheMenux = menux;
-	const cacheMenuxpages = menuxpages;
-	/** @type { HTMLDivElement } */
-	// @ts-expect-error ignore
-	var start = cacheMenuxpages.shift();
-	var rightPane = start.lastChild;
+  if (connectMenu) {
+    return;
+  }
+  /**
+   * 由于联机模式会创建第二个菜单，所以需要缓存一下可变的变量
+   */
+  // const cacheMenuContainer = menuContainer;
+  // const cachePopupContainer = popupContainer;
+  // const cacheMenux = menux;
+  const cacheMenuxpages = menuxpages;
+  /** @type { HTMLDivElement } */
+  // @ts-expect-error ignore
+  var start = cacheMenuxpages.shift();
+  var rightPane = start.lastChild;
 
-	var clickMode = function () {
-		if (this.mode == "get") {
-			this.update();
-		}
-		var active = this.parentNode.querySelector(".active");
-		if (active === this) {
-			return;
-		}
-		active.classList.remove("active");
-		active.link.remove();
-		active = this;
-		this.classList.add("active");
-		if (this.link) {
-			rightPane.appendChild(this.link);
-		} else {
-			this._initLink();
-			rightPane.appendChild(this.link);
-		}
-		updateNodes();
-	};
-	ui.click.extensionTab = function (name) {
-		ui.click.menuTab("扩展");
-		for (var i = 0; i < start.firstChild.childElementCount; i++) {
-			if (start.firstChild.childNodes[i].innerHTML == name) {
-				clickMode.call(start.firstChild.childNodes[i]);
-				break;
-			}
-		}
-	};
-	var updateNodes = function () {
-		for (var i = 0; i < start.firstChild.childNodes.length; i++) {
-			var node = start.firstChild.childNodes[i];
-			if (node.mode == "get") {
-				continue;
-			}
-			if (node.mode == "create") {
-				continue;
-			}
-			if (node.mode && node.mode.startsWith("extension_")) {
-				if (lib.config[node.mode + "_enable"]) {
-					node.classList.remove("off");
-					if (node.link) {
-						node.link.firstChild.classList.add("on");
-					}
-				} else {
-					node.classList.add("off");
-					if (node.link) {
-						node.link.firstChild.classList.remove("on");
-					}
-				}
-			} else {
-				if (lib.config.plays.includes(node.mode)) {
-					node.classList.remove("off");
-					if (node.link) {
-						node.link.firstChild.classList.add("on");
-					}
-				} else {
-					node.classList.add("off");
-					if (node.link) {
-						node.link.firstChild.classList.remove("on");
-					}
-				}
-			}
-		}
-	};
-	var togglePack = function (bool) {
-		var name = this._link.config._name;
-		if (name.startsWith("extension_")) {
-			if (bool) {
-				game.saveConfig(name, true);
-			} else {
-				game.saveConfig(name, false);
-			}
-		} else {
-			name = name.slice(0, name.indexOf("_enable_playpackconfig"));
-			if (bool) {
-				lib.config.plays.add(name);
-			} else {
-				lib.config.plays.remove(name);
-			}
-			game.saveConfig("plays", lib.config.plays);
-		}
-		if (this.onswitch) {
-			this.onswitch(bool);
-		}
-		updateNodes();
-	};
+  var clickMode = function () {
+    if (this.mode == "get") {
+      this.update();
+    }
+    var active = this.parentNode.querySelector(".active");
+    if (active === this) {
+      return;
+    }
+    active.classList.remove("active");
+    active.link.remove();
+    active = this;
+    this.classList.add("active");
+    if (this.link) {
+      rightPane.appendChild(this.link);
+    } else {
+      this._initLink();
+      rightPane.appendChild(this.link);
+    }
+    updateNodes();
+  };
+  ui.click.extensionTab = function (name) {
+    ui.click.menuTab("扩展");
+    for (var i = 0; i < start.firstChild.childElementCount; i++) {
+      if (start.firstChild.childNodes[i].innerHTML == name) {
+        clickMode.call(start.firstChild.childNodes[i]);
+        break;
+      }
+    }
+  };
+  var updateNodes = function () {
+    for (var i = 0; i < start.firstChild.childNodes.length; i++) {
+      var node = start.firstChild.childNodes[i];
+      if (node.mode == "get") {
+        continue;
+      }
+      if (node.mode == "create") {
+        continue;
+      }
+      if (node.mode && node.mode.startsWith("extension_")) {
+        if (lib.config[node.mode + "_enable"]) {
+          node.classList.remove("off");
+          if (node.link) {
+            node.link.firstChild.classList.add("on");
+          }
+        } else {
+          node.classList.add("off");
+          if (node.link) {
+            node.link.firstChild.classList.remove("on");
+          }
+        }
+      } else {
+        if (lib.config.plays.includes(node.mode)) {
+          node.classList.remove("off");
+          if (node.link) {
+            node.link.firstChild.classList.add("on");
+          }
+        } else {
+          node.classList.add("off");
+          if (node.link) {
+            node.link.firstChild.classList.remove("on");
+          }
+        }
+      }
+    }
+  };
+  var togglePack = function (bool) {
+    var name = this._link.config._name;
+    if (name.startsWith("extension_")) {
+      if (bool) {
+        game.saveConfig(name, true);
+      } else {
+        game.saveConfig(name, false);
+      }
+    } else {
+      name = name.slice(0, name.indexOf("_enable_playpackconfig"));
+      if (bool) {
+        lib.config.plays.add(name);
+      } else {
+        lib.config.plays.remove(name);
+      }
+      game.saveConfig("plays", lib.config.plays);
+    }
+    if (this.onswitch) {
+      this.onswitch(bool);
+    }
+    updateNodes();
+  };
 
-	var createModeConfig = function (mode, position) {
-		var page = ui.create.div("");
-		page.style.paddingBottom = "10px";
-		var node;
-		if (mode.startsWith("extension_")) {
-			node = ui.create.div(".menubutton.large", mode.slice(10), position, clickMode);
-		} else {
-			node = ui.create.div(".menubutton.large", lib.translate[mode + "_play_config"], position, clickMode);
-		}
-		if (node.innerHTML.length >= 5) {
-			node.classList.add("smallfont");
-		}
-		node.mode = mode;
-		// node._initLink=function(){
-		node.link = page;
-		for (var i in lib.extensionMenu[mode]) {
-			if (i == "game") {
-				continue;
-			}
-			var cfg = get.copy(lib.extensionMenu[mode][i]);
-			var j;
-			if (mode.startsWith("extension_")) {
-				j = mode + "_" + i;
-			} else {
-				j = mode + "_" + i + "_playpackconfig";
-			}
-			cfg._name = j;
-			if (j in lib.config) {
-				cfg.init = lib.config[j];
-			} else {
-				game.saveConfig(j, cfg.init);
-			}
+  var createModeConfig = function (mode, position) {
+    var page = ui.create.div("");
+    page.style.paddingBottom = "10px";
+    var node;
+    if (mode.startsWith("extension_")) {
+      node = ui.create.div(
+        ".menubutton.large",
+        mode.slice(10),
+        position,
+        clickMode
+      );
+    } else {
+      node = ui.create.div(
+        ".menubutton.large",
+        lib.translate[mode + "_play_config"],
+        position,
+        clickMode
+      );
+    }
+    if (node.innerHTML.length >= 5) {
+      node.classList.add("smallfont");
+    }
+    node.mode = mode;
+    // node._initLink=function(){
+    node.link = page;
+    for (var i in lib.extensionMenu[mode]) {
+      if (i == "game") {
+        continue;
+      }
+      var cfg = get.copy(lib.extensionMenu[mode][i]);
+      var j;
+      if (mode.startsWith("extension_")) {
+        j = mode + "_" + i;
+      } else {
+        j = mode + "_" + i + "_playpackconfig";
+      }
+      cfg._name = j;
+      if (j in lib.config) {
+        cfg.init = lib.config[j];
+      } else {
+        game.saveConfig(j, cfg.init);
+      }
 
-			if (i == "enable") {
-				cfg.onclick = togglePack;
-			} else if (!lib.extensionMenu[mode][i].onclick) {
-				cfg.onclick = function (result) {
-					var cfg = this._link.config;
-					game.saveConfig(cfg._name, result);
-				};
-			}
-			var cfgnode = createConfig(cfg);
-			if (cfg.onswitch) {
-				cfgnode.onswitch = cfg.onswitch;
-			}
-			page.appendChild(cfgnode);
-		}
-		// };
-		// if(!get.config('menu_loadondemand')) node._initLink();
-		return node;
-	};
-	let extensionsInMenu = Object.keys(lib.extensionMenu);
-	if (lib.config.extensionSort && Array.isArray(lib.config.extensionSort)) {
-		extensionsInMenu.sort((a, b) => {
-			return lib.config.extensionSort.indexOf(a) - lib.config.extensionSort.indexOf(b);
-		});
-	}
-	for (let i of extensionsInMenu) {
-		if (lib.config.all.stockextension.includes(i) && !lib.config.all.plays.includes(i)) {
-			continue;
-		}
-		if (lib.config.hiddenPlayPack.includes(i)) {
-			continue;
-		}
-		createModeConfig(i, start.firstChild);
-	}
-	(function () {
+      if (i == "enable") {
+        cfg.onclick = togglePack;
+      } else if (!lib.extensionMenu[mode][i].onclick) {
+        cfg.onclick = function (result) {
+          var cfg = this._link.config;
+          game.saveConfig(cfg._name, result);
+        };
+      }
+      var cfgnode = createConfig(cfg);
+      if (cfg.onswitch) {
+        cfgnode.onswitch = cfg.onswitch;
+      }
+      page.appendChild(cfgnode);
+    }
+    // };
+    // if(!get.config('menu_loadondemand')) node._initLink();
+    return node;
+  };
+  let extensionsInMenu = Object.keys(lib.extensionMenu);
+  if (lib.config.extensionSort && Array.isArray(lib.config.extensionSort)) {
+    extensionsInMenu.sort((a, b) => {
+      return (
+        lib.config.extensionSort.indexOf(a) -
+        lib.config.extensionSort.indexOf(b)
+      );
+    });
+  }
+  for (let i of extensionsInMenu) {
+    if (
+      lib.config.all.stockextension.includes(i) &&
+      !lib.config.all.plays.includes(i)
+    ) {
+      continue;
+    }
+    if (lib.config.hiddenPlayPack.includes(i)) {
+      continue;
+    }
+    createModeConfig(i, start.firstChild);
+  }
+  // 移除制作扩展功能
+  /* (function () {
 		if (!lib.device && !lib.db) {
 			return;
 		}
@@ -1559,1040 +1593,8 @@ export const extensionMenu = function (connectMenu) {
 					editnode.classList.add("disabled");
 					delnode.innerHTML = "取消";
 					delete delnode.button;
-					container.code = 'card={\n    \n}\n\n/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
-				};
-
-				newCard = ui.create.div(".new_character", page);
-				newCard.style.height = "173px";
-				var fakeme = ui.create.div(".card.fullskin", newCard);
-
-				var input = document.createElement("input");
-				input.type = "file";
-				input.accept = "image/*";
-				input.className = "fileinput";
-				input.onchange = function () {
-					var fileToLoad = input.files[0];
-					if (fileToLoad) {
-						var fileReader = new FileReader();
-						var fullimage = fileToLoad.name.includes(".jpg");
-						fileReader.onload = function (fileLoadedEvent) {
-							var data = fileLoadedEvent.target.result;
-							if (fullimage) {
-								fakeme.imagenode.style.backgroundImage = "";
-								fakeme.style.backgroundImage = "url(" + data + ")";
-								fakeme.classList.remove("fullskin");
-							} else {
-								fakeme.style.backgroundImage = "";
-								fakeme.imagenode.style.backgroundImage = "url(" + data + ")";
-								fakeme.classList.add("fullskin");
-							}
-							fakeme.image64 = data;
-							fakeme.classList.add("inited");
-							var fileReader = new FileReader();
-							fileReader.onload = function (fileLoadedEvent) {
-								fakeme.image = fileLoadedEvent.target.result;
-								updateButton();
-							};
-							fileReader.readAsArrayBuffer(fileToLoad, "UTF-8");
-						};
-						fileReader.readAsDataURL(fileToLoad, "UTF-8");
-					}
-				};
-				fakeme.appendChild(input);
-
-				fakeme.imagenode = ui.create.div(".image", fakeme);
-				ui.create.div(".name", "选择背景", fakeme);
-
-				ui.create.div(".indent", '名称：<input class="new_name" type="text">', newCard).style.paddingTop = "8px";
-				ui.create.div(".indent", '描述：<input class="new_description" type="text">', newCard).style.paddingTop = "6px";
-				newCard.querySelector("input.new_name").onblur = updateButton;
-				var codeButton = document.createElement("button");
-				newCard.appendChild(codeButton);
-				codeButton.innerHTML = "编辑代码";
-				codeButton.style.left = "123px";
-				codeButton.style.top = "66px";
-				codeButton.style.position = "absolute";
-
-				var citeButton = document.createElement("button");
-				newCard.appendChild(citeButton);
-				citeButton.innerHTML = "引用代码";
-				citeButton.style.left = "123px";
-				citeButton.style.top = "90px";
-				citeButton.style.position = "absolute";
-				citeButton.onclick = function () {
-					codeButton.style.display = "none";
-					citeButton.style.display = "none";
-					selectname.style.display = "";
-					confirmcontainer.style.display = "";
-				};
-
-				var list = [];
-				for (var i in lib.card) {
-					if (lib.translate[i]) {
-						list.push([i, lib.translate[i]]);
-					}
-				}
-				list.sort(function (a, b) {
-					a = a[0];
-					b = b[0];
-					var aa = a,
-						bb = b;
-					if (aa.includes("_")) {
-						aa = aa.slice(aa.lastIndexOf("_") + 1);
-					}
-					if (bb.includes("_")) {
-						bb = bb.slice(bb.lastIndexOf("_") + 1);
-					}
-					if (aa != bb) {
-						return aa > bb ? 1 : -1;
-					}
-					return a > b ? 1 : -1;
-				});
-				var selectname = ui.create.selectlist(list, list[0], newCard);
-				selectname.style.left = "123px";
-				selectname.style.top = "66px";
-				selectname.style.position = "absolute";
-				selectname.style.display = "none";
-
-				var confirmcontainer = ui.create.div(newCard);
-				confirmcontainer.style.left = "123px";
-				confirmcontainer.style.top = "90px";
-				confirmcontainer.style.position = "absolute";
-				confirmcontainer.style.display = "none";
-
-				var citeconfirm = document.createElement("button");
-				citeconfirm.innerHTML = "引用";
-				confirmcontainer.appendChild(citeconfirm);
-				citeconfirm.onclick = function () {
-					codeButton.style.display = "";
-					citeButton.style.display = "";
-					selectname.style.display = "none";
-					confirmcontainer.style.display = "none";
-					container.code = "card=" + get.stringify(lib.card[selectname.value]);
-					codeButton.onclick.call(codeButton);
-					if (lib.translate[selectname.value + "_info"]) {
-						newCard.querySelector("input.new_description").value = lib.translate[selectname.value + "_info"];
-					}
-				};
-
-				var citecancel = document.createElement("button");
-				citecancel.innerHTML = "取消";
-				citecancel.style.marginLeft = "3px";
-				confirmcontainer.appendChild(citecancel);
-				citecancel.onclick = function () {
-					codeButton.style.display = "";
-					citeButton.style.display = "";
-					selectname.style.display = "none";
-					confirmcontainer.style.display = "none";
-				};
-
-				codeButton.onclick = function () {
-					var node = container;
-					ui.window.classList.add("shortcutpaused");
-					ui.window.classList.add("systempaused");
-					window.saveNonameInput = saveInput;
-					if (node.aced) {
-						ui.window.appendChild(node);
-						node.editor.setValue(node.code, 1);
-					} else if (lib.device == "ios") {
-						ui.window.appendChild(node);
-						if (!node.textarea) {
-							var textarea = document.createElement("textarea");
-							editor.appendChild(textarea);
-							node.textarea = textarea;
-							lib.setScroll(textarea);
-						}
-						node.textarea.value = node.code;
-					} else {
-						if (!window.CodeMirror) {
-							import("../../../../../game/codemirror.js").then(() => {
-								lib.codeMirrorReady(node, editor);
-							});
-							lib.init.css(lib.assetURL + "layout/default", "codemirror");
-						} else {
-							lib.codeMirrorReady(node, editor);
-						}
-					}
-				};
-
-				var container = ui.create.div(".popup-container.editor");
-				var saveInput = function () {
-					var code;
-					if (container.editor) {
-						code = container.editor.getValue();
-					} else if (container.textarea) {
-						code = container.textarea.value;
-					}
-					try {
-						var { card } = security.exec2(code);
-						if (card == null || typeof card != "object") {
-							throw "err";
-						}
-					} catch (e) {
-						if (e == "err") {
-							alert("代码格式有错误，请对比示例代码仔细检查");
-						} else {
-							var tip = lib.getErrorTip(e) || "";
-							alert("代码语法有错误，请仔细检查（" + e + "）" + tip);
-						}
-						window.focus();
-						if (container.editor) {
-							container.editor.focus();
-						} else if (container.textarea) {
-							container.textarea.focus();
-						}
-						return;
-					}
-					dash2.link.classList.add("active");
-					ui.window.classList.remove("shortcutpaused");
-					ui.window.classList.remove("systempaused");
-					container.delete();
-					container.code = code;
-					delete window.saveNonameInput;
-				};
-				var editor = ui.create.editor(container, saveInput);
-				container.code = 'card={\n    \n}\n\n/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
-
-				var editnode = ui.create.div(".menubutton.large.new_card.disabled", "创建卡牌", newCard, function () {
-					var name = page.querySelector("input.new_name").value;
-					if (!name) {
-						alert("请填写卡牌名\n提示：卡牌名格式为id+|+中文名，其中id必须惟一");
-						return;
-					}
-					name = name.split("|");
-					var translate = name[1] || name[0];
-					var info = page.querySelector("input.new_description").value;
-					name = name[0];
-					if (currentButton) {
-						if (currentButton.link != name) {
-							if (lib.card[name] || page.content.pack.card[name]) {
-								alert("卡牌名与现有卡牌重复，请更改\n提示：卡牌名格式为id+|+中文名，其中id必须惟一");
-								return;
-							}
-							var extname;
-							if (currentButton.classList.contains("fullskin")) {
-								extname = ".png";
-							} else {
-								extname = ".jpg";
-							}
-							page.content.image[name + extname] = page.content.image[currentButton.link + extname];
-							delete page.content.image[currentButton.link + extname];
-							delete page.content.pack.card[currentButton.link];
-							delete page.content.pack.translate[currentButton.link];
-							delete page.content.pack.translate[currentButton.link + "_info"];
-							currentButton.link = name;
-						}
-					} else {
-						if (lib.card[name] || page.content.pack.card[name]) {
-							alert("卡牌名与现有卡牌重复，请更改\n提示：卡牌名格式为id+|+中文名，其中id必须惟一");
-							return;
-						}
-					}
-					if (fakeme.image) {
-						if (fakeme.classList.contains("fullskin")) {
-							page.content.image[name + ".png"] = fakeme.image;
-							delete page.content.image[name + ".jpg"];
-						} else {
-							page.content.image[name + ".jpg"] = fakeme.image;
-							delete page.content.image[name + ".png"];
-						}
-					} else if (!fakeme.classList.contains("inited")) {
-						alert("请选择一个卡牌背景");
-						return;
-					}
-					page.content.pack.translate[name] = translate;
-					page.content.pack.translate[name + "_info"] = info;
-					try {
-						var { card } = security.exec2(container.code);
-						if (card == null || typeof card != "object") {
-							throw "err";
-						}
-						page.content.pack.card[name] = card;
-					} catch (e) {
-						page.content.pack.card[name] = {};
-					}
-					if (fakeme.classList.contains("inited")) {
-						if (fakeme.classList.contains("fullskin")) {
-							page.content.pack.card[name].fullskin = true;
-							delete page.content.pack.card[name].fullimage;
-						} else {
-							page.content.pack.card[name].fullimage = true;
-							delete page.content.pack.card[name].fullskin;
-						}
-					}
-					if (this.innerHTML == "创建卡牌") {
-						createButton(name, fakeme.image64, fakeme.classList.contains("fullskin"));
-					} else if (currentButton) {
-						if (fakeme.image64) {
-							if (fakeme.classList.contains("fullskin")) {
-								currentButton.style.color = "";
-								currentButton.style.textShadow = "";
-								currentButton.imagenode.style.backgroundImage = "url(" + fakeme.image64 + ")";
-								currentButton.style.backgroundImage = "";
-								currentButton.style.backgroundSize = "";
-								currentButton.classList.add("fullskin");
-							} else {
-								currentButton.style.color = "white";
-								currentButton.style.textShadow = "black 0 0 2px";
-								currentButton.imagenode.style.backgroundImage = "";
-								currentButton.style.backgroundImage = "url(" + fakeme.image64 + ")";
-								currentButton.style.backgroundSize = "cover";
-								currentButton.classList.remove("fullskin");
-							}
-						}
-						currentButton.nodename.innerHTML = get.verticalStr(translate);
-					}
-					resetEditor();
-					updatePile();
-					dash2.link.classList.add("active");
-				});
-				var delnode = ui.create.div(".menubutton.large.new_card_delete", "取消", editnode.parentNode, function () {
-					if (this.innerHTML == "删除") {
-						this.button.remove();
-						var name = this.button.link;
-						delete dash2.content.pack.card[name];
-						delete dash2.content.pack.translate[name];
-						delete dash2.content.pack.translate[name + "_info"];
-						delete dash2.content.image[name];
-						updatePile();
-						dash2.link.classList.add("active");
-					}
-					resetEditor();
-				});
-
-				var editPile;
-				var toggle2 = ui.create.div(".config.more", "编辑牌堆 <div>&gt;</div>", page, function () {
-					this.classList.toggle("on");
-					if (this.classList.contains("on")) {
-						editPile.style.display = "";
-					} else {
-						editPile.style.display = "none";
-					}
-				});
-
-				editPile = ui.create.div(".edit_pile", page);
-				editPile.style.display = "none";
-
-				var cardpileadd = ui.create.div(".config.toggle.cardpilecfg.cardpilecfgadd", editPile);
-				var pile = ui.create.div(editPile);
-				page.pile = pile;
-				var cardpileaddname = document.createElement("select");
-				var updatePile = function () {
-					cardpileaddname.innerHTML = "";
-					var list = [];
-					var list2 = [];
-					for (var i in page.content.pack.card) {
-						list.push([i, page.content.pack.translate[i]]);
-						list2.push(i);
-					}
-					if (list.length) {
-						toggle2.style.display = "";
-						if (toggle2.classList.contains("on")) {
-							editPile.style.display = "";
-						} else {
-							editPile.style.display = "none";
-						}
-						for (var i = 0; i < list.length; i++) {
-							var option = document.createElement("option");
-							option.value = list[i][0];
-							option.innerHTML = list[i][1];
-							cardpileaddname.appendChild(option);
-						}
-						for (var i = 0; i < pile.childNodes.length; i++) {
-							if (!list2.includes(pile.childNodes[i].name)) {
-								pile.childNodes[i].remove();
-								i--;
-							}
-						}
-					} else {
-						toggle2.style.display = "none";
-						editPile.style.display = "none";
-						pile.innerHTML = "";
-					}
-				};
-				updatePile();
-				cardpileadd.appendChild(cardpileaddname);
-				cardpileaddname.style.width = "75px";
-				cardpileaddname.style.marginRight = "2px";
-				cardpileaddname.style.marginLeft = "-1px";
-				var cardpileaddsuit = ui.create.selectlist(
-					[
-						["heart", "红桃"],
-						["diamond", "方片"],
-						["club", "梅花"],
-						["spade", "黑桃"],
-					],
-					null,
-					cardpileadd
-				);
-				cardpileaddsuit.style.width = "53px";
-				cardpileaddsuit.style.marginRight = "2px";
-				var cardpileaddnumber = ui.create.selectlist([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13], null, cardpileadd);
-				cardpileaddnumber.style.width = "43px";
-				cardpileaddnumber.style.marginRight = "2px";
-				var button = document.createElement("button");
-				button.innerHTML = "确定";
-				button.style.width = "40px";
-				button.onclick = function () {
-					var card = [cardpileaddsuit.value, cardpileaddnumber.value, cardpileaddname.value];
-					var node = document.createElement("button");
-					node.innerHTML = page.content.pack.translate[card[2]] + " " + lib.translate[card[0]] + card[1];
-					node.name = card[2];
-					node.link = card;
-					pile.appendChild(node);
-					node.onclick = function () {
-						this.remove();
-					};
-				};
-				cardpileadd.appendChild(button);
-				cardpileadd.style.whiteSpace = "nowrap";
-				cardpileadd.style.position = "relative";
-				cardpileadd.style.right = "-4px";
-
-				return page;
-			})();
-			var dash3 = (function () {
-				var page = ui.create.div(".hidden.menu-buttons.new_skill");
-				var updateButton = function () {
-					var name = page.querySelector("input.new_name").value;
-					if (!name) {
-						editnode.classList.add("disabled");
-						return;
-					}
-					name = name.split("|");
-					name = name[0];
-					if (currentButton) {
-						if (currentButton.link != name) {
-							if (lib.skill[name] || page.content.pack.skill[name]) {
-								editnode.classList.add("disabled");
-								return;
-							}
-						}
-					} else {
-						if (lib.skill[name] || page.content.pack.skill[name]) {
-							editnode.classList.add("disabled");
-							return;
-						}
-					}
-					editnode.classList.remove("disabled");
-				};
-				page.init = function () {
-					if (!page.querySelector(".menubutton:not(.large)")) {
-						toggle.classList.add("on");
-						newSkill.style.display = "";
-					}
-				};
-				page.reset = function (name) {
-					resetEditor();
-					var buttons = page.querySelectorAll(".menubutton:not(.large)");
-					var list = [];
-					for (var i = 0; i < buttons.length; i++) {
-						list.push(buttons[i]);
-					}
-					for (var i = 0; i < list.length; i++) {
-						list[i].remove();
-					}
-					if (lib.extensionPack[name]) {
-						page.content.pack = lib.extensionPack[name].skill || {
-							skill: {},
-							translate: {},
-						};
-						page.content.audio = {};
-						for (var i in page.content.pack.skill) {
-							createButton(i);
-						}
-						dash1.updateSkill();
-					} else {
-						page.content = {
-							pack: {
-								skill: {},
-								translate: {},
-							},
-							audio: {},
-						};
-						toggle.classList.add("on");
-						newSkill.style.display = "";
-					}
-				};
-				ui.create.div(".config.more.margin-bottom", '<div style="transform:none;margin-right:3px">←</div>返回', page, function () {
-					ui.create.templayer();
-					page.hide();
-					if (page.fromchar) {
-						dash1.show();
-						delete page.fromchar;
-					} else {
-						pageboard.show();
-					}
-				});
-				var currentButton = null;
-				var clickButton = function () {
-					if (currentButton == this) {
-						resetEditor();
-						return;
-					}
-					resetEditor();
-					currentButton = this;
-					toggle.classList.add("on");
-					newSkill.style.display = "";
-					if (page.content.pack.translate[this.link] != this.link) {
-						newSkill.querySelector(".new_name").value = this.link + "|" + page.content.pack.translate[this.link];
-					} else {
-						newSkill.querySelector(".new_name").value = this.link;
-					}
-					newSkill.querySelector(".new_description").value = page.content.pack.translate[this.link + "_info"];
-					var info = page.content.pack.skill[this.link];
-					container.code =
-						"skill=" +
-						// 需要考虑getter和setter以及Symbol
-						(() => {
-							const obj = Object.defineProperty(get.copy(info), "_priority", {
-								enumerable: false,
-								writable: true,
-								configurable: true,
-							});
-							let str = "{\n";
-							const indent = "    ";
-							for (const key in obj) {
-								const descriptor = Object.getOwnPropertyDescriptor(obj, key);
-								if (descriptor?.get || descriptor?.set) {
-									if (descriptor.get) {
-										str += indent + get.stringify(descriptor.get, 1) + ",\n";
-									}
-									if (descriptor.set) {
-										str += indent + get.stringify(descriptor.set, 1) + ",\n";
-									}
-								} else {
-									let keyString = (/[^a-zA-Z]/.test(key) ? `"${key}"` : key) + ": ";
-									if (get.is.functionMethod(obj, key)) {
-										keyString = "";
-									}
-									str += indent + keyString + get.stringify(obj[key], 1) + ",\n";
-								}
-							}
-							Object.getOwnPropertySymbols(obj).forEach(symbol => {
-								str += `${indent}[${String(symbol)}]: ${get.stringify(obj[symbol], 1)},\n`;
-							});
-							str += "}";
-							return str;
-						})();
-					toggle.innerHTML = "编辑技能 <div>&gt;</div>";
-					editnode.innerHTML = "编辑技能";
-					editnode.classList.remove("disabled");
-					delnode.button = this;
-					delnode.innerHTML = "删除";
-				};
-				var createButton = function (name) {
-					var button = ui.create.div(".menubutton");
-					button.link = name;
-					button.innerHTML = page.content.pack.translate[name];
-					button.listen(clickButton);
-					page.insertBefore(button, page.childNodes[1]);
-				};
-				var newSkill;
-				var toggle = ui.create.div(".config.more.on", "创建技能 <div>&gt;</div>", page, function () {
-					this.classList.toggle("on");
-					if (this.classList.contains("on")) {
-						newSkill.style.display = "";
-					} else {
-						newSkill.style.display = "none";
-					}
-				});
-				page.toggle = toggle;
-				var resetEditor = function () {
-					currentButton = null;
-					toggle.classList.remove("on");
-					newSkill.style.display = "none";
-					var inputs = newSkill.querySelectorAll("input");
-					for (var i = 0; i < inputs.length; i++) {
-						inputs[i].value = "";
-					}
-					var inputs = newSkill.querySelectorAll("textarea");
-					for (var i = 0; i < inputs.length; i++) {
-						inputs[i].value = "";
-					}
-					toggle.innerHTML = "创建技能 <div>&gt;</div>";
-					editnode.innerHTML = "创建技能";
-					editnode.classList.add("disabled");
-					delnode.innerHTML = "取消";
-					delete delnode.button;
-					container.code = 'skill={\n    \n}\n\n/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
-					if (page.fromchar == "add") {
-						page.fromchar = true;
-					}
-				};
-
-				newSkill = ui.create.div(".new_character.new_skill", page);
-				page.newSkill = newSkill;
-				var namenode = ui.create.div(".config", '名称：<input class="new_name" type="text" style="width:120px"></input>', newSkill);
-				var descnode = ui.create.div(".config", '描述：<input class="new_description" type="text" style="width:120px"></input>', newSkill);
-				namenode.querySelector("input.new_name").onblur = updateButton;
-				var commandline = ui.create.div(".config", newSkill);
-				var editbutton = document.createElement("button");
-				editbutton.innerHTML = "编辑代码";
-				commandline.appendChild(editbutton);
-				editbutton.onclick = function () {
-					var node = container;
-					ui.window.classList.add("shortcutpaused");
-					ui.window.classList.add("systempaused");
-					window.saveNonameInput = saveInput;
-					if (node.aced) {
-						ui.window.appendChild(node);
-						node.editor.setValue(node.code, 1);
-					} else if (lib.device == "ios") {
-						ui.window.appendChild(node);
-						if (!node.textarea) {
-							var textarea = document.createElement("textarea");
-							editor.appendChild(textarea);
-							node.textarea = textarea;
-							lib.setScroll(textarea);
-						}
-						node.textarea.value = node.code;
-					} else {
-						if (!window.CodeMirror) {
-							import("../../../../../game/codemirror.js").then(() => {
-								lib.codeMirrorReady(node, editor);
-							});
-							lib.init.css(lib.assetURL + "layout/default", "codemirror");
-						} else {
-							lib.codeMirrorReady(node, editor);
-						}
-					}
-				};
-
-				var container = ui.create.div(".popup-container.editor");
-				var saveInput = function () {
-					var code;
-					if (container.editor) {
-						code = container.editor.getValue();
-					} else if (container.textarea) {
-						code = container.textarea.value;
-					}
-					try {
-						var { skill } = security.exec2(code);
-						if (skill == null || typeof skill != "object") {
-							throw "err";
-						}
-					} catch (e) {
-						if (e == "err") {
-							alert("代码格式有错误，请对比示例代码仔细检查");
-						} else {
-							var tip = lib.getErrorTip(e) || "";
-							alert("代码语法有错误，请仔细检查（" + e + "）" + tip);
-						}
-						window.focus();
-						if (container.editor) {
-							container.editor.focus();
-						} else if (container.textarea) {
-							container.textarea.focus();
-						}
-						return;
-					}
-					dash3.link.classList.add("active");
-					ui.window.classList.remove("shortcutpaused");
-					ui.window.classList.remove("systempaused");
-					container.delete();
-					container.code = code;
-					delete window.saveNonameInput;
-				};
-				var editor = ui.create.editor(container, saveInput);
-				container.code = 'skill={\n    \n}\n\n/*\n示例：\nskill={\n    trigger:{player:"phaseJieshuBegin"},\n    frequent:true,\n    content:function(){\n        player.draw()\n    }\n}\n此例为闭月代码\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
-
-				var citebutton = document.createElement("button");
-				citebutton.innerHTML = "引用代码";
-				commandline.appendChild(citebutton);
-				citebutton.onclick = function () {
-					editbutton.style.display = "none";
-					citebutton.style.display = "none";
-					selectname.style.display = "";
-					skillopt.style.display = "";
-					addSkillButton.style.display = "";
-					cancelSkillButton.style.display = "";
-				};
-
-				var list = [];
-				for (var i in lib.character) {
-					if (lib.character[i][3].length) {
-						list.push([i, lib.translate[i]]);
-					}
-				}
-				if (!list.length) {
-					if (!lib.character["noname_sunce"]) {
-						lib.character["noname_sunce"] = new Character({
-							sex: "male",
-							group: "wu",
-							hp: 4,
-							skills: ["jiang"],
-							isUnseen: true,
-						});
-					}
-					if (!lib.translate["noname_sunce"]) {
-						lib.translate["noname_sunce"] = "孙策";
-					}
-					list.push(["noname_sunce", lib.translate["noname_sunce"]]);
-				}
-				list.sort(function (a, b) {
-					a = a[0];
-					b = b[0];
-					var aa = a,
-						bb = b;
-					if (aa.includes("_")) {
-						aa = aa.slice(aa.lastIndexOf("_") + 1);
-					}
-					if (bb.includes("_")) {
-						bb = bb.slice(bb.lastIndexOf("_") + 1);
-					}
-					if (aa != bb) {
-						return aa > bb ? 1 : -1;
-					}
-					return a > b ? 1 : -1;
-				});
-				list.push(["others", "其它"]);
-				var list2 = [];
-				var skills = lib.character[list[0][0]][3];
-				for (var i = 0; i < skills.length; i++) {
-					list2.push([skills[i], lib.translate[skills[i]]]);
-				}
-				var selectname = ui.create.selectlist(list, list[0], commandline);
-				var list3 = [];
-				for (var i in lib.skill) {
-					if (i != "global" && !get.is.empty(lib.skill[i]) && !lib.skilllist.includes(i)) {
-						list3.push(i);
-					}
-				}
-				list3.sort(function (a, b) {
-					return a > b ? 1 : -1;
-				});
-				selectname.onchange = function () {
-					var skills;
-					skillopt.innerHTML = "";
-					if (this.value == "others") {
-						skills = list3;
-						for (var i = 0; i < skills.length; i++) {
-							var option = document.createElement("option");
-							option.value = skills[i];
-							option.innerHTML = skills[i];
-							skillopt.appendChild(option);
-						}
-					} else {
-						skills = lib.character[this.value][3];
-						for (var i = 0; i < skills.length; i++) {
-							var option = document.createElement("option");
-							option.value = skills[i];
-							option.innerHTML = lib.translate[skills[i]];
-							skillopt.appendChild(option);
-						}
-					}
-				};
-				selectname.style.display = "none";
-				selectname.style.maxWidth = "80px";
-				var skillopt = ui.create.selectlist(list2, list2[0], commandline);
-				skillopt.style.display = "none";
-				skillopt.style.maxWidth = "60px";
-				var addSkillButton = document.createElement("button");
-				addSkillButton.style.display = "none";
-				addSkillButton.innerHTML = "引用";
-				commandline.appendChild(addSkillButton);
-				addSkillButton.onclick = function () {
-					editbutton.style.display = "";
-					citebutton.style.display = "";
-					selectname.style.display = "none";
-					skillopt.style.display = "none";
-					addSkillButton.style.display = "none";
-					cancelSkillButton.style.display = "none";
-					container.code =
-						"skill=" +
-						// 需要考虑getter和setter以及Symbol
-						(() => {
-							const obj = Object.defineProperty(get.copy(lib.skill[skillopt.value]), "_priority", {
-								enumerable: false,
-								writable: true,
-								configurable: true,
-							});
-							let str = "{\n";
-							const indent = "    ";
-							for (const key in obj) {
-								const descriptor = Object.getOwnPropertyDescriptor(obj, key);
-								if (descriptor?.get || descriptor?.set) {
-									if (descriptor.get) {
-										str += indent + get.stringify(descriptor.get, 1) + ",\n";
-									}
-									if (descriptor.set) {
-										str += indent + get.stringify(descriptor.set, 1) + ",\n";
-									}
-								} else {
-									let keyString = (/[^a-zA-Z]/.test(key) ? `"${key}"` : key) + ": ";
-									if (get.is.functionMethod(obj, key)) {
-										keyString = "";
-									}
-									str += indent + keyString + get.stringify(obj[key], 1) + ",\n";
-								}
-							}
-							Object.getOwnPropertySymbols(obj).forEach(symbol => {
-								str += `${indent}[${String(symbol)}]: ${get.stringify(obj[symbol], 1)},\n`;
-							});
-							str += "}";
-							return str;
-						})();
-					editbutton.onclick.call(editbutton);
-					if (lib.translate[skillopt.value + "_info"]) {
-						newSkill.querySelector("input.new_description").value = lib.translate[skillopt.value + "_info"];
-					}
-				};
-				var cancelSkillButton = document.createElement("button");
-				cancelSkillButton.style.display = "none";
-				cancelSkillButton.innerHTML = "取消";
-				commandline.appendChild(cancelSkillButton);
-				cancelSkillButton.onclick = function () {
-					editbutton.style.display = "";
-					citebutton.style.display = "";
-					selectname.style.display = "none";
-					skillopt.style.display = "none";
-					addSkillButton.style.display = "none";
-					cancelSkillButton.style.display = "none";
-				};
-
-				var editnode = ui.create.div(
-					".menubutton.large.new_skill.disabled",
-					"创建技能",
-					function () {
-						var name = page.querySelector("input.new_name").value;
-						if (!name) {
-							alert("请填写技能名\n提示：技能名格式为id+|+中文名，其中id必须惟一");
-							return;
-						}
-						name = name.split("|");
-						var translate = name[1] || name[0];
-						var info = page.querySelector("input.new_description").value;
-						name = name[0];
-						if (currentButton) {
-							if (currentButton.link != name) {
-								if (lib.skill[name] || page.content.pack.skill[name]) {
-									alert("技能名与现有技能重复，请更改\n提示：技能名格式为id+|+中文名，其中id必须惟一");
-									return;
-								}
-								delete page.content.pack.skill[currentButton.link];
-								delete page.content.pack.translate[currentButton.link];
-								delete page.content.pack.translate[currentButton.link + "_info"];
-								currentButton.link = name;
-							}
-						} else {
-							if (lib.skill[name] || page.content.pack.skill[name]) {
-								alert("技能名与现有技能重复，请更改\n提示：技能名格式为id+|+中文名，其中id必须惟一");
-								return;
-							}
-						}
-						page.content.pack.translate[name] = translate;
-						page.content.pack.translate[name + "_info"] = info;
-						try {
-							var { skill } = security.exec2(container.code);
-							if (skill == null || typeof skill != "object") {
-								throw "err";
-							}
-							page.content.pack.skill[name] = skill;
-						} catch (e) {
-							page.content.pack.skill[name] = {};
-						}
-						dash1.selectname.value = "current_extension";
-						dash1.selectname.onchange.call(dash1.selectname);
-						if (this.innerHTML == "创建技能") {
-							createButton(name);
-							if (page.fromchar == "add") {
-								ui.create.templayer();
-								page.hide();
-								dash1.show();
-								dash1.skillopt.value = name;
-								dash1.addSkillButton.onclick();
-								delete page.fromchar;
-							}
-						} else if (currentButton) {
-							currentButton.innerHTML = translate;
-						}
-						resetEditor();
-						dash3.link.classList.add("active");
-						dash1.updateSkill();
-					},
-					newSkill
-				);
-				var delnode = ui.create.div(".menubutton.large.new_card_delete", "取消", editnode.parentNode, function () {
-					if (this.innerHTML == "删除") {
-						this.button.remove();
-						var name = this.button.link;
-						delete dash3.content.pack.skill[name];
-						delete dash3.content.pack.translate[name];
-						delete dash3.content.pack.translate[name + "_info"];
-						dash3.link.classList.add("active");
-						if (get.is.empty(dash3.content.pack.skill)) {
-							dash1.selectname.value = dash1.selectname.childNodes[1].value;
-						}
-						dash1.selectname.onchange.call(dash1.selectname);
-						dash1.updateSkill();
-						resetEditor();
-					} else if (page.fromchar == "add") {
-						ui.create.templayer();
-						page.hide();
-						dash1.show();
-						delete page.fromchar;
-						setTimeout(resetEditor, 600);
-					} else {
-						resetEditor();
-					}
-				});
-
-				page.content = {
-					pack: {
-						skill: {},
-						translate: {},
-					},
-					audio: {},
-				};
-				return page;
-			})();
-			var dash4 = (function () {
-				var page = ui.create.div(".hidden.menu-buttons");
-				ui.create.div(".config.more.margin-bottom", '<div style="transform:none;margin-right:3px">←</div>返回', page, function () {
-					ui.create.templayer();
-					page.hide();
-					pageboard.show();
-				});
-				page.reset = function (name) {
-					page.content = {};
-					if (lib.extensionPack[name]) {
-						for (var i in dashes) {
-							dashes[i].node.code = "";
-						}
-						for (var i in lib.extensionPack[name].code) {
-							switch (typeof lib.extensionPack[name].code[i]) {
-								case "function":
-									page.content[i] = lib.extensionPack[name].code[i].toString();
-									break;
-								case "object":
-									page.content[i] = i + "=" + get.stringify(lib.extensionPack[name].code[i]);
-									break;
-							}
-						}
-						for (var i in page.content) {
-							dashes[i].node.code = page.content[i] || "";
-						}
-					} else {
-						dashes.arenaReady.node.code = "function(){\n    \n}\n\n/*\n函数执行时机为界面创建之后\n导出时本段代码中的换行、缩进以及注释将被清除\n*/";
-						dashes.content.node.code = "function(config,pack){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*/";
-						dashes.prepare.node.code = "function(){\n    \n}\n\n/*\n函数执行时机玩游戏扩展加载之后\n导出时本段代码中的换行、缩进以及注释将被清除\n*/";
-						dashes.precontent.node.code = "function(){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之前，联机模式亦可加载\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*/";
-						dashes.config.node.code = 'config={\n    \n}\n\n/*\n示例：\nconfig={\n    switcher_example:{\n    name:"示例列表选项",\n        init:"3",\n        item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
-						dashes.help.node.code = 'help={\n    \n}\n\ns/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*/';
-					}
-				};
-				var dashes = {};
-				var createCode = function (str1, str2, sub, func, link, str) {
-					var dash = ui.create.div(".menubutton.large.dashboard");
-					dashes[link] = dash;
-					sub.appendChild(dash);
-					dash.listen(func);
-					dash.link = link;
-					ui.create.div("", str1, dash);
-					ui.create.div("", str2, dash);
-					var container = ui.create.div(".popup-container.editor");
-					var saveInput = function () {
-						var code;
-						if (container.editor) {
-							code = container.editor.getValue();
-						} else if (container.textarea) {
-							code = container.textarea.value;
-						}
-						try {
-							if (["arenaReady", "content", "prepare", "precontent"].includes(link)) {
-								var { func } = security.exec2(`func = ${code}`);
-								if (typeof func != "function") {
-									throw "err";
-								}
-							} else if (link == "config") {
-								var { config } = security.exec2(code);
-								if (config == null || typeof config != "object") {
-									throw "err";
-								}
-							} else if (link == "help") {
-								var { help } = security.exec2(code);
-								if (help == null || typeof help != "object") {
-									throw "err";
-								}
-							}
-						} catch (e) {
-							if (e == "err") {
-								alert("代码格式有错误，请对比示例代码仔细检查");
-							} else {
-								var tip = lib.getErrorTip(e) || "";
-								alert("代码语法有错误，请仔细检查（" + e + "）" + tip);
-							}
-							window.focus();
-							if (container.editor) {
-								container.editor.focus();
-							} else if (container.textarea) {
-								container.textarea.focus();
-							}
-							return;
-						}
-						dash4.link.classList.add("active");
-						ui.window.classList.remove("shortcutpaused");
-						ui.window.classList.remove("systempaused");
-						container.delete();
-						container.code = code;
-						page.content[link] = code;
-						delete window.saveNonameInput;
-					};
-					var editor = ui.create.editor(container, saveInput);
-					container.code = str;
-					dash.editor = editor;
-					dash.node = container;
-					dash.saveInput = saveInput;
-					page.content[link] = str;
-				};
-				var clickCode = function () {
-					var node = this.node;
-					ui.window.classList.add("shortcutpaused");
-					ui.window.classList.add("systempaused");
-					window.saveNonameInput = this.saveInput;
-					if (node.aced) {
-						ui.window.appendChild(node);
-						node.editor.setValue(node.code, 1);
-					} else if (lib.device == "ios") {
-						ui.window.appendChild(node);
-						if (!node.textarea) {
-							var textarea = document.createElement("textarea");
-							this.editor.appendChild(textarea);
-							node.textarea = textarea;
-							lib.setScroll(textarea);
-						}
-						node.textarea.value = node.code;
-					} else {
-						if (!window.CodeMirror) {
-							import("../../../../../game/codemirror.js").then(() => {
-								lib.codeMirrorReady(node, this.editor);
-							});
-							lib.init.css(lib.assetURL + "layout/default", "codemirror");
-						} else {
-							lib.codeMirrorReady(node, this.editor);
-						}
-					}
-				};
-				page.content = {};
-				createCode("辅", "辅助代码", page, clickCode, "arenaReady", "function(){\n    \n}\n\n/*\n函数执行时机为游戏界面创建之后\n导出时本段代码中的换行、缩进以及注释将被清除\n*/");
-				createCode("主", "主代码", page, clickCode, "content", "function(config,pack){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之后、界面加载之前\n参数1扩展选项（见选项代码）；参数2为扩展定义的武将、卡牌和技能等（可在此函数中修改）\n导出时本段代码中的换行、缩进以及注释将被清除\n*/");
-				createCode("预", "预备代码", page, clickCode, "prepare", "function(){\n    \n}\n\n/*\n函数执行时机为游戏扩展全部加载之后\n导出时本段代码中的换行、缩进以及注释将被清除\n*/");
-				createCode("启", "启动代码", page, clickCode, "precontent", "function(){\n    \n}\n\n/*\n函数执行时机为游戏数据加载之前，联机模式亦可加载\n除添加模式外请慎用\n导出时本段代码中的换行、缩进以及注释将被清除\n*/");
-				createCode("选", "选项代码", page, clickCode, "config", 'config={\n    \n}\n\n/*\n示例：\nconfig={\n    switcher_example:{\n        name:"示例列表选项",\n        init:"3",\n     	  item:{"1":"一","2":"二","3":"三"}\n    },\n    toggle_example:{\n        name:"示例开关选项",\n        init:true\n    }\n}\n此例中传入的主代码函数的默认参数为{switcher_example:"3",toggle_example:true}\n导出时本段代码中的换行、缩进以及注释将被清除\n*/');
-				createCode("帮", "帮助代码", page, clickCode, "help", 'help={\n    \n}\n\n/*\n示例：\nhelp={\n    "帮助条目":"<ul><li>列表1-条目1<li>列表1-条目2</ul><ol><li>列表2-条目1<li>列表2-条目2</ul>"\n}\n帮助内容将显示在菜单－选项－帮助中\n导出时本段代码中的换行、缩进以及注释将被清除\n*/');
-
-				return page;
-			})();
-			createDash("将", "编辑武将", dash1);
-			createDash("卡", "编辑卡牌", dash2);
-			createDash("技", "编辑技能", dash3);
-			createDash("码", "编辑代码", dash4);
-		};
-		if (!get.config("menu_loadondemand")) {
-			node._initLink();
-		}
-	})();
+					container.code = 'card={\n    \n}\n\n/*\n示例：\ncard={\n    type:"basic",\n    enable:true,\n    filterTarget:true,\n    content:function(){\n        target.draw()\n    },\n    ai:{\n        order:1,\n        result:{\n            target:1\n        }\n    }\n}\n此例的效果为目标摸一张牌\n导出时本段代码中的换行、缩进以及注释将被清除\n*/
+  /* 移除获取扩展功能
 	(function () {
 		var page = ui.create.div("");
 		var node = ui.create.div(".menubutton.large", "获取扩展", start.firstChild, clickMode);
@@ -2927,15 +1929,15 @@ export const extensionMenu = function (connectMenu) {
 		if (!get.config("menu_loadondemand")) {
 			node._initLink();
 		}
-	})();
-	var active = start.firstChild.querySelector(".active");
-	if (!active) {
-		active = start.firstChild.firstChild;
-		active.classList.add("active");
-	}
-	if (!active.link) {
-		active._initLink();
-	}
-	rightPane.appendChild(active.link);
-	updateNodes();
+	})(); */
+  var active = start.firstChild.querySelector(".active");
+  if (!active) {
+    active = start.firstChild.firstChild;
+    active.classList.add("active");
+  }
+  if (!active.link) {
+    active._initLink();
+  }
+  rightPane.appendChild(active.link);
+  updateNodes();
 };
