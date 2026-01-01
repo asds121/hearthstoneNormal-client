@@ -158,10 +158,6 @@ export class UI {
 	 */
 	ordering;
 	/**
-	 * @type {HTMLDivElement}
-	 */
-	coin;
-	/**
 	 * @type {SMap<HTMLLinkElement | HTMLStyleElement>}
 	 */
 	css;

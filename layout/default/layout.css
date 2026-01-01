@@ -4648,24 +4648,7 @@ div[data-decoration="bronze"]::after {
 #window.canvas_top > canvas.fun {
 	z-index: 20;
 }
-.coin_menu .content > .caption > .coin_buy {
-	line-height: 36px;
-	font-family: "xinwei";
-	font-size: 24px;
-}
-.coin_menu .content > .caption > .coin_buy > .menubutton {
-	width: auto;
-	position: relative;
-	float: right;
-	padding-left: 5px;
-	padding-right: 5px;
-	height: auto;
-	font-size: 24px;
-	margin-left: 10px;
-}
-.coin_menu .content > .caption > .coin_buy > .menubutton.disabled {
-	opacity: 0.5;
-}
+
 
 .wunature {
 	font-family: "huangcao", "xinwei";

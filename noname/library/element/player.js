@@ -14226,21 +14226,7 @@ export class Player extends HTMLDivElement {
 		}
 		game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, time, "legend");
 	}
-	$coin() {
-		game.broadcast(function (player) {
-			if (!lib.config.low_performance) {
-				player.$coin();
-			}
-		}, this);
-		game.addVideo("flame", this, "coin");
-		var left = this.getLeft() - ui.arena.offsetLeft;
-		var top = this.getTop() - ui.arena.offsetTop;
-		if (this.classList.contains("minskin")) {
-			top += 15;
-		}
-		top -= 25;
-		game.animate.flame(left + this.offsetWidth / 2, top + this.offsetHeight - 30, 700, "coin");
-	}
+
 	$dust() {
 		game.broadcast(function (player) {
 			if (!lib.config.low_performance) {

@@ -188,14 +188,13 @@ window.config = {
   log_highlight: true,
 
   modeconfig: false,
-  gameconfig: false,
-  appearence: false,
-  video: "20",
-  coin: 0,
+	gameconfig: false,
+	appearence: false,
+	video: "20",
 
-  intro: "i",
-  right_click: "pause",
-  sort: "type_sort",
+	intro: "i",
+	right_click: "pause",
+	sort: "type_sort",
 
   cards: [],
   characters: [],

@@ -110,10 +110,6 @@ export class status {
 	 * @type { string | undefined }
 	 */
 	playback = undefined;
-	/**
-	 * @type { number | undefined }
-	 */
-	coinCoeff = undefined;
 	pauseManager = new PauseManager();
 	get paused() {
 		return this.pauseManager.pause.isStarted;

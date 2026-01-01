@@ -943,10 +943,7 @@ export const otherMenu = function (/** @type { boolean | undefined } */ connectM
 						}
 					}
 				}
-				if (ui.coin) {
-					game.changeCoin(-20);
-				}
-				clickContainer.call(cacheMenuContainer, connectMenu);
+					clickContainer.call(cacheMenuContainer, connectMenu);
 			}
 		});
 

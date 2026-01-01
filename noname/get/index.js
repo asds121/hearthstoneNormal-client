@@ -1836,44 +1836,7 @@ export class Get extends GetCompatible {
 		}
 		return lib.config.mode_config[mode][item];
 	}
-	coinCoeff(list) {
-		var num = 0;
-		for (var i = 0; i < list.length; i++) {
-			var rank = get.rank(list[i]);
-			switch (rank) {
-				case "sp":
-					return 0.1;
-				case "s":
-					num += 0.4;
-					break;
-				case "ap":
-					num += 0.6;
-					break;
-				case "a":
-					num += 0.8;
-					break;
-				case "am":
-					num += 0.95;
-					break;
-				case "bp":
-					num += 1.05;
-					break;
-				case "b":
-					num += 1.2;
-					break;
-				case "bm":
-					num += 1.4;
-					break;
-				case "c":
-					num += 1.6;
-					break;
-				case "d":
-					num += 1.8;
-					break;
-			}
-		}
-		return num / list.length;
-	}
+
 	rank(name, num) {
 		if (typeof name === "object" && name.name) {
 			name = name.name;

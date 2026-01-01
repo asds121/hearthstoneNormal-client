@@ -11278,11 +11278,7 @@ player.removeVirtualEquip(card);
 			}
 		}
 
-		if (typeof _status.coin == "number" && source && !_status.auto) {
-			if (source == game.me || source.isUnderControl()) {
-				_status.coin += 10;
-			}
-		}
+
 		if (source && lib.config.border_style == "auto" && (lib.config.autoborder_count == "kill" || lib.config.autoborder_count == "mix")) {
 			switch (source.node.framebg.dataset.auto) {
 				case "gold":
