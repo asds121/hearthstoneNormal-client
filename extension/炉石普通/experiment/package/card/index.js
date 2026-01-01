@@ -529,7 +529,7 @@ export function cardModule() {
   hearthstone.imported.forEach((i) => {
     for (const j in i.spell.info) {
       if (keys.includes(j)) {
-        alert(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
+        console.warn(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
       } else {
         minispell[j] = i.spell.info[j];
       }
@@ -665,7 +665,7 @@ export function cardModule() {
   hearthstone.imported.forEach((i) => {
     for (const j in i.spell.skill) {
       if (keys.includes(j)) {
-        alert(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
+        console.warn(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
       } else {
         full[j] = i.spell.skill[j];
       }
@@ -683,7 +683,7 @@ export function cardModule() {
   hearthstone.imported.forEach((i) => {
     for (const j in i.trap.info) {
       if (keys.includes(j)) {
-        alert(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
+        console.warn(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
       } else {
         minitrap[j] = i.trap.info[j];
       }
@@ -724,7 +724,7 @@ export function cardModule() {
   hearthstone.imported.forEach((i) => {
     for (const j in i.trap.skill) {
       if (keys.includes(j)) {
-        alert(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
+        console.warn(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
       } else {
         full2[j] = i.trap.skill[j];
       }
@@ -742,7 +742,7 @@ export function cardModule() {
   hearthstone.imported.forEach((i) => {
     for (const j in i.weapon.skill) {
       if (keys.includes(j)) {
-        alert(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
+        console.warn(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
       } else {
         weaponfull[j] = i.weapon.skill[j];
       }
@@ -754,7 +754,7 @@ export function cardModule() {
   hearthstone.imported.forEach((i) => {
     for (const j in i.weapon.info) {
       if (keys.includes(j)) {
-        alert(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
+        console.warn(`喵喵！扩展包《${i.name}》的${j}重复了哦！`);
       } else {
         miniweapon[j] = i.weapon.info[j];
       }
@@ -1053,7 +1053,7 @@ export function cardModule() {
   globalThis.hearthstone.imported.forEach((i) => {
     for (const j in i.hero.skill) {
       if (keys.includes(j)) {
-        alert(`扩展包《${i.name}》的${j}重复了`);
+        console.warn(`扩展包《${i.name}》的${j}重复了`);
       } else {
         herofull[j] = i.hero.skill[j];
       }

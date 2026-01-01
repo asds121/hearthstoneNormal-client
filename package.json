@@ -1,23 +1,15 @@
 {
-  "name": "noname-extensions-client",
+  "name": "hearthstone-normal-client",
   "version": "1.0.0",
-  "description": "通用无名杀扩展运行环境",
-  "main": "index.js",
-  "type": "module",
+  "description": "炉石普通游戏的专用客户端",
   "scripts": {
-    "start": "node simple-loader.js",
-    "debug": "node index.js",
-    "start-client": "node hearthstone-client.js"
+    "start": "npx http-server -p 8080 -o",
+    "serve": "npx http-server -p 8080"
   },
-  "keywords": [
-    "noname",
-    "extension",
-    "hearthstone"
-  ],
+  "keywords": ["炉石传说", "游戏客户端", "卡牌游戏"],
   "author": "",
   "license": "MIT",
-  "dependencies": {
-    "express": "^5.2.1",
-    "ws": "^8.18.3"
+  "devDependencies": {
+    "http-server": "^14.1.1"
   }
 }

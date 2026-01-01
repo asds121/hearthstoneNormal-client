@@ -1328,6 +1328,14 @@ async function setOnError() {
   };
 
   window.onerror = function (msg, src, line, column, err) {
+    // 过滤404错误
+    if (
+      typeof msg === "string" &&
+      (msg.includes("404") || msg.includes("Not Found"))
+    ) {
+      return true;
+    }
+
     if (promiseErrorHandler.onErrorPrepare) {
       promiseErrorHandler.onErrorPrepare();
     }

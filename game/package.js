@@ -1,14 +1,7 @@
 window.noname_package = {
-  character: {
-    mojinpsp: "魔禁",
-  },
-  card: {
-    standard: "标准",
-    extra: "军争",
-  },
-  play: {
-    coin: "富甲天下",
-  },
+  character: {},
+  card: {},
+  play: {},
   mode: {},
   submode: {},
 

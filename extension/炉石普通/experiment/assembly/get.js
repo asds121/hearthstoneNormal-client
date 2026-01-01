@@ -488,7 +488,7 @@ export const getDivision = {
 	 * 内部调试弹窗
 	 */
 	hs_alt(...args) {
-		alert.apply(window, [[""].concat(args).join("")]);
+		console.warn.apply(window, [[""].concat(args).join("")]);
 	},
 	/**
 	 *卡牌编号(作用：连系随从和卡牌，减少内存)

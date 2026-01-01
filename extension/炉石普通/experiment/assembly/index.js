@@ -227,7 +227,9 @@ export const hearthstone = {
 			//记录下directgain函数，暂不做打算
 			lib.hearthstone.drgf = lib.element.player.directgain;
 			//冰属性伤害不触发弃牌
-			lib.skill.icesha_skill.filter = () => false;
+			if (lib.skill.icesha_skill) {
+				lib.skill.icesha_skill.filter = () => false;
+			}
 
 			game.addGlobalSkill("hs_autoswap");
 			//确定场地
