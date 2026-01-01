@@ -1,0 +1,6 @@
+1. 应用GameEvent机制到炉石普通客户端
+2. 实现lib.hook机制支持
+3. 完善trigger技能触发系统
+4. 检查ui.window、ui.arena、ui.background等DOM元素的层叠顺序
+5. 确保DOM元素的类名设置正确，以便应用炉石普通的CSS样式
+6. 测试游戏初始化流程，确保所有UI元素正确显示

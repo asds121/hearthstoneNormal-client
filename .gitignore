@@ -1,62 +1,56 @@
-# 日志文件
-*.log
-
-# Node.js依赖
+# Dependencies
 node_modules/
 
-# 编辑器相关
+# Build outputs
+dist/
+build/
+*.log
+
+# Editor directories and files
 .vscode/
+.idea/
 *.swp
 *.swo
 *~
-
-# 操作系统文件
 .DS_Store
 Thumbs.db
-
-# 构建产物
-dist/
-build/
-
-# 缓存文件
-.cache/
-.temp/
-
-# 配置文件
-.env
-.env.local
-.env.*.local
-
-# 备份文件
-*.bak
-*.backup
-
-# IDE配置
-.idea/
 *.project
 *.classpath
 *.settings/
 
-# 测试覆盖率
-coverage/
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
 
-# 临时文件
+# Testing
+coverage/
+.nyc_output/
+
+# Misc
+*.bak
+*.backup
 *.tmp
 *.temp
+.cache/
+.temp/
 
-# 数据库文件
+# Database files
 *.db
 *.sqlite
 *.sqlite3
 
-# 视频和音频文件
+# Video and audio files
 *.mp4
 *.avi
 *.mov
 *.mp3
 *.wav
 
-# 压缩文件
+# Compressed files
 *.zip
 *.rar
 *.tar.gz
