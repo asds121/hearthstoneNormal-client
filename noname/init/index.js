@@ -464,7 +464,6 @@ export async function boot() {
     Object.keys(pack.font).forEach((value) => {
       const font = pack.font[value];
       appearenceConfig.name_font.item[value] = font;
-      appearenceConfig.identity_font.item[value] = font;
       appearenceConfig.cardtext_font.item[value] = font;
       appearenceConfig.global_font.item[value] = font;
       fontSheet.insertRule(

@@ -3616,8 +3616,9 @@ export class Create {
 		ui.handcards2Container = ui.create.div("#handcards2", ui.me);
 		ui.arena.classList.remove("nome");
 		if (lib.config.mousewheel && !lib.config.touchscreen) {
-			ui.handcards1Container.onmousewheel = ui.click.mousewheel;
-			ui.handcards2Container.onmousewheel = ui.click.mousewheel;
+			// 使用addEventListener代替直接赋值，添加passive: true提升滚动性能
+			ui.handcards1Container.addEventListener('wheel', ui.click.mousewheel, { passive: true });
+			ui.handcards2Container.addEventListener('wheel', ui.click.mousewheel, { passive: true });
 		}
 		ui.handcards1Container.ontouchstart = ui.click.touchStart;
 		ui.handcards2Container.ontouchstart = ui.click.touchStart;

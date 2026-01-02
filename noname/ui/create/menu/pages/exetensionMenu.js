@@ -6,7 +6,6 @@ import {
   updateActiveCard,
   setUpdateActiveCard,
   menux,
-  menuxpages,
   menuUpdates,
   openMenu,
   clickToggle,
@@ -31,10 +30,20 @@ export const extensionMenu = function (connectMenu) {
   // const cacheMenuContainer = menuContainer;
   // const cachePopupContainer = popupContainer;
   // const cacheMenux = menux;
-  const cacheMenuxpages = menuxpages;
+  // 直接使用window.menuxpages，而不是导入的menuxpages，避免循环依赖问题
+  const cacheMenuxpages = window.menuxpages || [];
   /** @type { HTMLDivElement } */
   // @ts-expect-error ignore
   var start = cacheMenuxpages.shift();
+  if (!start) {
+    console.error("Could not get start page from cacheMenuxpages");
+    return;
+  }
+  // 添加更严格的检查，确保start.lastChild存在
+  if (!start.lastChild) {
+    console.error("Start page has no lastChild element");
+    return;
+  }
   var rightPane = start.lastChild;
 
   var clickMode = function () {

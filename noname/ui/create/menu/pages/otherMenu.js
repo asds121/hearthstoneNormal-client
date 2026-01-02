@@ -1,6 +1,6 @@
 import {
   menuContainer,
-  menuxpages,
+  menuUpdates,
   openMenu,
   clickToggle,
   clickSwitcher,
@@ -23,13 +23,24 @@ export const otherMenu = function (
   /**
    * 由于联机模式会创建第二个菜单，所以需要缓存一下可变的变量
    */
+  // Use direct access to the exported variables to avoid circular dependency issues
   const cacheMenuContainer = menuContainer;
   // const cachePopupContainer = popupContainer;
   // const cacheMenux = menux;
-  const cacheMenuxpages = menuxpages;
+  // 直接使用window.menuxpages，而不是导入的menuxpages，避免循环依赖问题
+  const cacheMenuxpages = window.menuxpages || [];
   /** @type { HTMLDivElement } */
   // @ts-expect-error ignore
   var start = cacheMenuxpages.shift();
+  if (!start) {
+    console.error("Could not get start page from cacheMenuxpages");
+    return;
+  }
+  // 添加更严格的检查，确保start.lastChild存在
+  if (!start.lastChild) {
+    console.error("Start page has no lastChild element");
+    return;
+  }
   var rightPane = start.lastChild;
   var cheatButton = ui.create.div(".menubutton.round.highlight", "作", start);
   cheatButton.style.display = "none";
@@ -1163,7 +1174,10 @@ export const otherMenu = function (
       }
       checkCheat();
     };
-    menuUpdates.push(function () {
+    // 完全避免使用menuUpdates变量，直接从window获取或创建新数组
+    // 这样无论menuUpdates是否被定义，都不会出现ReferenceError
+    const safeMenuUpdates = window.menuUpdates || [];
+    safeMenuUpdates.push(function () {
       if (_status.video || _status.connectMode) {
         node.classList.add("off");
         if (node.classList.contains("active")) {
@@ -1251,7 +1265,11 @@ export const otherMenu = function (
     );
     ui.commandnode = node;
     node.type = "cmd";
-    menuUpdates.push(function () {
+
+    // 完全避免使用menuUpdates变量，直接从window获取或创建新数组
+    // 这样无论menuUpdates是否被定义，都不会出现ReferenceError
+    const safeMenuUpdates = window.menuUpdates || [];
+    safeMenuUpdates.push(function () {
       if (_status.connectMode) {
         node.classList.add("off");
         if (node.classList.contains("active")) {

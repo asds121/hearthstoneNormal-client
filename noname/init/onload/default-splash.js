@@ -38,7 +38,7 @@ export class DefaultSplash {
 		this.app.mount(node);
 
 		if (lib.config.mousewheel) {
-			node.addEventListener("wheel", ui.click.mousewheel);
+			node.addEventListener("wheel", ui.click.mousewheel, { passive: true });
 		}
 	}
 

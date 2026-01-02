@@ -119,7 +119,7 @@ export class LibInit {
 				game.saveConfigValue("brokenFile");
 			}
 
-			var onfree = lib.onfree;
+			var onfree = lib.onfree || [];
 			delete lib.onfree;
 			var loop = function () {
 				if (onfree.length) {
@@ -531,8 +531,6 @@ export class LibInit {
 		ui.css.styles = lib.init.sheet();
 		ui.css.styles.sheet.insertRule("#arena .player>.name,#arena .button.character>.name {font-family: " + (lib.config.name_font || "xinwei") + ",xinwei}", 0);
 		ui.css.styles.sheet.insertRule("#arena .player>.name,.button.character>.name {font-family: " + (lib.config.name_font || "xinwei") + ",xinwei}", 0);
-		ui.css.styles.sheet.insertRule("#arena .player .identity>div {font-family: " + (lib.config.identity_font || "huangcao") + ",xinwei}", 0);
-		ui.css.styles.sheet.insertRule(".button.character.newstyle>.identity {font-family: " + (lib.config.identity_font || "huangcao") + ",xinwei}", 0);
 		if (lib.config.cardtext_font && lib.config.cardtext_font != "default") {
 			ui.css.styles.sheet.insertRule(".card div:not(.info):not(.background) {font-family: " + lib.config.cardtext_font + ";}", 0);
 		}
