@@ -57,7 +57,7 @@ coverage/
 *.7z
 
 # Image files
-*.jpg
+*/*.jpg
 *.jpeg
 *.png
 *.gif
@@ -67,3 +67,9 @@ coverage/
 *.ico
 *.tiff
 *.tif
+
+# Root image folder
+/image/
+
+# Hearthstone resource folder
+extension/炉石普通/resource/
