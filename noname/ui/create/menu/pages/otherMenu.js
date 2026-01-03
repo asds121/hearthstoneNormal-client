@@ -377,85 +377,10 @@ export const otherMenu = function (
             });
         };
 
-        if (!dev) {
-          getLatestVersionFromGitHub()
-            .then((tagName) => {
-              game.saveConfig("check_version", tagName.slice(1));
-              if (
-                typeof lib.config[`version_description_${tagName}`] == "object"
-              ) {
-                /** @type { ReturnType<import('../../../../library/update.js').getRepoTagDescription> } */
-                const description =
-                  lib.config[`version_description_${tagName}`];
-                return description;
-              } else {
-                return getRepoTagDescription(tagName);
-              }
-            })
-            .then((description) => {
-              // 保存版本信息
-              if (
-                typeof lib.config["version_description_" + description.name] !=
-                "object"
-              ) {
-                game.saveConfig(
-                  "version_description_" + description.name,
-                  description
-                );
-              }
-              const versionResult = checkVersion(lib.version, description.name);
-              if (versionResult === 0) {
-                // forcecheck: 为false的时候是自动检测更新的调用
-                if (
-                  forcecheck === false ||
-                  !confirm("版本已是最新，是否强制更新？")
-                ) {
-                  refresh();
-                  return;
-                }
-              }
-              const str =
-                versionResult < 0
-                  ? `有新版本${description.name}可用，是否下载？`
-                  : `本地版本${lib.version}高于或等于github版本${description.name}，是否强制下载？`;
-              const str2 = description.body;
-              if (navigator.notification && navigator.notification.confirm) {
-                navigator.notification.confirm(
-                  str2,
-                  function (index) {
-                    if (index == 1) {
-                      download(description);
-                    } else {
-                      refresh();
-                    }
-                  },
-                  str,
-                  ["确定", "取消"]
-                );
-              } else {
-                if (confirm(str + "\n" + str2)) {
-                  download(description);
-                } else {
-                  refresh();
-                }
-              }
-            })
-            .catch((e) => {
-              alert("获取更新失败: " + e);
-              refresh();
-            });
-        } else {
-          if (confirm("将要直接下载dev版本的完整包，是否继续?")) {
-            download({
-              name: "noname-PR-Branch",
-              assets: [],
-              zipball_url:
-                "https://ghproxy.cc/https://github.com/libnoname/noname/archive/PR-Branch.zip",
-            });
-          } else {
-            refresh();
-          }
-        }
+        // 删除了GitHub更新检查功能
+        alert("更新检查功能已移除");
+        refresh();
+        return;
       }
     };
 
@@ -492,16 +417,10 @@ export const otherMenu = function (
         if (lib.config.asset_image) {
           assetDirectories.push("image");
         }
-        const version = await getLatestVersionFromGitHub().catch((e) => {
-          refresh();
-          throw e;
-        });
-        const files = await getTreesFromGithub(assetDirectories, version).catch(
-          (e) => {
-            refresh();
-            throw e;
-          }
-        );
+        // 删除了GitHub资源更新功能
+        alert("资源更新功能已移除");
+        refresh();
+        return;
 
         assetDirectories.forEach((assetDirectory, index) => {
           const arr = files[index];

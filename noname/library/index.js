@@ -28,7 +28,7 @@ import { Announce } from "./announce/index.js";
 import { Channel } from "./channel/index.js";
 import { experimental } from "./experimental/index.js";
 import * as Element from "./element/index.js";
-import { updateURLs } from "./update-urls.js";
+
 import { defaultHooks } from "./hooks/index.js";
 import { freezeButExtensible } from "../util/index.js";
 import security from "../util/security.js";
@@ -43,9 +43,7 @@ const html = dedent;
 export class Library {
   configprefix = "noname_0.9_";
   versionOL = 27;
-  updateURLS = updateURLs;
-  updateURL = updateURLs.github;
-  mirrorURL = updateURLs.coding;
+
   hallURL = "";
   assetURL = assetURL;
   userAgent = userAgentLowerCase;
@@ -1380,12 +1378,7 @@ export class Library {
             }
           },
         },
-        auto_check_update: {
-          name: "自动检查游戏更新",
-          intro: "进入游戏时检查更新",
-          init: false,
-          unfrequent: true,
-        },
+
         lucky_star: {
           name: "幸运星模式",
           intro:
@@ -1395,7 +1388,7 @@ export class Library {
         },
         dev: {
           name: "开发者模式",
-          intro: "开启后可使用浏览器控制台控制游戏，同时可更新到开发版",
+          intro: "开启后可使用浏览器控制台控制游戏",
           init: false,
           onclick(bool) {
             game.saveConfig("dev", bool);
@@ -1463,30 +1456,14 @@ export class Library {
           init: false,
           unfrequent: true,
         },
-        update_link: {
-          name: "更新地址",
-          init: "coding",
-          unfrequent: true,
-          item: {
-            coding: "URC",
-            github: "GitHub",
-          },
-          onclick(item) {
-            game.saveConfig("update_link", item);
-            lib.updateURL = lib.updateURLS[item] || lib.updateURLS.coding;
-          },
-        },
+
         update: function (config, map) {
           if ("ontouchstart" in document) {
             map.touchscreen.show();
           } else {
             map.touchscreen.hide();
           }
-          if (lib.device || lib.node) {
-            map.auto_check_update.show();
-          } else {
-            map.auto_check_update.hide();
-          }
+
           if (lib.device) {
             map.enable_vibrate.show();
             map.keep_awake.show();
@@ -8560,7 +8537,7 @@ export class Library {
   };
   help = {
     关于游戏:
-      '<div style="margin:10px">关于无名杀</div><ul style="margin-top:0"><li>无名杀官方发布地址仅有GitHub仓库！<br><a href="https://github.com/libnoname/noname">点击前往Github仓库</a><br><li>无名杀基于GPLv3开源协议。<br><a href="https://www.gnu.org/licenses/gpl-3.0.html">点击查看GPLv3协议</a><br><li>其他所有的所谓“无名杀”社群（包括但不限于绝大多数“官方”QQ群、QQ频道等）均为玩家自发组织，与无名杀官方无关！',
+      '<div style="margin:10px">关于炉石普通专用客户端</div><ul style="margin-top:0"><li>炉石普通专用客户端发布地址：<br><a href="https://github.com/asds121/hearthstoneNormal-client">点击前往Github仓库</a></li><li>本项目基于无名杀游戏框架开发，遵循 GPLv3 开源协议。<br><a href="https://www.gnu.org/licenses/gpl-3.0.html">点击查看GPLv3协议</a></li></ul>',
     游戏操作:
       "<ul><li>长按/鼠标悬停/右键单击显示信息。<li>触屏模式中，双指点击切换暂停；下划显示菜单，上划切换托管。<li>键盘快捷键<br>" +
       "<table><tr><td>A<td>切换托管<tr><td>W<td>切换不询问无懈<tr><td>空格<td>暂停</table><li>编辑牌堆<br>在卡牌包中修改牌堆后，将自动创建一个临时牌堆，在所有模式中共用，当保存当前牌堆后，临时牌堆被清除。每个模式可设置不同的已保存牌堆，设置的牌堆优先级大于临时牌堆。</ul>",
@@ -8577,25 +8554,6 @@ export class Library {
       "<li>使用卡牌<br>player.useCard(card,<br>targets)<li>死亡<br>player.die()<li>复活<br>player.revive(hp)</ul>" +
       '<div style="margin:10px">游戏操作</div><ul style="margin-top:0"><li>在命令框中输出结果<br>game.print(str)<li>清除命令框中的内容<br>cls<li>上一条/下一条输入的内容<br>up/down<li>游戏结束<br>game.over(bool)' +
       "<li>角色资料<br>lib.character<li>卡牌资料<br>lib.card</ul>",
-    游戏名词:
-      "<ul><li>智囊：无名杀默认为过河拆桥/无懈可击/无中生有/洞烛先机。牌堆中没有的智囊牌会被过滤。可在卡牌设置中自行增减。若没有可用的智囊，则改为随机选取的三种锦囊牌的牌名。" +
-      "<li>仁库：部分武将使用的游戏外共通区域。至多包含六张牌。当有新牌注入后，若牌数超过上限，则将最早进入仁库的溢出牌置入弃牌堆。" +
-      "<li>护甲：和体力类似，每点护甲可抵挡1点伤害，但不影响手牌上限。" +
-      "<li>随从：通过技能获得，拥有独立的技能、手牌区和装备区（共享判定区），出场时替代主武将的位置；随从死亡时自动切换回主武将。" +
-      "<li>发现：从三张随机亮出的牌中选择一张，若无特殊说明，则获得此牌。" +
-      "<li>蓄能技：发动时可以增大黄色的数字。若如此做，红色数字于技能的结算过程中改为原来的两倍。" +
-      "<li>施法：若技能的拥有者未拥有等待执行的同名“施法”效果，则其可以发动“施法”技能。其须选择声明一个数字X（X∈[1, 3]），在此之后的第X个回合结束时，其执行“施法”效果，且效果中的数字X视为与技能发动者声明的X相同。" +
-      "<li>共同拼点：一种特殊的拼点结算。发起者与被指定的拼点目标同时亮出拼点牌，进行一次决算：其中拼点牌点数唯一最大的角色赢，其他角色均没赢；若没有点数唯一最大的拼点牌，则所有角色拼点均没赢。" +
-      "<li>强令：若一名角色拥有带有“强令”的技能，则该技能的发动时机为“出牌阶段开始时”。若技能拥有者发动该技能，其须发布“强令”给一名其他角色，并在对应技能的时间节点加以判断目标角色是否成功完成该强令所要求的任务条件。成功或失败则会根据技能效果执行不同结算流程。" +
-      "<li>摧坚：若一名角色拥有带有“摧坚”的技能，则该技能的发动时机为“当你使用伤害牌指定第一个目标后”。你可以对其中一个目标发动“摧坚”技能，然后执行后续效果。其中，后续效果里的X等于该目标的非charlotte技能的数量。" +
-      "<li>妄行：一种特殊的选项。若一名角色拥有带有“妄行”的技能，则该技能触发时，你须选择声明一个数字X（X∈{1,2,3,4}），技能后续中的X即为你选择的数字。选择完毕后，你获得如下效果：回合结束时，你选择一项：1.弃置X张牌；2.减1点体力上限。" +
-      "<li>搏击：若一名角色拥有带有“搏击”的技能，则当该搏击技能触发时，若本次技能的目标角色在你攻击范围内，且你在其攻击范围内，则你执行技能主体效果时，同时额外执行“搏击”后的额外效果。" +
-      "<li>游击：若一名角色拥有带有“游击”的技能，则当该游击技能执行至“游击”处时，若本次技能的目标角色在你的攻击范围内，且你不在其攻击范围内，则你可以执行“游击”后的额外效果。" +
-      "<li>激昂：一名角色发动“昂扬技”标签技能后，此技能失效，直至从此刻至满足此技能“激昂”条件后。" +
-      "<li>历战：一名角色的回合结束时，若本回合发动过拥有历战效果的技能，则对此技能效果的进行等同于发动次数的永久可叠加式升级或修改。" +
-      "<li>同心：若技能拥有同心效果，则拥有该技能的角色可在回合开始时与其他角色同心直到自己下回合开始（默认为选择一名角色同心），选择的角色称为“同心角色”。拥有同心效果的技能发动后，技能发动者先执行同心效果。然后若有与其同心的角色，这些角色也依次执行同心效果。" +
-      "<li>持恒技：拥有此标签的技能不会被其他技能无效。" +
-      "",
   };
   /**
    * @type {import('path')}
@@ -15275,445 +15233,7 @@ export class Library {
         _status.enteringroom = false;
         ui.create.connecting(true);
       },
-      roomlist: function (list, events, clients, wsid) {
-        game.send("server", "key", [game.onlineKey, lib.version]);
-        game.online = true;
-        game.onlinehall = true;
-        lib.config.recentIP.remove(_status.ip);
-        lib.config.recentIP.unshift(_status.ip);
-        lib.config.recentIP.splice(5);
-        if (
-          !lib.config.reconnect_info ||
-          lib.config.reconnect_info[0] != _status.ip
-        ) {
-          game.saveConfig("reconnect_info", [_status.ip, null]);
-        }
-        game.saveConfig("recentIP", lib.config.recentIP);
-        _status.connectMode = true;
 
-        game.clearArena();
-        game.clearConnect();
-        ui.pause.hide();
-        ui.auto.hide();
-
-        clearTimeout(_status.createNodeTimeout);
-        game.send(
-          "server",
-          "changeAvatar",
-          get.connectNickname(),
-          lib.config.connect_avatar
-        );
-
-        var proceed = function () {
-          game.ip = get.trimip(_status.ip);
-          ui.create.connectRooms(list);
-          if (events) {
-            ui.connectEvents = ui.create.div(
-              ".forceopaque.menubutton.large.connectevents.pointerdiv",
-              "约战",
-              ui.window,
-              ui.click.connectEvents
-            );
-            ui.connectEventsCount = ui.create.div(
-              ".forceopaque.menubutton.icon.connectevents.highlight.hidden",
-              "",
-              ui.window
-            );
-            ui.connectClients = ui.create.div(
-              ".forceopaque.menubutton.large.connectevents.pointerdiv.left",
-              "在线",
-              ui.window,
-              ui.click.connectClients
-            );
-            ui.connectClientsCount = ui.create.div(
-              ".forceopaque.menubutton.icon.connectevents.highlight.left",
-              "1",
-              ui.window
-            );
-            ui.createRoomButton = ui.create.div(
-              ".forceopaque.menubutton.large.connectevents.pointerdiv.left2",
-              "创建房间",
-              ui.window,
-              function () {
-                if (!_status.creatingroom) {
-                  _status.creatingroom = true;
-                  ui.click.connectMenu();
-                }
-              }
-            );
-            if (events.length) {
-              ui.connectEventsCount.innerHTML = events.filter(function (evt) {
-                return (
-                  evt.creator == game.onlineKey || !get.is.banWords(evt.content)
-                );
-              }).length;
-              ui.connectEventsCount.show();
-            }
-          }
-          game.wsid = wsid;
-          lib.message.client.updaterooms(list, clients);
-          lib.message.client.updateevents(events);
-          ui.exitroom = ui.create.system(
-            "退出房间",
-            function () {
-              game.saveConfig("tmp_owner_roomId");
-              game.saveConfig("tmp_user_roomId");
-              if (ui.rooms) {
-                game.saveConfig("reconnect_info");
-              } else {
-                if (lib.config.reconnect_info) {
-                  lib.config.reconnect_info.length = 1;
-                  game.saveConfig("reconnect_info", lib.config.reconnect_info);
-                }
-              }
-              game.reload();
-            },
-            true
-          );
-
-          var findRoom = function (id) {
-            for (var room of ui.rooms) {
-              if (room.key == id) {
-                return room;
-              }
-            }
-            return false;
-          };
-          if (typeof lib.config.tmp_owner_roomId == "string") {
-            if (
-              typeof game.roomId != "string" &&
-              !findRoom(lib.config.tmp_owner_roomId)
-            ) {
-              lib.configOL.mode = lib.config.connect_mode;
-              game.roomId = lib.config.tmp_owner_roomId;
-            }
-            game.saveConfig("tmp_owner_roomId");
-          }
-          if (typeof lib.config.tmp_user_roomId == "string") {
-            if (typeof game.roomId != "string") {
-              if (findRoom(lib.config.tmp_user_roomId)) {
-                game.roomId = lib.config.tmp_user_roomId;
-              } else {
-                ui.create.connecting();
-                (function () {
-                  var n = 10;
-                  var id = lib.config.tmp_user_roomId;
-                  var interval = setInterval(function () {
-                    if (n > 0) {
-                      n--;
-                      if (findRoom(id)) {
-                        clearInterval(interval);
-                        game.send(
-                          "server",
-                          "enter",
-                          id,
-                          get.connectNickname(),
-                          lib.config.connect_avatar
-                        );
-                      }
-                    } else {
-                      ui.create.connecting(true);
-                      clearInterval(interval);
-                    }
-                  }, 500);
-                })();
-              }
-            }
-            game.saveConfig("tmp_user_roomId");
-          }
-
-          if (window.isNonameServer) {
-            var cfg = "pagecfg" + window.isNonameServer;
-            if (lib.config[cfg]) {
-              lib.configOL = lib.config[cfg][0];
-              game.send("server", "server", lib.config[cfg].slice(1));
-              game.saveConfig(cfg);
-              _status.protectingroom = true;
-              setTimeout(function () {
-                _status.protectingroom = false;
-                if (
-                  !lib.node ||
-                  !lib.node.clients ||
-                  !lib.node.clients.length
-                ) {
-                  game.reload();
-                }
-              }, 15000);
-            } else {
-              game.send("server", "server");
-            }
-          } else if (typeof game.roomId == "string") {
-            var room = findRoom(game.roomId);
-            if (game.roomIdServer && room && (room.serving || !room.version)) {
-              console.log();
-              if (lib.config.reconnect_info) {
-                lib.config.reconnect_info[2] = null;
-                game.saveConfig("reconnect_info", lib.config.reconnect_info);
-              }
-            } else {
-              ui.create.connecting();
-              game.send(
-                "server",
-                game.roomId == game.onlineKey ? "create" : "enter",
-                game.roomId,
-                get.connectNickname(),
-                lib.config.connect_avatar
-              );
-            }
-          }
-          lib.init.onfree();
-        };
-        if (_status.event.parent) {
-          game.forceOver("noover", proceed);
-        } else {
-          proceed();
-        }
-      },
-      updaterooms: function (list, clients) {
-        if (ui.rooms) {
-          var map = {},
-            map2 = {};
-          for (var i of ui.rooms) {
-            map2[i.key] = true;
-          }
-          for (var i of list) {
-            if (!i) {
-              continue;
-            }
-            map[i[4]] = i;
-          }
-          ui.window.classList.add("more_room");
-          for (var i = 0; i < ui.rooms.length; i++) {
-            if (!map[ui.rooms[i].key]) {
-              ui.rooms[i].remove();
-              ui.rooms.splice(i--, 1);
-            } else {
-              ui.rooms[i].initRoom(list[i]);
-            }
-          }
-          for (var i of list) {
-            if (!i) {
-              continue;
-            }
-            map[i[4]] = i;
-            if (!map2[i[4]]) {
-              var player = ui.roombase.add(
-                '<div class="popup text pointerdiv" style="width:calc(100% - 10px);display:inline-block;white-space:nowrap">空房间</div>'
-              );
-              player.roomindex = i;
-              player.initRoom = lib.element.Player.prototype.initRoom;
-              player.addEventListener(
-                lib.config.touchscreen ? "touchend" : "click",
-                ui.click.connectroom
-              );
-              player.initRoom(i);
-              ui.rooms.push(player);
-            }
-          }
-          if (
-            !_status.requestReadClipboard &&
-            get.config("read_clipboard", "connect")
-          ) {
-            const read = (text) => {
-              try {
-                var roomId = text.split("\n")[1].match(/\d+/);
-                var caption = ui.rooms.find((caption) => caption.key == roomId);
-                if (
-                  caption &&
-                  (_status.read_clipboard_text ||
-                    confirm(`是否通过复制的内容加入${roomId}房间？`))
-                ) {
-                  ui.click.connectroom.call(caption);
-                  delete _status.read_clipboard_text;
-                }
-              } catch (e) {
-                console.log(e);
-              }
-            };
-            //每次启动只请求一次
-            _status.requestReadClipboard = true;
-            if (_status.read_clipboard_text) {
-              read(_status.read_clipboard_text);
-            } else {
-              window.focus();
-              if (navigator.clipboard && lib.node) {
-                navigator.clipboard
-                  .readText()
-                  .then(read)
-                  .catch((_) => {});
-              } else {
-                var input = ui.create.node("textarea", ui.window, {
-                  opacity: "0",
-                });
-                input.select();
-                var result = document.execCommand("paste");
-                input.blur();
-                ui.window.removeChild(input);
-                if (result || input.value.length > 0) {
-                  read(input.value);
-                } else if (confirm("是否输入邀请链接以加入房间？")) {
-                  var text = prompt("请输入邀请链接");
-                  if (typeof text == "string" && text.length > 0) {
-                    read(text);
-                  }
-                }
-              }
-            }
-          }
-        }
-        lib.message.client.updateclients(clients, true);
-      },
-      updateclients: function (clients, bool) {
-        if (clients && ui.connectClients) {
-          ui.connectClients.info = clients;
-          ui.connectClientsCount.innerHTML = clients.length;
-        }
-        if (_status.connectClientsCallback) {
-          _status.connectClientsCallback();
-        }
-      },
-      updateevents: function (events) {
-        if (events && ui.connectEvents) {
-          ui.connectEvents.info = events;
-          var num = events.filter(function (evt) {
-            return (
-              typeof evt.creator == "string" &&
-              (evt.creator == game.onlineKey || !get.is.banWords(evt.content))
-            );
-          }).length;
-          if (num) {
-            ui.connectEventsCount.innerHTML = num;
-            ui.connectEventsCount.show();
-          } else {
-            ui.connectEventsCount.hide();
-          }
-          if (_status.connectEventsCallback) {
-            _status.connectEventsCallback();
-          }
-        }
-      },
-      eventsdenied: function (reason) {
-        var str = "创建约战失败";
-        if (reason == "total") {
-          str += "，约战总数不能超过20";
-        } else if (reason == "time") {
-          str += "，时间已过";
-        } else if (reason == "ban") {
-          str += "，请注意文明发言";
-        }
-        alert(str);
-      },
-      init: function (id, config, ip, servermode, roomId) {
-        game.online = true;
-        game.onlineID = id;
-        game.ip = ip;
-        game.servermode = servermode;
-        game.roomId = roomId;
-        if (game.servermode) {
-          game.saveConfig("reconnect_info", [_status.ip, id, game.roomId]);
-        } else {
-          game.saveConfig("reconnect_info", [_status.ip, id]);
-          game.saveConfig("tmp_user_roomId", roomId);
-        }
-        lib.config.recentIP.remove(_status.ip);
-        lib.config.recentIP.unshift(_status.ip);
-        lib.config.recentIP.splice(5);
-        game.saveConfig("recentIP", lib.config.recentIP);
-        _status.connectMode = true;
-        lib.configOL = config;
-        lib.playerOL = {};
-        lib.cardOL = {};
-        lib.vcardOL = {};
-
-        game.clearArena();
-        game.finishCards();
-        ui.create.roomInfo();
-        ui.create.chat();
-        if (game.servermode) {
-          ui.create.connectPlayers(get.modetrans(config, true));
-        } else {
-          ui.create.connectPlayers(ip);
-        }
-        ui.pause.hide();
-        ui.auto.hide();
-        game.clearConnect();
-        clearTimeout(_status.createNodeTimeout);
-
-        var proceed = function () {
-          game.loadModeAsync(config.mode, function (mode) {
-            for (var i in mode.ai) {
-              if (typeof mode.ai[i] == "object") {
-                if (ai[i] == undefined) {
-                  ai[i] = {};
-                }
-                for (var j in mode.ai[i]) {
-                  ai[i][j] = mode.ai[i][j];
-                }
-              } else {
-                ai[i] = mode.ai[i];
-              }
-            }
-            for (var i in mode.get) {
-              if (typeof mode.get[i] == "object") {
-                if (get[i] == undefined) {
-                  get[i] = {};
-                }
-                for (var j in mode.get[i]) {
-                  get[i][j] = mode.get[i][j];
-                }
-              } else {
-                get[i] = mode.get[i];
-              }
-            }
-            for (var i in mode.translate) {
-              lib.translate[i] = mode.translate[i];
-            }
-            if (mode.game) {
-              game.getIdentityList = mode.game.getIdentityList;
-              game.updateState = mode.game.updateState;
-              game.getRoomInfo = mode.game.getRoomInfo;
-            }
-            if (mode.element && mode.element.player) {
-              Object.defineProperties(
-                lib.element.Player.prototype,
-                Object.getOwnPropertyDescriptors(mode.element.player)
-              );
-            }
-            if (mode.skill) {
-              for (var i in mode.skill) {
-                lib.skill[i] = mode.skill[i];
-              }
-            }
-            if (mode.card) {
-              for (var i in mode.card) {
-                lib.card[i] = mode.card[i];
-              }
-            }
-            game.finishCards();
-            if (mode.characterPack) {
-              for (var i in mode.characterPack) {
-                lib.characterPack[i] = mode.characterPack[i];
-              }
-            }
-            _status.event = lib.element.GameEvent.initialGameEvent();
-            _status.paused = false;
-            game.createEvent("game", false).setContent(lib.init.startOnline);
-            game.loop();
-            game.send("inited");
-            ui.create.connecting(true);
-          });
-        };
-        if (_status.event.parent) {
-          game.forceOver("noover", proceed);
-        } else {
-          proceed();
-        }
-        for (var i in lib.characterPack) {
-          for (var j in lib.characterPack[i]) {
-            lib.character[j] = lib.character[j] || lib.characterPack[i][j];
-          }
-        }
-      },
       reinit: function (
         config,
         state,

@@ -16,7 +16,8 @@ if (core === "chrome" && !isNaN(version) && version < 91) {
 		window.open("https://github.com/libnoname/noname/releases/tag/chromium91-client");
 	}
 	*/
-  waitUpdate = game.tryUpdateClient(/** UpdateReason.UNDERSUPPORT **/ 4);
+  // 不再需要客户端更新检查，已删除相关代码
+  waitUpdate = Promise.resolve();
 }
 
 waitUpdate.then(boot).then(onload);

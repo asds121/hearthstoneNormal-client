@@ -337,7 +337,7 @@ export function createConfig(config, position) {
       input.innerHTML = config.init || "无名玩家";
       input.onblur = function () {
         input.innerHTML = input.innerHTML.replace(/<br>/g, "");
-        if (!input.innerHTML || get.is.banWords(input.innerHTML)) {
+        if (!input.innerHTML) {
           input.innerHTML = "无名玩家";
         }
         input.innerHTML = input.innerHTML.slice(0, 12);

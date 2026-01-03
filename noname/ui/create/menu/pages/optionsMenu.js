@@ -18,10 +18,7 @@ import {
 import { ui, game, get, ai, lib, _status } from "../../../../../noname.js";
 import { nonameInitialized } from "../../../../util/index.js";
 
-export const optionsMenu = function (connectMenu) {
-  if (connectMenu) {
-    return;
-  }
+export const optionsMenu = function () {
   /**
    * 由于联机模式会创建第二个菜单，所以需要缓存一下可变的变量
    */
@@ -49,10 +46,12 @@ export const optionsMenu = function (connectMenu) {
     if (active === this) {
       return;
     }
-    active.classList.remove("active");
-    active.link.remove();
+    if (active) {
+      active.classList.remove("active");
+      active.link.remove();
+    }
     active = this;
-    active.classList.add("active");
+    this.classList.add("active");
     if (this.link) {
       rightPane.appendChild(this.link);
     } else {
@@ -110,24 +109,25 @@ export const optionsMenu = function (connectMenu) {
         skip = true;
         break;
       }
-      str += get.translation(forbid[i][j]) + "+";
-      str2 += forbid[i][j] + "+";
-      str3 +=
-        get.translation(forbid[i][j]) +
-        "：" +
-        lib.translate[forbid[i][j] + "_info"];
-      if (j < forbid[i].length - 1) {
-        str3 +=
-          '<div class="placeholder slim" style="display:block;height:8px"></div>';
-      }
     }
     if (skip) {
       continue;
     }
-    str = str.slice(0, str.length - 1);
-    str2 = str2.slice(0, str2.length - 1);
-
-    lib.configMenu.skill.config[str2] = {
+    for (var j = 0; j < forbid[i].length; j++) {
+      str +=
+        lib.translate[forbid[i][j] + "_noconf"] || lib.translate[forbid[i][j]];
+      if (j != forbid[i].length - 1) {
+        str += "/";
+      }
+    }
+    for (var j = 0; j < forbid[i].length; j++) {
+      str2 += lib.translate[forbid[i][j]];
+      if (j != forbid[i].length - 1) {
+        str2 += "/";
+      }
+    }
+    str3 = lib.translate[forbid[i][0] + "_info"] || "";
+    lib.configMenu.skill.config[forbid[i][0]] = {
       name: str,
       init: true,
       type: "banskill",
@@ -136,480 +136,97 @@ export const optionsMenu = function (connectMenu) {
     };
   }
 
-  var updateView = null;
-  var updateAppearence = null;
-  var createModeConfig = function (mode, position) {
-    var info = lib.configMenu[mode];
-    var page = ui.create.div("");
-    var node = ui.create.div(
+  for (var i in lib.configMenu) {
+    // 跳过没有name属性的配置项，避免出现空白按钮
+    if (!lib.configMenu[i] || !lib.configMenu[i].name) {
+      continue;
+    }
+    // 跳过"技能"配置项，避免创建不需要的按钮
+    if (i === "skill") {
+      continue;
+    }
+    var nodexx = ui.create.div(
       ".menubutton.large",
-      info.name,
-      position,
+      lib.configMenu[i].name,
+      start.firstChild,
       clickMode
     );
-    node.mode = mode;
-    // node._initLink=function(){
-    node.link = page;
+    var page = ui.create.div("");
+    nodexx.link = page;
+    page.classList.add("menu-sym");
     var map = {};
-    if (info.config) {
-      var hiddenNodes = [];
-      var autoskillNodes = [];
-      var banskillNodes = [];
-      var custombanskillNodes = [];
-      var banskill;
+    var config = {
+      ...lib.config,
+    };
+    var info = lib.configMenu[i];
+    var hiddenNodes = [];
+    var autoskillNodes = [];
+    var banskillNodes = [];
 
-      if (mode == "skill") {
-        var autoskillexpanded = false;
-        var banskillexpanded = false;
-        ui.create.div(
-          ".config.more",
-          "自动发动 <div>&gt;</div>",
-          page,
-          function () {
-            if (autoskillexpanded) {
-              this.classList.remove("on");
-              for (var k = 0; k < autoskillNodes.length; k++) {
-                autoskillNodes[k].style.display = "none";
-              }
-            } else {
-              this.classList.add("on");
-              for (var k = 0; k < autoskillNodes.length; k++) {
-                autoskillNodes[k].style.display = "";
-              }
-            }
-            autoskillexpanded = !autoskillexpanded;
-          }
-        );
-        banskill = ui.create.div(
-          ".config.more",
-          "双将禁配 <div>&gt;</div>",
-          page,
-          function () {
-            if (banskillexpanded) {
-              this.classList.remove("on");
-              for (var k = 0; k < banskillNodes.length; k++) {
-                banskillNodes[k].style.display = "none";
-              }
-            } else {
-              this.classList.add("on");
-              for (var k = 0; k < banskillNodes.length; k++) {
-                banskillNodes[k].style.display = "";
-              }
-            }
-            banskillexpanded = !banskillexpanded;
-          }
-        );
-
-        var banskilladd = ui.create.div(
-          ".config.indent",
-          '<span class="pointerdiv">添加...</span>',
-          page,
-          function () {
-            this.nextSibling.classList.toggle("hidden");
-          }
-        );
-        banskilladd.style.display = "none";
-        banskillNodes.push(banskilladd);
-
-        var banskilladdNode = ui.create.div(
-          ".config.indent.hidden.banskilladd",
-          page
-        );
-        banskilladdNode.style.display = "none";
-        banskillNodes.push(banskilladdNode);
-
-        var matchBanSkill = function (skills1, skills2) {
-          if (skills1.length != skills2.length) {
-            return false;
-          }
-          for (var i = 0; i < skills1.length; i++) {
-            if (!skills2.includes(skills1[i])) {
-              return false;
-            }
-          }
-          return true;
-        };
-        var deleteCustomBanSkill = function () {
-          for (var i = 0; i < lib.config.customforbid.length; i++) {
-            if (
-              matchBanSkill(lib.config.customforbid[i], this.parentNode.link)
-            ) {
-              lib.config.customforbid.splice(i--, 1);
-              break;
-            }
-          }
-          game.saveConfig("customforbid", lib.config.customforbid);
-          this.parentNode.remove();
-        };
-        var createCustomBanSkill = function (skills) {
-          var node = ui.create.div(".config.indent.toggle");
-          node.style.display = "none";
-          node.link = skills;
-          banskillNodes.push(node);
-          custombanskillNodes.push(node);
-          var str = get.translation(skills[0]);
-          for (var i = 1; i < skills.length; i++) {
-            str += "+" + get.translation(skills[i]);
-          }
-          node.innerHTML = str;
-          var span = document.createElement("span");
-          span.classList.add("cardpiledelete");
-          span.innerHTML = "删除";
-          span.onclick = deleteCustomBanSkill;
-          node.appendChild(span);
-          page.insertBefore(node, banskilladdNode.nextSibling);
-          return node;
-        };
-        for (var i = 0; i < lib.config.customforbid.length; i++) {
-          createCustomBanSkill(lib.config.customforbid[i]);
-        }
-        (function () {
-          var list = [];
-          for (var i in lib.character) {
-            if (lib.character[i][3].length) {
-              list.push([i, lib.translate[i]]);
-            }
-          }
-          if (!list.length) {
-            return;
-          }
-          list.sort(function (a, b) {
-            a = a[0];
-            b = b[0];
-            var aa = a,
-              bb = b;
-            if (aa.includes("_")) {
-              aa = aa.slice(aa.lastIndexOf("_") + 1);
-            }
-            if (bb.includes("_")) {
-              bb = bb.slice(bb.lastIndexOf("_") + 1);
-            }
-            if (aa != bb) {
-              return aa > bb ? 1 : -1;
-            }
-            return a > b ? 1 : -1;
-          });
-
-          var list2 = [];
-          var skills = lib.character[list[0][0]][3];
-          for (var i = 0; i < skills.length; i++) {
-            list2.push([skills[i], lib.translate[skills[i]]]);
-          }
-
-          var selectname = ui.create.selectlist(list, list[0], banskilladdNode);
-          selectname.onchange = function () {
-            var skills = lib.character[this.value][3];
-            skillopt.innerHTML = "";
-            for (var i = 0; i < skills.length; i++) {
-              var option = document.createElement("option");
-              option.value = skills[i];
-              option.innerHTML = lib.translate[skills[i]];
-              skillopt.appendChild(option);
-            }
-          };
-          selectname.style.maxWidth = "85px";
-          var skillopt = ui.create.selectlist(list2, list2[0], banskilladdNode);
-
-          var span = document.createElement("span");
-          span.innerHTML = "＋";
-          banskilladdNode.appendChild(span);
-          var br = document.createElement("br");
-          banskilladdNode.appendChild(br);
-
-          var selectname2 = ui.create.selectlist(
-            list,
-            list[0],
-            banskilladdNode
-          );
-          selectname2.onchange = function () {
-            var skills = lib.character[this.value][3];
-            skillopt2.innerHTML = "";
-            for (var i = 0; i < skills.length; i++) {
-              var option = document.createElement("option");
-              option.value = skills[i];
-              option.innerHTML = lib.translate[skills[i]];
-              skillopt2.appendChild(option);
-            }
-          };
-          selectname2.style.maxWidth = "85px";
-          var skillopt2 = ui.create.selectlist(
-            list2,
-            list2[0],
-            banskilladdNode
-          );
-          var confirmbutton = document.createElement("button");
-          confirmbutton.innerHTML = "确定";
-          banskilladdNode.appendChild(confirmbutton);
-
-          confirmbutton.onclick = function () {
-            var skills = [skillopt.value, skillopt2.value];
-            if (skills[0] == skills[1]) {
-              skills.shift();
-            }
-            if (!lib.config.customforbid) {
-              return;
-            }
-            for (var i = 0; i < lib.config.customforbid.length; i++) {
-              if (matchBanSkill(lib.config.customforbid[i], skills)) {
-                return;
-              }
-            }
-            lib.config.customforbid.push(skills);
-            game.saveConfig("customforbid", lib.config.customforbid);
-            createCustomBanSkill(skills).style.display = "";
-          };
-        })();
-        page.style.paddingBottom = "10px";
+    for (var j in info.config) {
+      if (j === "update") {
+        continue;
       }
-      var config = lib.config;
-      if (mode == "appearence") {
-        updateAppearence = function () {
-          info.config.update(config, map);
-        };
-      } else if (mode == "view") {
-        updateView = function () {
-          info.config.update(config, map);
-        };
+      var cfg = get.copy(info.config[j]);
+      cfg._name = j;
+      if (j in config) {
+        cfg.init = config[j];
+      } else {
+        game.saveConfig(j, cfg.init);
       }
-      for (var j in info.config) {
-        if (j === "update") {
-          continue;
-        }
-        var cfg = get.copy(info.config[j]);
-        cfg._name = j;
-        if (j in config) {
-          cfg.init = config[j];
-        } else if (cfg.type != "autoskill" && cfg.type != "banskill") {
-          game.saveConfig(j, cfg.init);
-        }
-        if (!cfg.onclick) {
-          cfg.onclick = function (result) {
-            var cfg = this._link.config;
-            game.saveConfig(cfg._name, result);
-            if (cfg.onsave) {
-              cfg.onsave.call(this, result);
-            }
-          };
-        }
-        if (info.config.update) {
-          if (mode == "appearence" || mode == "view") {
-            cfg.update = function () {
-              if (updateAppearence) {
-                updateAppearence();
-              }
-              if (updateView) {
-                updateView();
-              }
-            };
-          } else {
-            cfg.update = function () {
-              info.config.update(config, map);
-            };
+      if (!cfg.onclick) {
+        cfg.onclick = function (result) {
+          var cfg = this._link.config;
+          game.saveConfig(cfg._name, result);
+          if (cfg.onsave) {
+            cfg.onsave.call(this, result);
           }
-        }
-        var cfgnode = createConfig(cfg);
-        if (cfg.type == "autoskill") {
-          autoskillNodes.push(cfgnode);
-          // cfgnode.style.transition='all 0s';
-          cfgnode.classList.add("indent");
-          // cfgnode.hide();
-          cfgnode.style.display = "none";
-        } else if (cfg.type == "banskill") {
-          banskillNodes.push(cfgnode);
-          // cfgnode.style.transition='all 0s';
-          cfgnode.classList.add("indent");
-          // cfgnode.hide();
-          cfgnode.style.display = "none";
-        }
-        if (j == "import_data_button") {
-          ui.import_data_button = cfgnode;
-          cfgnode.hide();
-          cfgnode.querySelector("button").onclick = function () {
-            var fileToLoad = this.previousSibling.files[0];
-            if (fileToLoad) {
-              var fileReader = new FileReader();
-              fileReader.onload = function (fileLoadedEvent) {
-                var data = fileLoadedEvent.target.result;
-                if (!data) {
-                  return;
-                }
-                try {
-                  data = JSON.parse(lib.init.decode(data));
-                  if (!data || typeof data != "object") {
-                    throw "err";
-                  }
-                  if (lib.db && (!data.config || !data.data)) {
-                    throw "err";
-                  }
-                } catch (e) {
-                  console.log(e);
-                  alert("导入失败");
-                  return;
-                }
-                alert("导入成功");
-                if (!lib.db) {
-                  var noname_inited = localStorage.getItem("noname_inited");
-                  var onlineKey = localStorage.getItem(
-                    lib.configprefix + "key"
-                  );
-                  localStorage.clear();
-                  if (noname_inited) {
-                    localStorage.setItem("noname_inited", noname_inited);
-                  }
-                  if (onlineKey) {
-                    localStorage.setItem(lib.configprefix + "key", onlineKey);
-                  }
-                  for (var i in data) {
-                    localStorage.setItem(i, data[i]);
-                  }
-                } else {
-                  for (var i in data.config) {
-                    game.putDB("config", i, data.config[i]);
-                    lib.config[i] = data.config[i];
-                  }
-                  for (var i in data.data) {
-                    game.putDB("data", i, data.data[i]);
-                  }
-                }
-                lib.init.background();
-                game.reload();
-              };
-              fileReader.readAsText(fileToLoad, "UTF-8");
-            }
-          };
-        } else if (j == "import_music") {
-          cfgnode.querySelector("button").onclick = function () {
-            if (_status.music_importing) {
-              return;
-            }
-            _status.music_importing = true;
-            var fileToLoad = this.previousSibling.files[0];
-            if (fileToLoad) {
-              if (!lib.config.customBackgroundMusic) {
-                lib.config.customBackgroundMusic = {};
-              }
-              var name = fileToLoad.name;
-              if (name.includes(".")) {
-                name = name.slice(0, name.indexOf("."));
-              }
-              var link = (game.writeFile ? "cdv_" : "custom_") + name;
-              if (lib.config.customBackgroundMusic[link]) {
-                if (
-                  !confirm(
-                    "已经存在文件名称相同的背景音乐，是否仍然要继续导入？"
-                  )
-                ) {
-                  _status.music_importing = false;
-                  return;
-                }
-                for (var i = 1; i < 1000; i++) {
-                  if (!lib.config.customBackgroundMusic[link + "_" + i]) {
-                    link = link + "_" + i;
-                    break;
-                  }
-                }
-              }
-              var callback = function () {
-                var nodexx = ui.background_music_setting;
-                var nodeyy = nodexx._link.menu;
-                var nodezz = nodexx._link.config;
-                var musicname = link.slice(link.indexOf("_") + 1);
-                game.prompt(
-                  "###请输入音乐的名称###" + musicname,
-                  true,
-                  function (str) {
-                    if (str) {
-                      musicname = str;
-                    }
-                    lib.config.customBackgroundMusic[link] = musicname;
-                    lib.config.background_music = link;
-                    lib.config.all.background_music.add(link);
-                    game.saveConfig("background_music", link);
-                    game.saveConfig(
-                      "customBackgroundMusic",
-                      lib.config.customBackgroundMusic
-                    );
-                    nodezz.item[link] = lib.config.customBackgroundMusic[link];
-                    var textMenu = ui.create.div(
-                      "",
-                      lib.config.customBackgroundMusic[link],
-                      nodeyy,
-                      clickMenuItem,
-                      nodeyy.childElementCount - 2
-                    );
-                    textMenu._link = link;
-                    nodezz.updatex.call(nodexx, []);
-                    _status.music_importing = false;
-                    if (!_status._aozhan) {
-                      game.playBackgroundMusic();
-                    }
-                  }
-                );
-              };
-              if (game.writeFile) {
-                game.writeFile(
-                  fileToLoad,
-                  "audio/background",
-                  link + ".mp3",
-                  callback
-                );
-              } else {
-                game.putDB("audio", link, fileToLoad, callback);
-              }
-            }
-          };
-        } else if (j == "extension_source") {
-          ui.extension_source = cfgnode;
-          cfgnode.updateInner = function () {
-            this._link.choosing.innerHTML = lib.config.extension_source;
-          };
-        }
-        map[j] = cfgnode;
-        if (!cfg.unfrequent) {
-          if (cfg.type == "autoskill") {
-            page.insertBefore(cfgnode, banskill);
-          } else {
-            page.appendChild(cfgnode);
+          if (cfg.update) {
+            cfg.update(map);
           }
-        } else {
-          // cfgnode.classList.add('auto-hide');
-          hiddenNodes.push(cfgnode);
-        }
-      }
-      var expanded = false;
-      if (hiddenNodes.length) {
-        // ui.create.div('.config.more','更多 <div>&gt;</div>',page,function(){
-        //     if(expanded){
-        //      			this.classList.remove('on');
-        //      			this.parentNode.classList.remove('expanded');
-        //     }
-        //     else{
-        //      			this.classList.add('on');
-        //      			this.parentNode.classList.add('expanded');
-        //     }
-        //     expanded=!expanded;
-        // });
-        page.classList.add("morenodes");
-        for (var k = 0; k < hiddenNodes.length; k++) {
-          page.appendChild(hiddenNodes[k]);
-        }
+        };
       }
       if (info.config.update) {
-        info.config.update(config, map);
+        cfg.update = function () {
+          info.config.update(config, map);
+        };
+      }
+      var cfgnode = createConfig(cfg);
+      if (cfg.type == "autoskill") {
+        autoskillNodes.push(cfgnode);
+        cfgnode.classList.add("indent");
+        cfgnode.style.display = "none";
+      } else if (cfg.type == "banskill") {
+        banskillNodes.push(cfgnode);
+        cfgnode.classList.add("indent");
+        cfgnode.style.display = "none";
+      }
+      if (j == "import_data_button") {
+        ui.import_data_button = cfgnode;
+        cfgnode.hide();
+      }
+      map[j] = cfgnode;
+      if (!cfg.unfrequent) {
+        if (cfg.type == "autoskill") {
+          page.insertBefore(cfgnode, banskill);
+        } else {
+          page.appendChild(cfgnode);
+        }
+      } else {
+        hiddenNodes.push(cfgnode);
       }
     }
-    // };
-    // if(!get.config('menu_loadondemand')) node._initLink();
-    return node;
-  };
-
-  for (var i in lib.configMenu) {
-    // 跳过与炉石传说无关的选项类别
-    if (i != "others" && i != "skill") {
-      createModeConfig(i, start.firstChild);
+    var expanded = false;
+    if (hiddenNodes.length) {
+      page.classList.add("morenodes");
+      for (var k = 0; k < hiddenNodes.length; k++) {
+        page.appendChild(hiddenNodes[k]);
+      }
+    }
+    if (info.config.update) {
+      info.config.update(config, map);
     }
   }
-  createModeConfig("others", start.firstChild);
 
   var active = start.firstChild.querySelector(".active");
   if (!active) {
@@ -620,4 +237,20 @@ export const optionsMenu = function (connectMenu) {
     active._initLink();
   }
   rightPane.appendChild(active.link);
+  if (lib.config.fold_mode) {
+    rightPane.addEventListener(
+      "mousewheel",
+      function (e) {
+        var morenodes = this.firstChild.morenodes;
+        if (morenodes) {
+          if (e.wheelDelta < 0) {
+            morenodes._onclick.call(morenodes, "expand");
+          } else if (this.scrollTop == 0) {
+            morenodes._onclick.call(morenodes, "unexpand");
+          }
+        }
+      },
+      { passive: true }
+    );
+  }
 };

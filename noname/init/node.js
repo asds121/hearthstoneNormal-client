@@ -28,7 +28,11 @@ export function nodeReady() {
 	lib.path = lib.node.path;
 	game.download = function (url, folder, onsuccess, onerror, dev, onprogress) {
 		if (!url.startsWith("http")) {
-			url = get.url(dev) + url;
+			// 删除了对远程仓库的访问支持，只支持直接的http/https链接
+			if (onerror) {
+				onerror(new Error("只支持直接的http/https下载链接"));
+			}
+			return;
 		}
 		game.ensureDirectory(
 			folder,

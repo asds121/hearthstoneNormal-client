@@ -9,7 +9,7 @@ export const helpModule = {
 			<ul style="margin-top:0; list-style: disc; padding-left: 20px;">
 				<li>
 					<strong>运行环境与协议:</strong><br/>
-					本扩展需要依靠无名杀本体运行。无名杀使用 GPLv3 协议，因此本扩展也遵循 GPLv3 协议。
+				本扩展需要依靠炉石普通专用客户端运行。炉石普通专用客户端使用 GPLv3 协议，因此本扩展也遵循 GPLv3 协议。
 					<br/>
 					<a :href="licenseLink" target="_blank" style="color: #4CAF50;">点击查看GPLv3协议详情</a>
 					<br/>

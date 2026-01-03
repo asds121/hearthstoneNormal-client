@@ -489,7 +489,7 @@ export async function boot() {
       lib.configMenu.appearence.config.theme.item[name] = pack.theme[name];
     }
   }
-  if (config.get("extension_sources")) {
+  if (config.get("extension_sources") && lib.configMenu.general.config.extension_source && lib.configMenu.general.config.extension_source.item) {
     for (const name in config.get("extension_sources")) {
       lib.configMenu.general.config.extension_source.item[name] = name;
     }

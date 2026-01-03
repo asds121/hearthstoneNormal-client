@@ -1257,15 +1257,8 @@ export class Get extends GetCompatible {
 		return "###" + str + "###" + lib.translate[skill + "_info"];
 	}
 	url(master) {
-		var url = lib.config.updateURL || lib.updateURL;
-		if (url[url.length - 1] != "/") {
-			url += "/";
-		}
-		if (master != "nodev") {
-			return url + "master/";
-		} else {
-			return url + "v" + lib.version + "/";
-		}
+		// 删除了对远程服务器的访问，此方法已不再使用
+		return "";
 	}
 	round(num, f) {
 		var round = Math.pow(10, f);
