@@ -45,7 +45,6 @@ export class Player extends HTMLDivElement {
     const node = (player.node = {
       avatar: ui.create.div(".avatar", player, ui.click.avatar).hide(),
       avatar2: ui.create.div(".avatar2", player, ui.click.avatar2).hide(),
-      turnedover: ui.create.div(".turned", "<div>翻面<div>", player),
       framebg: ui.create.div(".framebg", player),
       intro: ui.create.div(".intro", player),
       identity: ui.create.div(".identity", player),
@@ -1301,67 +1300,7 @@ export class Player extends HTMLDivElement {
       this.getGiftAIResultTarget(card, target) * get.attitude(this, target)
     );
   }
-  //Recast
-  /**
-   * 重铸
-   * @param { Card | Card[] } cards
-   * @param { (player: Player, cards: Card[]) => any } [recastingLose]
-   * @param { (player: Player, cards: Card[]) => any } [recastingGain]
-   */
-  recast(
-    cards,
-    recastingLose = (player, cards) =>
-      (player.loseToDiscardpile(cards).log = false),
-    recastingGain = (player, cards) => (player.draw(cards.length).log = false)
-  ) {
-    const recast = game.createEvent("recast");
-    recast.player = this;
-    const isArray = Array.isArray(cards);
-    if (cards && !isArray) {
-      recast.cards = [cards];
-    } else if (isArray && cards.length) {
-      recast.cards = cards;
-    } else {
-      _status.event.next.remove(recast);
-      recast.resolve();
-    }
-    if (typeof recastingLose != "function") {
-      if (recastingLose === null) {
-        console.trace(
-          `recast的recastingLose参数不应传入null,可以用void 0或undefined占位`
-        );
-      }
-      recastingLose = (player, cards) =>
-        (player.loseToDiscardpile(cards).log = false);
-    }
-    recast.recastingLose = recastingLose;
-    recast.recastingLosingEvents = [];
-    if (typeof recastingGain != "function") {
-      if (recastingLose === null) {
-        console.trace(
-          `recast的recastingGain参数不应传入null,可以用void 0或undefined占位`
-        );
-      }
-      recastingGain = (player, cards) =>
-        (player.draw(cards.length).log = false);
-    }
-    recast.recastingGain = recastingGain;
-    recast.recastingGainingEvents = [];
-    recast.setContent("recast");
-    recast._args = Array.from(arguments);
-    return recast;
-  }
-  /**
-   * Check if the player can recast the card
-   *
-   * 检测角色是否能重铸此牌
-   * @param { Card } card
-   * @param { Player } [source]
-   * @param { boolean } [strict]
-   */
-  canRecast(card, source, strict) {
-    return lib.filter.cardRecastable(card, this, source, strict);
-  }
+
   //装备栏相关
   /**
    * 判断一名角色的某个区域是否被废除
@@ -3213,11 +3152,7 @@ export class Player extends HTMLDivElement {
     if (!lib.character[character]) {
       return;
     }
-    if (get.is.jun(character2)) {
-      var tmp = character;
-      character = character2;
-      character2 = tmp;
-    }
+
     if (character2 == false) {
       skill = false;
       character2 = null;
@@ -4194,8 +4129,6 @@ export class Player extends HTMLDivElement {
     this._giveUp = true;
     if (this == game.me) {
       ui.create.giveup();
-    } else if (this.isOnline2()) {
-      this.send(ui.create.giveup);
     }
   }
   applySkills(skills) {
@@ -5768,11 +5701,7 @@ export class Player extends HTMLDivElement {
     if (!identity) {
       identity = this.identity;
     }
-    if (get.is.jun(this)) {
-      this.node.identity.firstChild.innerHTML = "君";
-    } else {
-      this.node.identity.firstChild.innerHTML = get.translation(identity);
-    }
+    this.node.identity.firstChild.innerHTML = get.translation(identity);
     this.node.identity.dataset.color = nature || identity;
     return this;
   }
@@ -7550,15 +7479,7 @@ export class Player extends HTMLDivElement {
       }
     }
     next.setContent("draw");
-    if (
-      lib.config.mode == "stone" &&
-      _status.mode == "deck" &&
-      next.drawDeck == undefined &&
-      !next.player.isMin() &&
-      next.num > 1
-    ) {
-      next.drawDeck = 1;
-    }
+
     next.result = [];
     next.gaintag = [];
     return next;
@@ -9226,26 +9147,7 @@ export class Player extends HTMLDivElement {
     next.setContent("judge");
     return next;
   }
-  turnOver(bool) {
-    var next = game.createEvent("turnOver");
-    next.player = this;
-    next.includeOut = true;
-    next.setContent("turnOver");
-    if (typeof bool == "boolean") {
-      if (bool) {
-        if (this.isTurnedOver()) {
-          _status.event.next.remove(next);
-          next.resolve();
-        }
-      } else {
-        if (!this.isTurnedOver()) {
-          _status.event.next.remove(next);
-          next.resolve();
-        }
-      }
-    }
-    return next;
-  }
+
   out(skill) {
     if (typeof skill == "number") {
       this.outCount += skill;
@@ -9894,10 +9796,7 @@ export class Player extends HTMLDivElement {
       player.updateMarks();
     };
     if (event.player == game.me) {
-      func(skill, target);
-    } else if (event.isOnline()) {
-      this.send(func, skill, target);
-    }
+      func(skill, target);}
   }
   markSkill(name, info, card, nobroadcast) {
     if (info === true) {
@@ -12434,13 +12333,7 @@ export class Player extends HTMLDivElement {
     }
     return this.classList.contains("linked");
   }
-  /**
-   * 返回玩家是否是翻面状态
-   * @returns { boolean }
-   */
-  isTurnedOver() {
-    return this.classList.contains("turnedover");
-  }
+
   /**
    * 返回玩家是否是被移出游戏
    * @returns { boolean }
@@ -12449,7 +12342,7 @@ export class Player extends HTMLDivElement {
     return this.classList.contains("out");
   }
   isMin(distance) {
-    if (distance && lib.config.mode != "stone") {
+    if (distance) {
       return false;
     }
     if (this.forcemin) {
@@ -12530,21 +12423,9 @@ export class Player extends HTMLDivElement {
     return false;
   }
   isOnline() {
-    if (
-      this.ws &&
-      lib.node &&
-      !this.ws.closed &&
-      this.ws.inited &&
-      !this.isAuto
-    ) {
-      return true;
-    }
     return false;
   }
   isOnline2() {
-    if (this.ws && lib.node && !this.ws.closed) {
-      return true;
-    }
     return false;
   }
   isOffline() {

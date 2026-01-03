@@ -858,7 +858,7 @@ export class Game extends GameCompatible {
     if (rank.rare.includes(name)) {
       return "rare";
     }
-    if (get.mode() != "chess" && rank.junk.includes(name)) {
+    if (rank.junk.includes(name)) {
       return "junk";
     }
     return "common";
@@ -3582,52 +3582,18 @@ export class Game extends GameCompatible {
           game.players[i].init(players[i].name, players[i].name2);
           game.players[i].setIdentity(players[i].identity);
           game.players[i].setNickname(players[i].nickname);
-        } else if (lib.config.mode == "stone") {
-          game.players[i].init(players[i].name, players[i].name2);
-          game.players[i].classList.add("noidentity");
-          game.players[i].updateActCount(null, players[i].count, 0);
         } else if (lib.config.mode == "boss") {
           game.players[i].init(players[i].name, players[i].name2);
           game.players[i].setIdentity(players[i].identity);
           game.players[i].dataset.position = players[i].position;
           game.players[i].node.action.innerHTML = "行动";
-        } else if (lib.config.mode == "versus") {
-          game.players[i].init(players[i].name, players[i].name2);
-          game.players[i].node.identity.firstChild.innerHTML =
-            players[i].identity;
-          game.players[i].node.identity.dataset.color = players[i].color;
-          game.players[i].node.action.innerHTML = "行动";
-        } else if (lib.config.mode == "guozhan") {
-          game.players[i].name = players[i].name;
-          game.players[i].name1 = players[i].name1;
-          game.players[i].name2 = players[i].name2;
-
-          game.players[i].sex = "unknown";
-          game.players[i].identity = "unknown";
-
-          lib.translate[game.players[i].name] = players[i].translate;
-          game.players[i].init(players[i].name1, players[i].name2);
-
-          game.players[i].classList.add("unseen_v");
-          game.players[i].classList.add("unseen2_v");
-          if (game.players[i] != game.me) {
-            game.players[i].node.identity.firstChild.innerHTML = "猜";
-            game.players[i].node.identity.dataset.color = "unknown";
-          } else {
-            game.players[i].setIdentity(game.players[i].group);
-          }
-          game.players[i].setNickname(players[i].nickname);
         }
       }
       for (var i = 0; i < game.players.length; i++) {
         game.playerMap[game.players[i].dataset.position] = game.players[i];
       }
 
-      if (lib.config.mode == "versus") {
-        if (players.bool) {
-          game.onSwapControl();
-        }
-      } else if (lib.config.mode == "boss") {
+      if (lib.config.mode == "boss") {
         if (!players.boss) {
           game.onSwapControl();
         }
@@ -4429,11 +4395,6 @@ export class Game extends GameCompatible {
       player.next.previous = player.previous;
       game.players.remove(player);
       game.dead.push(player);
-      if (lib.config.mode == "stone") {
-        setTimeout(function () {
-          player.delete();
-        }, 500);
-      }
     },
     tafangMe: function (player) {
       if (player) {
@@ -6892,7 +6853,7 @@ export class Game extends GameCompatible {
       game.addOverDialog(dialog, result);
     }
 
-    if (get.mode() == "versus" && _status.ladder) {
+    if (false) {
       let mmr = _status.ladder_mmr;
       mmr += 10 - get.rank(game.me.name, true) * 2;
       if (result == "战斗胜利") {
@@ -7242,28 +7203,11 @@ export class Game extends GameCompatible {
       };
       let modecharacters = lib.characterPack["mode_" + get.mode()];
       if (modecharacters) {
-        if (get.mode() == "guozhan") {
-          if (modecharacters[newvid.name1]) {
-            if (newvid.name1.startsWith("gz_shibing")) {
-              newvid.name1 = newvid.name1.slice(3, 11);
-            } else {
-              newvid.name1 = newvid.name1.slice(3);
-            }
-          }
-          if (modecharacters[newvid.name2]) {
-            if (newvid.name2.startsWith("gz_shibing")) {
-              newvid.name2 = newvid.name2.slice(3, 11);
-            } else {
-              newvid.name2 = newvid.name2.slice(3);
-            }
-          }
-        } else {
-          if (modecharacters[newvid.name1]) {
-            newvid.name1 = get.mode() + "::" + newvid.name1;
-          }
-          if (modecharacters[newvid.name2]) {
-            newvid.name2 = get.mode() + "::" + newvid.name2;
-          }
+        if (modecharacters[newvid.name1]) {
+          newvid.name1 = get.mode() + "::" + newvid.name1;
+        }
+        if (modecharacters[newvid.name2]) {
+          newvid.name2 = get.mode() + "::" + newvid.name2;
         }
       }
       if (newvid.name1 && newvid.name1.startsWith("subplayer_")) {
@@ -7304,12 +7248,6 @@ export class Game extends GameCompatible {
             game.saveConfig("mode", "boss");
             break;
           case "boss":
-            game.saveConfig("mode", "chess");
-            break;
-          case "chess":
-            game.saveConfig("mode", "stone");
-            break;
-          case "stone":
             game.saveConfig("mode", "identity");
             break;
         }
@@ -9599,11 +9537,7 @@ export class Game extends GameCompatible {
           avatar = player.node.avatar.cloneNode();
         } else if (!player.isUnseen(1)) {
           avatar = player.node.avatar2.cloneNode();
-        } else if (
-          get.mode() == "guozhan" &&
-          player.node &&
-          player.node.name_seat
-        ) {
+        } else if (player.node && player.node.name_seat) {
           avatar = ui.create.div(".avatar.cardbg");
           avatar.innerHTML = player.node.name_seat.innerHTML[0];
         } else {
@@ -9649,11 +9583,7 @@ export class Game extends GameCompatible {
         avatar = player.node.avatar.cloneNode();
       } else if (!player.isUnseen(1)) {
         avatar = player.node.avatar2.cloneNode();
-      } else if (
-        get.mode() == "guozhan" &&
-        player.node &&
-        player.node.name_seat
-      ) {
+      } else if (player.node && player.node.name_seat) {
         avatar = ui.create.div(".avatar.cardbg");
         avatar.innerHTML = player.node.name_seat.innerHTML[0];
       } else {
@@ -9676,11 +9606,7 @@ export class Game extends GameCompatible {
             avatar2 = target.node.avatar.cloneNode();
           } else if (!player.isUnseen(1)) {
             avatar2 = target.node.avatar2.cloneNode();
-          } else if (
-            get.mode() == "guozhan" &&
-            target.node &&
-            target.node.name_seat
-          ) {
+          } else if (target.node && target.node.name_seat) {
             avatar2 = ui.create.div(".avatar.cardbg");
             avatar2.innerHTML = target.node.name_seat.innerHTML[0];
           } else {

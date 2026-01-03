@@ -117,7 +117,7 @@ class Application {
           const hasNoDefaultPicture =
             nameinfo?.[4]?.includes("noDefaultPicture");
           const sex =
-            nameinfo && ["male", "female", "double"].includes(nameinfo[0])
+            nameinfo && ["male", "female"].includes(nameinfo[0])
               ? nameinfo[0]
               : "male";
           const backgrounds = hasNoDefaultPicture

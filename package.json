@@ -2,7 +2,14 @@
   "name": "hearthstone-normal-client",
   "version": "1.0.0",
   "description": "基于无名杀框架的多游戏扩展客户端，默认加载炉石普通扩展",
-  "keywords": ["无名杀", "游戏客户端", "卡牌游戏", "炉石传说", "影之诗", "游戏王"],
+  "keywords": [
+    "无名杀",
+    "游戏客户端",
+    "卡牌游戏",
+    "炉石传说",
+    "影之诗",
+    "游戏王"
+  ],
   "scripts": {
     "start": "npx http-server -p 8080 -o",
     "serve": "npx http-server -p 8080"

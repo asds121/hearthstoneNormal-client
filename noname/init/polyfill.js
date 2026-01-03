@@ -47,7 +47,7 @@ HTMLDivElement.prototype.animate = function (keyframes, options) {
  */
 HTMLDivElement.prototype.addTempClass = function (name, time = 1000) {
 	// @ts-expect-error ignore
-	let that = get.is.mobileMe(this) && name === "target" ? ui.mebg : this;
+	let that = this;
 	that.classList.add(name);
 	setTimeout(() => {
 		that.classList.remove(name);

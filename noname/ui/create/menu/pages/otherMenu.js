@@ -972,9 +972,6 @@ export const otherMenu = function (
             case "横置":
               target.link();
               break;
-            case "翻面":
-              target.turnOver();
-              break;
             case "复活":
               target.revive(target.maxHp);
               break;
@@ -1039,7 +1036,6 @@ export const otherMenu = function (
     var nodedraw = ui.create.div(".menubutton", "摸牌", row1, clickrow1);
     var nodediscard = ui.create.div(".menubutton", "弃牌", row1, clickrow1);
     var nodelink = ui.create.div(".menubutton", "横置", row1, clickrow1);
-    var nodeturnover = ui.create.div(".menubutton", "翻面", row1, clickrow1);
     var noderevive = ui.create.div(".menubutton", "复活", row1, clickrow1);
     var nodereplace = ui.create.div(".menubutton", "换人", row1, clickrow1);
     if (!game.canReplaceViewpoint || !game.canReplaceViewpoint()) {
@@ -1143,7 +1139,6 @@ export const otherMenu = function (
       }
       if (
         lib.config.mode == "identity" ||
-        lib.config.mode == "guozhan" ||
         lib.config.mode == "doudizhu"
       ) {
         if (

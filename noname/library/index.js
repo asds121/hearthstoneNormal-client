@@ -409,7 +409,7 @@ export class Library {
    * @type { { character?: SMap<importCharacterConfig>, card?: SMap<importCardConfig>, mode?: SMap<importModeConfig>, player?: SMap<importPlayerConfig>, extension?: SMap<importExtensionConfig>, play?: SMap<importPlayConfig> } }
    */
   imported = {};
-  layoutfixed = ["chess", "tafang", "stone"];
+  layoutfixed = ["stone"];
   pinyins = {
     _metadata: {
       shengmu: [
@@ -1302,12 +1302,7 @@ export class Library {
             2500: "2.5秒",
           },
         },
-        doubleclick_intro: {
-          name: "双击显示武将资料",
-          init: true,
-          unfrequent: true,
-          intro: "双击武将头像后显示其资料卡",
-        },
+
         video: {
           name: "保存录像",
           init: "20",
@@ -3744,12 +3739,11 @@ export class Library {
         die_move: {
           name: "阵亡效果",
           intro: "阵亡后武将的显示效果",
-          init: "flip",
+          init: "move",
           unfrequent: true,
           item: {
             off: "关闭",
             move: "移动",
-            flip: "翻面",
           },
         },
         target_shake: {
@@ -3767,20 +3761,7 @@ export class Library {
             ui.arena.dataset.target_shake = bool;
           },
         },
-        turned_style: {
-          name: "翻面文字",
-          intro: "角色被翻面时显示“翻面”",
-          init: true,
-          unfrequent: true,
-          onclick(bool) {
-            game.saveConfig("turned_style", bool);
-            if (bool) {
-              ui.arena.classList.remove("hide_turned");
-            } else {
-              ui.arena.classList.add("hide_turned");
-            }
-          },
-        },
+
         link_style2: {
           name: "横置样式",
           intro: "设置角色被横置时的样式",
@@ -5316,15 +5297,12 @@ export class Library {
             map.connect_choice_zhong.hide();
             map.connect_choice_fan.hide();
             map.connect_choice_nei.hide();
-            map.connect_double_nei.hide();
             map.connect_enable_commoner.hide();
             map.connect_choice_commoner.hide();
             map.connect_enable_year_limit.show();
             map.connect_zhong_card.show();
             map.connect_special_identity.hide();
-            map.connect_double_character.show();
           } else if (config.connect_identity_mode == "stratagem") {
-            map.connect_double_character.show();
             map.connect_player_number.show();
             map.connect_choice_zhu.show();
             map.connect_limit_zhu.hide();
@@ -5333,7 +5311,6 @@ export class Library {
             map.connect_choice_zhong.show();
             map.connect_choice_fan.show();
             map.connect_choice_nei.show();
-            map.connect_double_nei.hide();
             map.connect_enable_commoner.hide();
             map.connect_choice_commoner.hide();
             map.connect_enable_year_limit.show();
@@ -5348,15 +5325,12 @@ export class Library {
             map.connect_choice_zhong.hide();
             map.connect_choice_fan.hide();
             map.connect_choice_nei.hide();
-            map.connect_double_nei.hide();
             map.connect_enable_commoner.hide();
             map.connect_choice_commoner.hide();
             map.connect_enable_year_limit.hide();
             map.connect_zhong_card.hide();
             map.connect_special_identity.hide();
-            map.connect_double_character.hide();
           } else {
-            map.connect_double_character.show();
             map.connect_player_number.show();
             map.connect_choice_zhu.show();
             map.connect_limit_zhu.show();
@@ -5365,14 +5339,9 @@ export class Library {
             map.connect_choice_zhong.show();
             map.connect_choice_fan.show();
             map.connect_choice_nei.show();
-            map.connect_double_nei[
+            map.connect_enable_commoner[
               config.connect_player_number != "2" &&
               !config.connect_enable_commoner
-                ? "show"
-                : "hide"
-            ]();
-            map.connect_enable_commoner[
-              config.connect_player_number != "2" && !config.connect_double_nei
                 ? "show"
                 : "hide"
             ]();
@@ -5498,15 +5467,6 @@ export class Library {
             game.saveConfig("connect_choice_nei", num, "identity");
           },
         },
-        connect_double_nei: {
-          name: "双内奸",
-          init: false,
-          restart: true,
-          // frequent:true,
-          get intro() {
-            return lib.mode.identity.config.double_nei.intro;
-          },
-        },
         connect_enable_commoner: {
           name: "启用平民",
           init: false,
@@ -5532,12 +5492,6 @@ export class Library {
             text.innerText = num;
             game.saveConfig("connect_choice_commoner", num, "identity");
           },
-        },
-        connect_double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: true,
         },
         connect_change_card: {
           name: "启用手气卡",
@@ -5604,7 +5558,6 @@ export class Library {
             map.player_number.hide();
             map.enhance_zhu.hide();
             map.enable_mingcha.hide();
-            map.double_nei.hide();
             map.auto_identity.hide();
             map.choice_zhu.hide();
             map.limit_zhu.hide();
@@ -5622,14 +5575,8 @@ export class Library {
             map.choose_group.show();
             map.change_choice.show();
             map.auto_mark_identity.show();
-            map.double_character.show();
             map.free_choose.show();
             map.change_identity.show();
-            if (config.double_character) {
-              map.double_hp.show();
-            } else {
-              map.double_hp.hide();
-            }
             map.continue_game.show();
           } else if (config.identity_mode == "stratagem") {
             map.continue_game.show();
@@ -5707,18 +5654,13 @@ export class Library {
             map.enhance_zhu.show();
             map.enable_mingcha.show();
             map.auto_identity.show();
-            map.double_nei[
-              config.player_number != "2" && !config.enable_commoner
-                ? "show"
-                : "hide"
-            ]();
             map.choice_zhu.show();
             map.limit_zhu.show();
             map.choice_zhong.show();
             map.choice_nei.show();
             map.choice_fan.show();
             map.enable_commoner[
-              config.player_number != "2" && !config.double_nei
+              config.player_number != "2" && !config.enable_commoner
                 ? "show"
                 : "hide"
             ]();
@@ -5789,14 +5731,6 @@ export class Library {
           frequent: true,
           restart: true,
         },
-        double_nei: {
-          name: "双内奸",
-          init: false,
-          restart: true,
-          frequent: true,
-          intro:
-            "若游戏人数不大于9，则开启后游戏中将有两个内奸（内奸胜利条件仍为主内1v1时击杀主公）",
-        },
         choose_group: {
           name: "神武将选择势力",
           init: true,
@@ -5811,12 +5745,6 @@ export class Library {
           init: true,
           unfrequent: true,
         },
-        double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: true,
-        },
         special_identity: {
           name: "特殊身份",
           init: false,
@@ -5828,18 +5756,6 @@ export class Library {
           name: "明忠卡牌替换",
           init: true,
           frequent: true,
-          restart: true,
-        },
-        double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
           restart: true,
         },
         auto_identity: {
@@ -6467,18 +6383,7 @@ export class Library {
           intro:
             "若开启此选项，晋势力武将将使用OL【文德武备】版本；否则使用线下【紫气东来】【受命于天】版本。",
         },
-        double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
-          restart: true,
-        },
+
         free_choose: {
           name: "自由选将",
           init: true,
@@ -6572,19 +6477,7 @@ export class Library {
           intro: "游戏结束后可选择用相同的武将再进行一局游戏",
           onclick(bool) {
             game.saveConfig("continue_game", bool, this._link.config.mode);
-            if (get.config("continue_game") && get.mode() == "guozhan") {
-              if (
-                !ui.continue_game &&
-                _status.over &&
-                !_status.brawl &&
-                !game.no_continue_game
-              ) {
-                ui.continue_game = ui.create.control(
-                  "再战",
-                  game.reloadCurrent
-                );
-              }
-            } else if (ui.continue_game) {
+            if (ui.continue_game) {
               ui.continue_game.close();
               delete ui.continue_game;
             }
@@ -6595,11 +6488,7 @@ export class Library {
           init: true,
           onclick(bool) {
             game.saveConfig("dierestart", bool, this._link.config.mode);
-            if (get.config("dierestart") && get.mode() == "guozhan") {
-              if (!ui.restart && game.me.isDead() && !_status.connectMode) {
-                ui.restart = ui.create.control("restart", game.reload);
-              }
-            } else if (ui.restart) {
+            if (ui.restart) {
               ui.restart.close();
               delete ui.restart;
             }
@@ -6610,11 +6499,7 @@ export class Library {
           init: false,
           onclick(bool) {
             game.saveConfig("revive", bool, this._link.config.mode);
-            if (get.config("revive") && get.mode() == "guozhan") {
-              if (!ui.revive && game.me.isDead()) {
-                ui.revive = ui.create.control("revive", ui.click.dierevive);
-              }
-            } else if (ui.revive) {
+            if (ui.revive) {
               ui.revive.close();
               delete ui.revive;
             }
@@ -6991,11 +6876,7 @@ export class Library {
           },
           frequent: true,
         },
-        double_character_jiange: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-        },
+
         replace_handcard_two: {
           name: "四号位保护",
           init: true,
@@ -7065,10 +6946,8 @@ export class Library {
           name: "编辑统率将池",
           clear: true,
           onclick() {
-            if (get.mode() != "versus") {
-              alert("请进入对决模式，然后再编辑将池");
-              return;
-            }
+            alert("请进入对决模式，然后再编辑将池");
+            return;
             var container = ui.create.div(".popup-container.editor");
             var node = container;
             var map = get.config("character_three") || lib.choiceThree;
@@ -7461,12 +7340,7 @@ export class Library {
           restart: true,
           frequent: true,
         },
-        connect_double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: true,
-        },
+
         connect_choice_zhu: {
           name: "地主候选武将数",
           init: 5,
@@ -7569,11 +7443,6 @@ export class Library {
             map.enhance_dizhu.show();
             map.feiyang_version.show();
           }
-          if (config.double_character && config.doudizhu_mode == "normal") {
-            map.double_hp.show();
-          } else {
-            map.double_hp.hide();
-          }
         },
         doudizhu_mode: {
           name: "游戏模式",
@@ -7588,24 +7457,7 @@ export class Library {
           restart: true,
           frequent: true,
         },
-        double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: true,
-        },
-        double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
-          restart: true,
-        },
+
         choice_zhu: {
           name: "地主候选武将数",
           init: 5,
@@ -7926,28 +7778,7 @@ export class Library {
           init: false,
           frequent: true,
         },
-        connect_double_character: {
-          name: "启用双将",
-          init: "single",
-          item: {
-            single: "不启用",
-            double: "启用双将",
-            singble: "单双任选",
-          },
-          restart: true,
-        },
-        connect_double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
-          restart: true,
-        },
+
         update: function (config, map) {
           if (config.connect_single_mode != "normal") {
             map.connect_enable_jin.hide();
@@ -8000,28 +7831,7 @@ export class Library {
             unlimited: "无限",
           },
         },
-        double_character: {
-          name: "启用双将",
-          init: "single",
-          item: {
-            single: "不启用",
-            double: "启用双将",
-            singble: "单双任选",
-          },
-          restart: true,
-        },
-        double_hp: {
-          name: "双将体力上限",
-          init: "pingjun",
-          item: {
-            hejiansan: "和减三",
-            pingjun: "平均值",
-            zuidazhi: "最大值",
-            zuixiaozhi: "最小值",
-            zonghe: "相加",
-          },
-          restart: true,
-        },
+
         single_control: {
           name: "单人控制",
           intro: "由玩家操作点将单挑的两名游戏角色",
@@ -8466,17 +8276,7 @@ export class Library {
           frequent: true,
           restart: true,
         },
-        double_character: {
-          name: "双将模式",
-          init: false,
-          frequent: true,
-          restart: function () {
-            return (
-              _status.event.getParent().name != "chooseCharacter" ||
-              _status.event.name != "chooseButton"
-            );
-          },
-        },
+
         free_choose: {
           name: "自由选将",
           init: true,
@@ -11698,41 +11498,12 @@ export class Library {
         if (lib.configOL.banned.includes(i) || lib.connectBanned.includes(i)) {
           return true;
         }
-        var double_character = false;
-        if (lib.configOL.mode == "guozhan") {
-          double_character = true;
-        } else if (
-          lib.configOL.double_character &&
-          (lib.configOL.mode == "identity" || lib.configOL.mode == "stone")
-        ) {
-          double_character = true;
-        } else if (
-          lib.configOL.double_character_jiange &&
-          lib.configOL.mode == "versus" &&
-          _status.mode == "jiange"
-        ) {
-          double_character = true;
-        }
-        if (double_character && lib.config.forbiddouble.includes(i)) {
-          return true;
-        }
       } else {
         if (lib.config.banned.includes(i)) {
           return true;
         }
         var double_character = false;
         if (get.mode() == "guozhan") {
-          double_character = true;
-        } else if (
-          get.config("double_character") &&
-          (lib.config.mode == "identity" || lib.config.mode == "stone")
-        ) {
-          double_character = true;
-        } else if (
-          get.config("double_character_jiange") &&
-          lib.config.mode == "versus" &&
-          _status.mode == "jiange"
-        ) {
           double_character = true;
         }
         if (double_character && lib.config.forbiddouble.includes(i)) {
@@ -12487,9 +12258,6 @@ export class Library {
           return 7;
         }
         let base = 0;
-        if (get.is.double(name, true)) {
-          base = 9;
-        }
         const group = info[1];
         if (group == "shen" || group == "devil") {
           return base - 1;
@@ -13802,18 +13570,12 @@ export class Library {
       priority: 25,
       charlotte: true,
       filter: function (event, player) {
-        return (
-          get.mode() != "guozhan" &&
-          get.is.double(player.name1) &&
-          !player._groupChosen
-        );
+        return get.mode() != "guozhan" && false && !player._groupChosen;
       },
       content: function () {
         "step 0";
         player._groupChosen = "double";
-        player
-          .chooseControl(get.is.double(player.name1, true))
-          .set("prompt", "请选择你的势力");
+        player.chooseControl([]).set("prompt", "请选择你的势力");
         ("step 1");
         player.changeGroup(result.control);
       },
@@ -14387,22 +14149,7 @@ export class Library {
         player.recast(cards, void 0, (player, cards) => {
           var numberOfCardsToDraw = cards.length;
           cards.forEach((value) => {
-            if (
-              lib.config.mode == "stone" &&
-              _status.mode == "deck" &&
-              !player.isMin() &&
-              get.type(value).startsWith("stone")
-            ) {
-              var stonecard = get.stonecard(1, player.career);
-              if (stonecard.length) {
-                numberOfCardsToDraw -= stonecard.length;
-                player.gain(game.createCard(stonecard.randomGet()), "draw");
-              } else {
-                player.draw({
-                  drawDeck: 1,
-                }).log = false;
-              }
-            } else if (get.subtype(value) == "spell_gold") {
+            if (get.subtype(value) == "spell_gold") {
               var libCard = get.libCard(
                 (info) => info.subtype == "spell_silver"
               );
@@ -16740,6 +16487,14 @@ export class Library {
   };
 }
 
+/**
+ * @typedef {Object} Config
+ * @property {"hs_hearthstone"|"identity"|undefined} mode - 游戏模式
+ */
+
+/**
+ * @type {Config}
+ */
 Library.prototype.config = undefined;
 Library.prototype.configOL = undefined;
 

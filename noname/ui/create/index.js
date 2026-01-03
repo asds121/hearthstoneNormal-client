@@ -1104,9 +1104,7 @@ export class Create {
         }
       }
 
-      if (lib.character[i].isHiddenInStoneMode) {
-        continue;
-      }
+
       if (lib.config.banned.includes(i)) {
         continue;
       }
@@ -1297,9 +1295,7 @@ export class Create {
             }
           }
 
-          if (lib.character[i].isHiddenInStoneMode) {
-            continue;
-          }
+
           if (lib.character[i].isUnseen) {
             continue;
           }
@@ -1314,11 +1310,7 @@ export class Create {
           continue;
         }
         list.push(i);
-        if (get.is.double(i)) {
-          groups.add("double");
-        } else {
-          groups.add(lib.character[i][1]);
-        }
+        groups.add(lib.character[i][1]);
         if (namecapt.indexOf(getCapt(i)) == -1) {
           namecapt.push(getCapt(i));
         }
@@ -3567,10 +3559,7 @@ export class Create {
       }
       node.link = item;
 
-      var double = get.is.double(node._link, true);
-      if (double) {
-        node._changeGroup = true;
-      }
+
       if (
         type == "characterx" &&
         lib.characterReplace[node._link] &&
@@ -3671,22 +3660,22 @@ export class Create {
           lib.setIntro(node);
         }
         if (infoitem[1]) {
-          if (double) {
-            node.node.group.innerHTML = double.reduce(
-              (previousValue, currentValue) =>
-                `${previousValue}<div data-nature="${get.groupnature(currentValue)}">${get.translation(currentValue)}</div>`,
-              ""
-            );
-            if (double.length > 4) {
-              if (new Set([5, 6, 9]).has(double.length)) {
-                node.node.group.style.height = "48px";
-              } else {
-                node.node.group.style.height = "64px";
+          if (infoitem.doubleGroup) {
+              node.node.group.innerHTML = infoitem.doubleGroup.reduce(
+                (previousValue, currentValue) =>
+                  `${previousValue}<div data-nature="${get.groupnature(currentValue)}">${get.translation(currentValue)}</div>`,
+                ""
+              );
+              if (infoitem.doubleGroup.length > 4) {
+                if (new Set([5, 6, 9]).has(infoitem.doubleGroup.length)) {
+                  node.node.group.style.height = "48px";
+                } else {
+                  node.node.group.style.height = "64px";
+                }
               }
+            } else {
+              node.node.group.innerHTML = `<div>${get.translation(infoitem[1])}</div>`;
             }
-          } else {
-            node.node.group.innerHTML = `<div>${get.translation(infoitem[1])}</div>`;
-          }
           node.node.group.style.backgroundColor = get.translation(
             `${get.bordergroup(infoitem)}Color`
           );
