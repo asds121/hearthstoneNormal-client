@@ -245,7 +245,7 @@ export async function boot() {
     } else {
       resolve(void 0);
     }
-  }).then(onWindowReady.bind(window));
+  });
 
   // 清瑤？過於先進以至於無法運行我們的落後本體，故也就不再檢測
 
@@ -489,7 +489,11 @@ export async function boot() {
       lib.configMenu.appearence.config.theme.item[name] = pack.theme[name];
     }
   }
-  if (config.get("extension_sources") && lib.configMenu.general.config.extension_source && lib.configMenu.general.config.extension_source.item) {
+  if (
+    config.get("extension_sources") &&
+    lib.configMenu.general.config.extension_source &&
+    lib.configMenu.general.config.extension_source.item
+  ) {
     for (const name in config.get("extension_sources")) {
       lib.configMenu.general.config.extension_source.item[name] = name;
     }
@@ -906,9 +910,7 @@ export async function boot() {
   for (const characterPack of config.get("all").characters) {
     toLoad.push(importCharacterPack(characterPack));
   }
-  toLoad.push(lib.init.promises.js(`${lib.assetURL}character`, "rank"));
   toLoad.push(lib.init.promises.js(`${lib.assetURL}character`, "replace"));
-  toLoad.push(lib.init.promises.js(`${lib.assetURL}character`, "perfectPairs"));
 
   if (_status.javaScriptExtensions) {
     const loadJavaScriptExtension = async (
@@ -1261,14 +1263,7 @@ async function loadCss() {
 
 /**
  * `window.onload`触发时执行的函数
- *
- * 目前无任何内容，预防以后出现需要的情况
- *
- * @deprecated
- * @return {Promise<void>}
  */
-async function onWindowReady() {}
-
 function setBackground() {
   let htmlbg = localStorage.getItem(lib.configprefix + "background");
   if (htmlbg) {

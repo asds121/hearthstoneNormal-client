@@ -6934,7 +6934,6 @@ export class Game extends GameCompatible {
         ui.ladder.innerHTML = game.getLadderName(lib.storage.ladder.current);
       }
     }
-    // if(true){
     if (game.players.length) {
       table = document.createElement("table");
       tr = document.createElement("tr");
