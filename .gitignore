@@ -73,3 +73,6 @@ coverage/
 
 # Hearthstone resource folder
 extension/炉石普通/resource/
+
+# Text files
+*.txt

@@ -24,60 +24,99 @@ import { initializeSandboxRealms } from "../util/initRealms.js";
 import { ErrorManager } from "../util/error.js";
 import { rootURL } from "../../noname.js";
 
+// 辅助函数：检查是否已经是http协议
+function isHttpProtocol() {
+  return location.protocol.startsWith("http");
+}
+
+// 辅助函数：检查是否是首次启动
+function isFirstStartup() {
+  return !config.get("new_tutorial");
+}
+
+// 辅助函数：检查是否是手机端(Cordova平台)
+function isCordovaPlatform() {
+  return typeof window.cordova === "object" && window.cordova !== null;
+}
+
+// 辅助函数：检查是否是诗笺App
+function isShijianApp() {
+  return (
+    nonameInitialized &&
+    nonameInitialized.endsWith("com.noname.shijian/") &&
+    window.noname_shijianInterfaces &&
+    typeof window.noname_shijianInterfaces.sendUpdate === "function" &&
+    typeof window.noname_shijianInterfaces.getApkVersion === "function"
+  );
+}
+
+// 辅助函数：检查是否是由理版App
+function isYouliApp() {
+  return (
+    window.NonameAndroidBridge &&
+    typeof window.NonameAndroidBridge.sendUpdate === "function"
+  );
+}
+
+// 辅助函数：检查是否是Electron平台
+function isElectronPlatform() {
+  return (
+    typeof window.require === "function" && typeof window.process === "object"
+  );
+}
+
+// 辅助函数：检查是否是诗笺电脑版
+function isShijianDesktop() {
+  try {
+    const fs = require("fs");
+    const path = require("path");
+    if (fs.existsSync(path.join(__dirname, "package.json"))) {
+      const json = require("./package.json");
+      return json && Number(json.installerVersion) >= 1.7;
+    }
+    return false;
+  } catch (e) {
+    return false;
+  }
+}
+
 // 判断是否从file协议切换到http/s协议
 export function canUseHttpProtocol() {
   // 如果是http了就不用
-  if (location.protocol.startsWith("http")) {
+  if (isHttpProtocol()) {
     return false;
   }
+
   // 首次启动不更新(即还没进行过新手教程)
-  if (!config.get("new_tutorial")) {
+  if (isFirstStartup()) {
     return false;
   }
-  if (typeof nonameInitialized == "string") {
+
+  if (typeof nonameInitialized === "string") {
     // 手机端
-    if (window.cordova) {
-      // 直接确定包名
-      // 因为懒人包作者不一定会改成什么版本
-      // @ts-expect-error ignore
-      if (
-        nonameInitialized.endsWith("com.noname.shijian/") &&
-        window.noname_shijianInterfaces &&
-        typeof window.noname_shijianInterfaces.sendUpdate === "function"
-      ) {
-        // 每个app自定义能升级的渠道，比如判断版本
-        // @ts-expect-error ignore
+    if (isCordovaPlatform()) {
+      // 诗笺App判断
+      if (isShijianApp()) {
+        // @ts-expect-error - 类型系统未来可期 - 第三方接口类型
         return window.noname_shijianInterfaces.getApkVersion() >= 16000;
       }
-      // 由理版判断，后续所有app都通过此接口来升级协议
-      // @ts-expect-error ignore
-      if (
-        window.NonameAndroidBridge &&
-        typeof window.NonameAndroidBridge.sendUpdate === "function"
-      ) {
+
+      // 由理版App判断
+      if (isYouliApp()) {
         return true;
       }
     }
     // 电脑端
-    else if (
-      typeof window.require == "function" &&
-      typeof window.process == "object"
-    ) {
-      // 从json判断版本号
-      const fs = require("fs");
-      const path = require("path");
-      if (fs.existsSync(path.join(__dirname, "package.json"))) {
-        // @ts-expect-error ignore
-        const json = require("./package.json");
-        // 诗笺电脑版的判断
-        return json && Number(json.installerVersion) >= 1.7;
-      }
+    else if (isElectronPlatform()) {
+      // 诗笺电脑版判断
+      return isShijianDesktop();
     }
     // 浏览器端
     else {
-      return location.protocol.startsWith("http");
+      return isHttpProtocol();
     }
   }
+
   return false;
 }
 
@@ -539,24 +578,29 @@ export async function boot() {
   }
   localStorage.removeItem("show_splash_off");
   const extensionlist = [];
-  const hsExtensionName = "炉石普通";
+  const defaultExtensionName = "炉石普通";
 
-  // 确保炉石普通扩展始终在扩展列表中
-  if (!config.get("extensions").includes(hsExtensionName)) {
-    config.get("extensions").push(hsExtensionName);
+  // 将炉石普通扩展设为默认高优先级扩展
+  if (!config.get("extensions").includes(defaultExtensionName)) {
+    // 插入到扩展列表首位，保证高优先级
+    config.get("extensions").unshift(defaultExtensionName);
+  } else {
+    // 如果已存在，移到首位
+    const index = config.get("extensions").indexOf(defaultExtensionName);
+    if (index > 0) {
+      config.get("extensions").splice(index, 1);
+      config.get("extensions").unshift(defaultExtensionName);
+    }
   }
 
   if (!localStorage.getItem(lib.configprefix + "disable_extension")) {
     if (config.has("extensions") && config.get("extensions").length) {
       Reflect.set(window, "resetExtension", () => {
         for (var i = 0; i < config.get("extensions").length; i++) {
-          // 炉石普通扩展不能被禁用
-          if (config.get("extensions")[i] !== hsExtensionName) {
-            game.saveConfig(
-              "extension_" + config.get("extensions")[i] + "_enable",
-              false
-            );
-          }
+          game.saveConfig(
+            "extension_" + config.get("extensions")[i] + "_enable",
+            false
+          );
         }
         // @ts-expect-error ignore
         localStorage.setItem(lib.configprefix + "disable_extension", true);
@@ -590,11 +634,6 @@ export async function boot() {
         extensionlist.push(extName);
       }
     }
-  }
-
-  // 确保炉石普通扩展被加载
-  if (!extensionlist.includes(hsExtensionName)) {
-    extensionlist.push(hsExtensionName);
   }
 
   let layout = config.get("layout");
@@ -979,52 +1018,8 @@ export async function boot() {
 
 export { onload } from "./onload.js";
 
-async function autoImportExtensions(extensionlist) {
-  const configValue = config.get("extension_auto_import");
-  const fsAccess =
-    typeof game.getFileList == "function" &&
-    typeof game.checkFile == "function";
-
-  if (!configValue || !fsAccess) {
-    return;
-  }
-
-  const includedPlays = config.get("all").plays;
-  const savedExtensions = config.get("extensions");
-  const extensionPath = new URL("./extension/", rootURL);
-  const [extFolders] = await game.promises.getFileList(
-    get.relativePath(extensionPath)
-  );
-  let changed = false;
-
-  const unimportedExtensions = extFolders.filter(
-    (folder) =>
-      !includedPlays.includes(folder) && !savedExtensions.includes(folder)
-  );
-
-  const promises = unimportedExtensions.map(async (ext) => {
-    const path = new URL(`./${ext}/`, extensionPath);
-    const file = new URL("./extension.js", path);
-    const tsFile = new URL("./extension.ts", path);
-
-    if (
-      (await game.promises.checkFile(get.relativePath(file))) == 1 ||
-      (await game.promises.checkFile(get.relativePath(tsFile))) == 1
-    ) {
-      extensionlist.push(ext);
-      savedExtensions.push(ext);
-      changed = true;
-      if (!config.has(`extension_${ext}_enable`)) {
-        await game.promises.saveConfig(`extension_${ext}_enable`, false);
-      }
-    }
-  });
-  await Promise.allSettled(promises);
-
-  if (changed) {
-    await game.promises.saveConfig("extensions", savedExtensions);
-  }
-}
+// autoImportExtensions 函数已移除，该函数定义了但未被调用
+// 如需重新启用，请恢复此函数并添加调用
 
 function initSheet(libConfig) {
   if (
