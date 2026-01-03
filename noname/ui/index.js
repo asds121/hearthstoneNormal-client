@@ -131,10 +131,6 @@ export class UI {
 	/**
 	 * @type {HTMLDivElement}
 	 */
-	auto;
-	/**
-	 * @type {HTMLDivElement}
-	 */
 	wuxie;
 	/**
 	 * @type {HTMLDivElement}

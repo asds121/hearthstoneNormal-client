@@ -103,26 +103,16 @@ export function clickSwitcher() {
 /**
  * @this { HTMLDivElement } menuContainer
  */
-export function clickContainer(connectMenu) {
+export function clickContainer() {
   this.classList.add("hidden");
-  if (connectMenu) {
-    if (_status.enteringroom) {
-      _status.enteringroom = false;
-    }
-    if (_status.creatingroom) {
-      _status.creatingroom = false;
-    }
-    ui.window.classList.remove("shortcutpaused");
-  } else {
-    game.resume2();
-    if (game.onresume2) {
-      game.onresume2();
-    }
-    ui.arena.classList.remove("menupaused");
-    ui.historybar.classList.remove("menupaused");
-    ui.window.classList.remove("touchinfohidden");
-    ui.config2.classList.remove("pressdown2");
+  game.resume2();
+  if (game.onresume2) {
+    game.onresume2();
   }
+  ui.arena.classList.remove("menupaused");
+  ui.historybar.classList.remove("menupaused");
+  ui.window.classList.remove("touchinfohidden");
+  ui.config2.classList.remove("pressdown2");
 }
 export function clickMenuItem() {
   var node = this.parentNode._link;
@@ -139,7 +129,7 @@ export function clickMenuItem() {
     config.update();
   }
 }
-export function createMenu(connectMenu, tabs, config) {
+export function createMenu(tabs, config) {
   var createPage = function (position) {
     var node = ui.create.div(position);
     lib.setScroll(ui.create.div(".left.pane", node));
@@ -153,10 +143,6 @@ export function createMenu(connectMenu, tabs, config) {
       e.stopPropagation();
     }
   );
-  if (connectMenu) {
-    menu.classList.add("center");
-    menuContainer.classList.add("centermenu");
-  }
   var menuTab = ui.create.div(".menu-tab", menu);
   var menuTabBar = ui.create.div(".menu-tab-bar", menu);
   menuTabBar.style.left = (config.bar || 0) + "px";
@@ -449,26 +435,20 @@ export let menuxpages = window.menuxpages;
  */
 export const menuUpdates = window.menuUpdates;
 
-/**
- * @param { boolean } [connectMenu]
- */
-export function menu(connectMenu) {
+export function menu() {
   /** 提示重启的计时器 */
   let menuTimeout = null;
-  if (!connectMenu && !game.syncMenu) {
+  if (!game.syncMenu) {
     menuTimeout = setTimeout(lib.init.reset, 1000);
   }
   /** menu是menux.menu，目前只有赋值没有使用，所以先注释掉 */
   // let menu;
 
-  /**
-   * 由于联机模式会创建第二个菜单，所以需要缓存一下可变的变量
-   */
   const cacheMenuContainer =
     (menuContainer =
     window.menuContainer =
       ui.create.div(".menu-container.hidden", ui.window, () => {
-        clickContainer.call(cacheMenuContainer, connectMenu);
+        clickContainer.call(cacheMenuContainer);
       }));
   const cachePopupContainer =
     (popupContainer =
@@ -487,72 +467,30 @@ export function menu(connectMenu) {
         }
       }));
 
-  if (!connectMenu) {
-    ui.menuContainer = cacheMenuContainer;
-    ui.click.configMenu = function () {
-      ui.click.shortcut(false);
-      if (cacheMenuContainer.classList.contains("hidden")) {
-        ui.config2.classList.add("pressdown2");
-        ui.arena.classList.add("menupaused");
-        ui.historybar.classList.add("menupaused");
-        ui.window.classList.add("touchinfohidden");
-        cacheMenuContainer.classList.remove("hidden");
-        for (var i = 0; i < menuUpdates.length; i++) {
-          menuUpdates[i]();
-        }
-      } else {
-        clickContainer.call(cacheMenuContainer, connectMenu);
+  ui.menuContainer = cacheMenuContainer;
+  ui.click.configMenu = function () {
+    ui.click.shortcut(false);
+    if (cacheMenuContainer.classList.contains("hidden")) {
+      ui.config2.classList.add("pressdown2");
+      ui.arena.classList.add("menupaused");
+      ui.historybar.classList.add("menupaused");
+      ui.window.classList.add("touchinfohidden");
+      cacheMenuContainer.classList.remove("hidden");
+      for (var i = 0; i < menuUpdates.length; i++) {
+        menuUpdates[i]();
       }
-    };
-    menux = window.menux = createMenu(
-      connectMenu,
-      ["开始", "选项", "武将", "卡牌", "扩展", "其它"],
-      {
-        position: cacheMenuContainer,
-        bar: 40,
-      }
-    );
-  } else {
-    ui.connectMenuContainer = cacheMenuContainer;
-    ui.click.connectMenu = function () {
-      if (cacheMenuContainer.classList.contains("hidden")) {
-        if (_status.waitingForPlayer) {
-          startButton.innerHTML = "设";
-          var start = cacheMenux.pages[0].firstChild;
-          for (var i = 0; i < start.childNodes.length; i++) {
-            if (start.childNodes[i].mode != lib.configOL.mode) {
-              start.childNodes[i].classList.add("unselectable");
-              start.childNodes[i].classList.remove("active");
-              if (start.childNodes[i].link) {
-                start.childNodes[i].link.remove();
-              }
-            } else {
-              start.childNodes[i].classList.add("active");
-              if (start.childNodes[i].link) {
-                start.nextSibling.appendChild(start.childNodes[i].link);
-              } else {
-                console.log(start.nextSibling, start.childNodes[i]);
-              }
-            }
-          }
-        }
-        ui.window.classList.add("shortcutpaused");
-        cacheMenuContainer.classList.remove("hidden");
-        for (var i = 0; i < menuUpdates.length; i++) {
-          menuUpdates[i]();
-        }
-      } else {
-        clickContainer.call(cacheMenuContainer, connectMenu);
-      }
-    };
-
-    menux = window.menux = createMenu(connectMenu, ["模式", "武将", "卡牌"], {
+    } else {
+      clickContainer.call(cacheMenuContainer);
+    }
+  };
+  menux = window.menux = createMenu(
+    ["开始", "选项", "武将", "卡牌", "扩展", "其它"],
+    {
       position: cacheMenuContainer,
-      bar: 123,
-    });
-    // menu = menux.menu;
-    let cacheMenux = menux;
-  }
+      bar: 40,
+    }
+  );
+
   menuxpages = window.menuxpages = menux.pages.slice(0);
 
   // 确保menuxpages数组不为空
@@ -562,26 +500,26 @@ export function menu(connectMenu) {
   }
 
   // 开始
-  let startButton = ui.create.startMenu(connectMenu);
+  let startButton = ui.create.startMenu(false);
 
   // 选项
-  ui.create.optionsMenu(connectMenu);
+  ui.create.optionsMenu(false);
 
   // 武将
-  let updateCharacterPackMenu = ui.create.characterPackMenu(connectMenu);
+  let updateCharacterPackMenu = ui.create.characterPackMenu(false);
   ui.updateCharacterPackMenu.push(updateCharacterPackMenu);
 
   // 卡牌
-  let updatecardPackMenu = ui.create.cardPackMenu(connectMenu);
+  let updatecardPackMenu = ui.create.cardPackMenu(false);
   ui.updateCardPackMenu.push(updatecardPackMenu);
 
   // 扩展
-  ui.create.extensionMenu(connectMenu);
+  ui.create.extensionMenu(false);
 
   // 其他
   // 添加try-catch块，防止其他菜单页面函数出错导致整个菜单创建失败
   try {
-    ui.create.otherMenu(connectMenu);
+    ui.create.otherMenu(false);
   } catch (e) {
     console.error("Error in otherMenu function:", e);
   }

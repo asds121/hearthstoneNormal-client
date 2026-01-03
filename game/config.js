@@ -1,11 +1,4 @@
 window.config = {
-  extension_sources: {
-    "GitHub Proxy":
-      "https://mirror.ghproxy.com/https://raw.githubusercontent.com/libccy/noname-extension/master/",
-    FastGit: "https://raw.fgit.cf/libccy/noname-extension/master/",
-    GitHub: "https://raw.githubusercontent.com/libccy/noname-extension/master/",
-  },
-  extension_source: "GitHub Proxy",
   forbidai: ["ns_liuzhang"],
   forbidai_user: [],
   forbidall: [],
@@ -73,7 +66,6 @@ window.config = {
     "gw_poxiao",
   ],
   zhinang_tricks: ["guohe", "wuxie", "wuzhong", "dongzhuxianji"],
-  connect_zhinang_tricks: ["guohe", "wuxie", "wuzhong", "dongzhuxianji"],
   all: {
     sgscharacters: [],
     sgscards: [],
@@ -105,8 +97,6 @@ window.config = {
   volumn_background: 8,
   volumn_audio: 8,
 
-  connect_avatar: "caocao",
-  connect_nickname: "无名玩家",
   config_menu: true,
   auto_popped_config: true,
   auto_popped_history: false,
@@ -168,7 +158,6 @@ window.config = {
   show_volumn: true,
   show_cardpile: true,
   only_fullskin: true,
-  show_connect: true,
   show_wuxie: false,
   show_wuxie_self: true,
   show_stat: true,
@@ -188,20 +177,18 @@ window.config = {
   log_highlight: true,
 
   modeconfig: false,
-	gameconfig: false,
-	appearence: false,
-	video: "20",
+  gameconfig: false,
+  appearence: false,
+  video: "20",
 
-	intro: "i",
-	right_click: "pause",
-	sort: "type_sort",
+  intro: "i",
+  right_click: "pause",
+  sort: "type_sort",
 
   cards: [],
   characters: [],
   moderned_chracters: [],
   moderned_modes: [],
-  connect_characters: [],
-  connect_cards: [],
   plays: [],
   extensions: ["炉石普通"],
   banned: [],

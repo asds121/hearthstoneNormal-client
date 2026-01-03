@@ -2475,28 +2475,7 @@ export class Create {
 		if (!lib.config.touchscreen) {
 			lib.setPopped(ui.config2, ui.click.pauseconfig, 170);
 		}
-		ui.auto = ui.create.system("托管", ui.click.auto);
-		if (!game.syncMenu) {
-			ui.config2.classList.add("hidden");
-			ui.config2.style.transition = "all 0.5s";
-			ui.roundmenu.classList.add("transparent2");
 
-			ui.auto.style.opacity = 0.5;
-			ui.auto.style.transition = "all 0.5s";
-			lib.onfree.push(function () {
-				ui.auto.style.opacity = "";
-				setTimeout(function () {
-					ui.auto.style.transition = "";
-				}, 500);
-			});
-		}
-		ui.auto.id = "autobutton";
-		ui.autonode = ui.create.div("#autonode", "<div>托管中...</div>", ui.arena);
-		ui.autonode.listen(ui.click.auto);
-		if (lib.config.mode == "connect") {
-			ui.auto.hide();
-			ui.pause.hide();
-		}
 
 		if (lib.forcehide) {
 			if (lib.forcehide.includes("replay")) {
@@ -2531,43 +2510,7 @@ export class Create {
 		// 	ui.cardPileButton.style.display='none';
 		// }
 
-		ui.sortCard = ui.create.system("整理手牌", function () {
-			if (!game.me || game.me.hasSkillTag("noSortCard")) {
-				return;
-			}
-			var hs = game.me.getCards("h");
-			if (!hs.length) {
-				return;
-			}
-			game.addVideo("lose", game.me, [get.cardsInfo(hs), [], [], []]);
-			for (var i = 0; i < hs.length; i++) {
-				hs[i].goto(ui.special);
-			}
-			if (game.me.hasSkillTag("sortCardByNum")) {
-				var getn = function (card) {
-					var num = get.number(card, game.me);
-					if (num < 3) {
-						return 13 + num;
-					}
-					return num;
-				};
-				hs.sort((a, b) => getn(b) - getn(a));
-			} else {
-				hs.sort(function (b, a) {
-					if (a.name != b.name) {
-						return lib.sort.card(a.name, b.name);
-					} else if (a.suit != b.suit) {
-						return lib.suit.indexOf(a) - lib.suit.indexOf(b);
-					} else {
-						return a.number - b.number;
-					}
-				});
-			}
-			game.me.directgain(hs, false);
-		});
-		if (!lib.config.show_sortcard) {
-			ui.sortCard.style.display = "none";
-		}
+
 		//------添加记牌器 by Curpond-------
 		ui.deckMonitor = ui.create.system(
 			"记牌器",
