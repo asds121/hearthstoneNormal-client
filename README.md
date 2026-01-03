@@ -38,3 +38,9 @@
 GNU GENERAL PUBLIC LICENSE Version 3, 29 June 2007
 
 详见 LICENSE 文件。
+
+## 致谢
+
+本项目基于无名杀游戏框架开发，感谢无名杀项目的贡献。
+
+- 无名杀项目主页：https://github.com/libnoname/noname
