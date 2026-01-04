@@ -291,7 +291,7 @@ export class LibInit {
               result.includes("jsjiami") ||
               result.includes("var _0x")
             ) {
-              alert(alertMessage);
+              console.error(alertMessage);
             }
           },
           () => void 0
@@ -306,7 +306,7 @@ export class LibInit {
               result.includes("jsjiami") ||
               result.includes("var _0x")
             ) {
-              alert(alertMessage);
+              console.error(alertMessage);
             }
           },
           () => void 0
@@ -405,7 +405,7 @@ export class LibInit {
           data.includes("jsjiami") ||
           data.includes("var _0x")
         ) {
-          alert(
+          console.error(
             `检测到您安装了使用免费版sojson进行加密的扩展。请谨慎使用这些扩展，避免游戏数据遭到破坏。\n扩展文件：${pathToRead}`
           );
         }

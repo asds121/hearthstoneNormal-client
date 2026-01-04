@@ -1536,7 +1536,7 @@ export class GameEvent {
 			}
 
 			const obj = runCode(this, result);
-			alert(!obj || obj instanceof Error ? String(obj) : get.stringify(obj));
+			console.error(!obj || obj instanceof Error ? String(obj) : get.stringify(obj));
 			return true;
 		};
 

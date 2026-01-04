@@ -518,7 +518,7 @@ export const extensionMenu = function (connectMenu) {
 								callback();
 							},
 							function () {
-								alert("许可证文件丢失，无法导出扩展");
+								console.error("许可证文件丢失，无法导出扩展");
 							}
 						);
 					} else {
@@ -597,7 +597,7 @@ export const extensionMenu = function (connectMenu) {
 				if (typeof game.readFile == "function" && window.noname_shijianInterfaces && typeof window.noname_shijianInterfaces.shareExtensionWithPassWordAsync == "function" && confirm("是否使用诗笺版自带的导出功能来导出扩展？")) {
 					const extName = inputExtName.value;
 					if (!extName) {
-						alert("未检测到扩展名，将使用无名杀自带的导出功能");
+						console.error("未检测到扩展名，将使用无名杀自带的导出功能");
 						oldExport();
 						return;
 					}
@@ -613,7 +613,7 @@ export const extensionMenu = function (connectMenu) {
 							}
 						},
 						() => {
-							alert("未检测到扩展文件，将使用无名杀自带的导出功能");
+							console.error("未检测到扩展文件，将使用无名杀自带的导出功能");
 							oldExport();
 						}
 					);
@@ -1057,7 +1057,7 @@ export const extensionMenu = function (connectMenu) {
 				var dieaudiotag = ui.create.node("audio", dieaudio);
 				var dieaudiopreview = ui.create.node("button", dieaudio, () => {
 					if (dieaudiotag.error) {
-						alert("您使用的客户端不支持预览此音频！");
+						console.error("您使用的客户端不支持预览此音频！");
 					} else {
 						dieaudiotag.play();
 					}
@@ -1176,7 +1176,7 @@ export const extensionMenu = function (connectMenu) {
 				addSkillButton.onclick = function () {
 					for (var i = 0; i < skillList.firstChild.childNodes.length; i++) {
 						if (skillList.firstChild.childNodes[i].skill == skillopt.value) {
-							return alert(selectname.value == "current_extension" ? "此扩展还未添加技能" : "此武将没有技能可添加");
+							return console.error(selectname.value == "current_extension" ? "此扩展还未添加技能" : "此武将没有技能可添加");
 						}
 					}
 					//无技能时
@@ -1225,7 +1225,7 @@ export const extensionMenu = function (connectMenu) {
 				var editnode = ui.create.div(".menubutton.large.disabled", "创建武将", ui.create.div(skillList), function () {
 					let name = page.querySelector("input.new_name").value;
 					if (!name) {
-						alert("请填写武将名\n提示：武将名格式为id+|+中文名，其中id必须惟一");
+						console.error("请填写武将名\n提示：武将名格式为id+|+中文名，其中id必须惟一");
 						return;
 					}
 					name = name.split("|");
@@ -1234,7 +1234,7 @@ export const extensionMenu = function (connectMenu) {
 					if (currentButton) {
 						if (currentButton.link != name) {
 							if (lib.character[name] || page.content.pack.character[name]) {
-								alert("武将名与现有武将重复，请更改\n提示：武将名格式为id+|+中文名，其中id必须惟一");
+								console.error("武将名与现有武将重复，请更改\n提示：武将名格式为id+|+中文名，其中id必须惟一");
 								return;
 							}
 							page.content.image[name + ".jpg"] = page.content.image[currentButton.link + ".jpg"];
@@ -1245,7 +1245,7 @@ export const extensionMenu = function (connectMenu) {
 						}
 					} else {
 						if (lib.character[name] || page.content.pack.character[name]) {
-							alert("武将名与现有武将重复，请更改\n提示：武将名格式为id+|+中文名，其中id必须惟一");
+							console.error("武将名与现有武将重复，请更改\n提示：武将名格式为id+|+中文名，其中id必须惟一");
 							return;
 						}
 					}
@@ -1253,7 +1253,7 @@ export const extensionMenu = function (connectMenu) {
 						page.content.image[name + ".jpg"] = fakeme.image;
 					} else {
 						if (!page.content.image[name + ".jpg"]) {
-							alert("请选择武将头像");
+							console.error("请选择武将头像");
 							return;
 						}
 					}
@@ -1644,7 +1644,7 @@ export const extensionMenu = function (connectMenu) {
 			importExtension.style.textAlign = "left";
 			ui.create.div("", '<input type="file" accept="application/zip" style="width:153px"><button>确定</button>', importExtension);
 			ui.create.div(".config", "修改下载地址", page, function () {
-				alert("您可以在“设置→通用→获取扩展地址”中，修改下载扩展时所采用的地址。");
+				console.error("您可以在“设置→通用→获取扩展地址”中，修改下载扩展时所采用的地址。");
 			});
 
 

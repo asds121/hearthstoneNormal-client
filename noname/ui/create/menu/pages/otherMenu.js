@@ -378,7 +378,7 @@ export const otherMenu = function (
         };
 
         // 删除了GitHub更新检查功能
-        alert("更新检查功能已移除");
+        console.error("更新检查功能已移除");
         refresh();
         return;
       }
@@ -418,7 +418,7 @@ export const otherMenu = function (
           assetDirectories.push("image");
         }
         // 删除了GitHub资源更新功能
-        alert("资源更新功能已移除");
+        console.error("资源更新功能已移除");
         refresh();
         return;
 
@@ -576,7 +576,7 @@ export const otherMenu = function (
           await finish();
         }
       } else {
-        alert("此版本不支持游戏内更新素材，请手动更新");
+        console.error("此版本不支持游戏内更新素材，请手动更新");
       }
     };
 
@@ -1137,10 +1137,7 @@ export const otherMenu = function (
         row1.hide();
         row2.hide();
       }
-      if (
-        lib.config.mode == "identity" ||
-        lib.config.mode == "doudizhu"
-      ) {
+      if (lib.config.mode == "identity" || lib.config.mode == "doudizhu") {
         if (
           game.notMe ||
           (game.me &&
@@ -1578,7 +1575,7 @@ export const otherMenu = function (
         ) {
           window.NonameAndroidBridge.changeWebviewProvider();
         } else {
-          alert("此客户端不支持此功能");
+          console.error("此客户端不支持此功能");
         }
       });
       page.appendChild(button);
@@ -1775,7 +1772,7 @@ export const otherMenu = function (
                 data = JSON.parse(lib.init.decode(data));
               } catch (e) {
                 console.log(e);
-                alert("导入失败");
+                console.error("导入失败");
                 return;
               }
               var store = lib.db
@@ -1807,7 +1804,7 @@ export const otherMenu = function (
               }
               for (var i = 0; i < lib.videos.length; i++) {
                 if (lib.videos[i].time == data.time) {
-                  alert("录像已存在");
+                  console.error("录像已存在");
                   return;
                 }
               }

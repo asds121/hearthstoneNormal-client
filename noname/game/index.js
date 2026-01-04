@@ -1886,7 +1886,7 @@ export class Game extends GameCompatible {
       }
       game.ws = new WebSocket(url);
     } catch {
-      alert("错误：无效联机地址");
+      console.error("错误：无效联机地址");
       if (callback) {
         callback(false);
       }
@@ -2648,7 +2648,7 @@ export class Game extends GameCompatible {
           ) {
             game.editExtension(name);
           } else {
-            alert("无法编辑未启用的扩展，请启用此扩展并重启后重试");
+            console.error("无法编辑未启用的扩展，请启用此扩展并重启后重试");
           }
         },
       };
@@ -2755,7 +2755,7 @@ export class Game extends GameCompatible {
       } catch (e1) {
         console.error(`加载《${name}》扩展的precontent时出现错误。`, e1);
         if (!lib.config.extension_alert) {
-          alert(
+          console.error(
             `加载《${name}》扩展的precontent时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(e1.stack)}`
           );
         }
@@ -2940,7 +2940,9 @@ export class Game extends GameCompatible {
                 fileWriter.write(blob);
               })
           )
-          .then(() => alert(`文件已导出至${directory}${fileNameToSaveAs}`));
+          .then(() =>
+            console.error(`文件已导出至${directory}${fileNameToSaveAs}`)
+          );
       } else {
         const downloadLink = document.createElement("a");
         downloadLink.download = fileNameToSaveAs;
@@ -2972,7 +2974,7 @@ export class Game extends GameCompatible {
           );
         }
       }
-      alert(`导入失败：\n${JSON.stringify(error, null, "\t")}`);
+      console.error(`导入失败：\n${JSON.stringify(error, null, "\t")}`);
       console.error(error);
     };
     try {
@@ -3288,7 +3290,7 @@ export class Game extends GameCompatible {
         entry.getFile(fileNameToSaveAs, { create: true }, function (fileEntry) {
           fileEntry.createWriter(function (fileWriter) {
             fileWriter.onwriteend = function () {
-              alert("文件已导出至" + directory + fileNameToSaveAs);
+              console.error("文件已导出至" + directory + fileNameToSaveAs);
             };
             fileWriter.write(textFileAsBlob);
           });
@@ -5197,7 +5199,7 @@ export class Game extends GameCompatible {
     //}
   }
   alert(str) {
-    game.prompt(str, "alert");
+    console.error(str);
   }
   print() {
     if (!_status.toprint) {

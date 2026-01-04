@@ -1500,8 +1500,11 @@ async function setOnError() {
             .replace(new RegExp(lib.assetURL, "g"), "")
             .replace(new RegExp(winPath, "g"), "");
       }
-      alert(str);
-      game.print(str);
+      // 创建错误对象并报告，确保发送到后端
+      const error = new Error(msg);
+      error.stack = err ? err.stack : `Error: ${msg}\n    at ${src}:${line}:${column}`;
+      const reporter = new ErrorReporter(error);
+      game.print(reporter.report(str + "\n代码出现错误"));
     }
     Reflect.set(window, "ea", Array.from(arguments));
     Reflect.set(window, "em", msg);

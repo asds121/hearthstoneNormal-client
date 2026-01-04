@@ -55,7 +55,8 @@ export class GamePromises {
 	 */
 	alert(title) {
 		return new Promise((resolve, reject) => {
-			game.prompt(title, "alert", resolve);
+			console.error(title);
+			resolve(true);
 		});
 	}
 	// 读写函数promises化(不用考虑其对应函数是否存在)

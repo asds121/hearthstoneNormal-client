@@ -140,7 +140,7 @@ export class GameCompatible {
 						tips = ["您使用的无名杀客户端已达到最新，但目前的浏览器内核版本过低，未来可能将无法使用！", "目前使用的浏览器UA信息为: ", userAgentLowerCase, "检测到你现在使用的是第三方客户端，请联系客户端制作者寻求帮助！", "稍后游戏将继续正常运行，但我们不保证不会出现任何报错"].join("\n");
 					}
 
-					alert(tips);
+					console.error(tips);
 				}
 				// 使用旧版安卓客户端，提示更新，在版本号为77时识别为兼容版
 				// 此时将先考虑能不能加载更新代码
@@ -180,7 +180,7 @@ export class GameCompatible {
 				// 使用chrome的，直接提示更新（不是现在还有人用Chrome 85以下的版本吗）
 				else {
 					let tips = ["你使用的浏览器内核已无法达到无名杀的最低要求，未来可能将无法使用！", "请更新你的Google Chrome/Chromium内核！", "稍后游戏将继续正常运行，但我们不保证不会出现任何报错"].join("\n");
-					alert(tips);
+					console.error(tips);
 				}
 
 				return needToWait;

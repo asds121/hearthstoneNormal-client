@@ -504,7 +504,7 @@ export class Is {
     }
     if (name) {
       setTimeout(function () {
-        alert(
+        console.error(
           "请将至少一个操作绑定为显示按钮或打开菜单，否则将永远无法打开菜单"
         );
       });
