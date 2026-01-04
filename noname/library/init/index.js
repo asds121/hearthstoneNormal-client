@@ -197,17 +197,35 @@ export class LibInit {
     const style = document.createElement("link");
     style.rel = "stylesheet";
     if (path) {
-      if (path[path.length - 1] == "/") {
-        path = path.slice(0, path.length - 1);
+      let resolvedPath = path;
+
+      // 检查路径是否已经是完整的CSS文件路径
+      const isCompleteCSSPath = path.endsWith(".css");
+
+      if (isCompleteCSSPath) {
+        // 如果路径已经是完整的CSS文件路径，直接使用
+        resolvedPath = path;
+      } else {
+        // 否则，处理路径和文件名
+        if (path[path.length - 1] == "/") {
+          path = path.slice(0, path.length - 1);
+        }
+        if (file) {
+          resolvedPath = `${path}${/^db:extension-[^:]*$/.test(path) ? ":" : "/"}${file}.css`;
+        } else {
+          console.warn(`尝试加载CSS文件时缺少文件名参数，路径：${path}`);
+          return style;
+        }
       }
-      if (file) {
-        path = `${path}${/^db:extension-[^:]*$/.test(path) ? ":" : "/"}${file}.css`;
-      }
-      (path.startsWith("db:")
-        ? game.getDB("image", path.slice(3)).then(get.objectURL)
-        : new Promise((resolve) => resolve(path))
-      ).then((resolvedPath) => {
-        style.href = resolvedPath;
+
+      // 处理数据库路径
+      const promise = resolvedPath.startsWith("db:")
+        ? game.getDB("image", resolvedPath.slice(3)).then(get.objectURL)
+        : new Promise((resolve) => resolve(resolvedPath));
+
+      // 加载CSS文件
+      promise.then((finalPath) => {
+        style.href = finalPath;
         if (typeof before == "function") {
           style.addEventListener("load", before);
           document.head.appendChild(style);

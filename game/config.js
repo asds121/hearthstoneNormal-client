@@ -72,6 +72,7 @@ window.config = {
   theme: "simple",
   layout: "nova",
   cardback_style: "liusha",
+  card_style: "default",
   cardshape: "default",
   hp_style: "glass",
   menu_style: "music",
