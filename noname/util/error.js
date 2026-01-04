@@ -6,17 +6,34 @@ let wsReconnectTimer = null;
 function connectWebSocket() {
   if (typeof window === "undefined" || !window.location) return;
 
+  // 处理about:blank协议，直接返回
+  if (window.location.protocol === "about:") {
+    return;
+  }
+
   try {
     // 检查是否为http或https协议
     const isHttpProtocol = window.location.protocol.startsWith("http");
-    // 检查hostname和port是否有效
+    // 检查hostname是否有效
     const hasValidHost =
       window.location.hostname && window.location.hostname !== "";
-    const hasValidPort = window.location.port && window.location.port !== "";
 
-    // 只有在所有条件都满足时才尝试连接
-    if (isHttpProtocol && hasValidHost && hasValidPort) {
-      const wsUrl = `ws://${window.location.hostname}:${window.location.port}`;
+    // 只有在条件满足时才尝试连接
+    if (isHttpProtocol && hasValidHost) {
+      // 正确处理WebSocket URL，根据协议和端口生成
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+      const hostname = window.location.hostname;
+      const port = window.location.port;
+
+      // 构建WebSocket URL，处理默认端口情况
+      let wsUrl;
+      if (port) {
+        wsUrl = `${protocol}//${hostname}:${port}`;
+      } else {
+        // 使用默认端口时，不需要显式指定端口
+        wsUrl = `${protocol}//${hostname}`;
+      }
+
       ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
@@ -37,7 +54,15 @@ function connectWebSocket() {
       };
     } else {
       // 跳过连接，记录日志
-      //console.log("ℹ️ 跳过WebSocket连接：无效的协议或地址");
+      let logMessage = "跳过WebSocket连接: ";
+      if (!isHttpProtocol) {
+        logMessage += "非HTTP协议 ";
+      }
+      if (!hasValidHost) {
+        logMessage += "无效的hostname ";
+      }
+
+      console.error(logMessage.trim());
       // 10秒后再次检查
       wsReconnectTimer = setTimeout(connectWebSocket, 10000);
     }

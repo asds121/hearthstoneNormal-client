@@ -12,6 +12,7 @@ import {
   device,
   leaveCompatibleEnvironment,
 } from "../util/index.js";
+import { ErrorReporter } from "../util/error.js";
 import * as config from "../util/config.js";
 import { promiseErrorHandlerMap } from "../util/browser.js";
 import {
