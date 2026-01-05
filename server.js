@@ -46,14 +46,18 @@ const server = http.createServer((req, res) => {
 
       // 记录404和500错误
       if (res.statusCode === 404) {
-        // 404错误去重
-        const errorKey = req.url;
-        if (!errorCache.http404.has(errorKey)) {
-          errorCache.http404.add(errorKey);
-          console.error(`🔴 404 Not Found: ${req.url}`);
-          console.error(
-            `   Request from: ${req.headers.referer || "直接访问"}`
-          );
+        // 只记录JS文件的404错误，屏蔽其他资源的404错误
+        const isJsFile = req.url.endsWith(".js") || req.url.endsWith(".ts");
+        if (isJsFile) {
+          // 404错误去重
+          const errorKey = req.url;
+          if (!errorCache.http404.has(errorKey)) {
+            errorCache.http404.add(errorKey);
+            console.error(`🔴 404 Not Found: ${req.url}`);
+            console.error(
+              `   Request from: ${req.headers.referer || "直接访问"}`
+            );
+          }
         }
       } else {
         console.error(`🔴 Server Error (${res.statusCode}): ${req.url}`);
@@ -92,51 +96,27 @@ wss.on("connection", (ws) => {
   );
 
   ws.on("message", (message) => {
-    try {
-      const data = JSON.parse(message);
-      if (data.type === "error") {
-        const errorMsg = data.error;
+        try {
+          const data = JSON.parse(message);
+          if (data.type === "error") {
+            const errorMsg = data.error;
 
-        // 合并字体资源错误
-        if (errorMsg.includes("font资源加载失败")) {
-          errorCache.fontError++;
-          if (errorCache.fontError === 1) {
-            console.error("\n🔴 前端错误:");
-            console.error("=".repeat(50));
-            console.error(errorMsg);
-            console.error("=".repeat(50));
-          } else if (errorCache.fontError % 5 === 0) {
-            console.error(
-              `\n🔴 前端错误: 已收到 ${errorCache.fontError} 个重复的字体资源加载失败错误`
-            );
+            // 屏蔽字体资源错误和音频资源错误
+            if (errorMsg.includes("font资源加载失败") || errorMsg.includes("audio资源加载失败")) {
+              // 不输出任何日志，直接屏蔽
+            }
+            // 其他错误正常记录
+            else {
+              console.error("\n🔴 前端错误:");
+              console.error("=".repeat(50));
+              console.error(errorMsg);
+              console.error("=".repeat(50));
+            }
           }
+        } catch (e) {
+          console.error("❌ 消息解析失败:", message);
         }
-        // 合并音频资源错误
-        else if (errorMsg.includes("audio资源加载失败")) {
-          errorCache.audioError++;
-          if (errorCache.audioError === 1) {
-            console.error("\n🔴 前端错误:");
-            console.error("=".repeat(50));
-            console.error(errorMsg);
-            console.error("=".repeat(50));
-          } else if (errorCache.audioError % 3 === 0) {
-            console.error(
-              `\n🔴 前端错误: 已收到 ${errorCache.audioError} 个重复的音频资源加载失败错误`
-            );
-          }
-        }
-        // 其他错误正常记录
-        else {
-          console.error("\n🔴 前端错误:");
-          console.error("=".repeat(50));
-          console.error(errorMsg);
-          console.error("=".repeat(50));
-        }
-      }
-    } catch (e) {
-      console.error("❌ 消息解析失败:", message);
-    }
-  });
+      });
 
   ws.on("close", () => {
     connectionCount--;

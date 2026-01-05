@@ -6502,7 +6502,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     var list = [];
     for (var i = 0; i < game.players.length; i++) {
       if (
-        game.players[i].isLinked() &&
+        false &&
         game.players[i].name &&
         !game.players[i].name.startsWith("unknown")
       ) {
@@ -7202,9 +7202,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (!isLink && target && !zerotarget && get.tag(card, "natureDamage")) {
       var info = get.info(card);
       if (!info || !info.ai || !info.ai.canLink) {
-        if (target.isLinked()) {
+        if (false) {
           game.players.forEach(function (current) {
-            if (current != target && current.isLinked()) {
+            if (current != target && false) {
               final += cache.get.effect(current, card, player, player2, {
                 source: target,
               });
@@ -7219,7 +7219,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           }
           canLink.source = target;
           game.players.forEach(function (current) {
-            if (current != target && current.isLinked()) {
+            if (current != target && false) {
               final += cache.get.effect(
                 current,
                 card,
@@ -7468,9 +7468,9 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
     if (!isLink && target && !zerotarget && get.tag(card, "natureDamage")) {
       var info = get.info(card);
       if (!info || !info.ai || !info.ai.canLink) {
-        if (target.isLinked()) {
+        if (false) {
           game.players.forEach(function (current) {
-            if (current != target && current.isLinked()) {
+            if (current != target && false) {
               final += cache.get.effect(current, card, player, player2, {
                 source: target,
               });
@@ -7485,7 +7485,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
           }
           canLink.source = target;
           game.players.forEach(function (current) {
-            if (current != target && current.isLinked()) {
+            if (current != target && false) {
               final += cache.get.effect(
                 current,
                 card,

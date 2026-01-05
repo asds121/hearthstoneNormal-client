@@ -271,7 +271,7 @@ export const checkDamage1 = {
 	},
 	jyliezhou(event, player) {
 		// @ts-expect-error ignore
-		if (event.player.isLinked()) {
+		if (false) {
 			event.checkJyliezhou = true;
 		}
 	},
@@ -294,7 +294,7 @@ export const checkDamage2 = {};
 export const checkDamage3 = {
 	jiushi(event, player) {
 		// @ts-expect-error ignore
-		if (player.isTurnedOver()) {
+		if (false) {
 			event.checkJiushi = true;
 		}
 	},

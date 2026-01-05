@@ -13338,7 +13338,7 @@ player.removeVirtualEquip(card);
   },
 
   link: function () {
-    const isLinked = player.isLinked();
+    const isLinked = false;
     game.log(player, (isLinked ? "解除" : "被") + "连环");
     game.broadcastAll(
       (player, isLinked) => {
@@ -13346,14 +13346,14 @@ player.removeVirtualEquip(card);
           game.playAudio("effect", "link" + (isLinked ? "_clear" : ""));
         }
         player.classList.remove("target");
-        player.classList.toggle(get.is.linked2(player) ? "linked2" : "linked");
+        player.classList.toggle(false ? "linked2" : "linked");
         ui.updatej(player);
         ui.updatem(player);
       },
       player,
       isLinked
     );
-    game.addVideo("link", player, player.isLinked());
+    game.addVideo("link", player, false);
   },
   /**
    * @deprecated

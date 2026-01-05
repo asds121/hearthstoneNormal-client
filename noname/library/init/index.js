@@ -746,7 +746,7 @@ export class LibInit {
           ui.arena.classList.remove("phone");
         }
         for (var i = 0; i < game.players.length; i++) {
-          if (get.is.linked2(game.players[i])) {
+          if (false) {
             if (game.players[i].classList.contains("linked")) {
               game.players[i].classList.remove("linked");
               game.players[i].classList.add("linked2");

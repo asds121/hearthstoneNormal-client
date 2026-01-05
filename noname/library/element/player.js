@@ -4225,8 +4225,8 @@ export class Player extends HTMLDivElement {
       ],
       identity: this.identity,
       dead: this.isDead(),
-      linked: this.isLinked(),
-      turnedover: this.isTurnedOver(),
+      linked: false,
+      turnedover: false,
       out: this.isOut(),
       phaseNumber: this.phaseNumber,
       unseen: this.isUnseen(0),
@@ -8576,7 +8576,7 @@ export class Player extends HTMLDivElement {
     if (!this.countCards("j")) {
       list.remove(5);
     }
-    if (!this.isLinked() && !this.isTurnedOver()) {
+    if (!false && !false) {
       list.remove(6);
     }
     if (this.hasSkill("qianxing")) {
@@ -8599,10 +8599,10 @@ export class Player extends HTMLDivElement {
         this.discard(this.getCards("j")).delay = !nodelay;
         break;
       case 6: {
-        if (this.isLinked()) {
+        if (false) {
           this.link();
         }
-        if (this.isTurnedOver()) {
+        if (false) {
           this.turnOver();
         }
         break;
@@ -8623,7 +8623,7 @@ export class Player extends HTMLDivElement {
     if (this.countCards("he") == 0) {
       list.remove(1);
     }
-    if (this.isLinked()) {
+    if (false) {
       list.remove(4);
     }
     if (this.hasSkill("fengyin")) {
@@ -8650,7 +8650,7 @@ export class Player extends HTMLDivElement {
         this.damage();
         break;
       case 4:
-        if (!this.isLinked()) {
+        if (!false) {
           this.link();
         }
         break;
@@ -9197,7 +9197,7 @@ export class Player extends HTMLDivElement {
     next.setContent("link");
     if (typeof bool == "boolean") {
       if (bool) {
-        if (this.isLinked()) {
+        if (false) {
           _status.event.next.remove(next);
           next.resolve();
         }
@@ -9796,7 +9796,8 @@ export class Player extends HTMLDivElement {
       player.updateMarks();
     };
     if (event.player == game.me) {
-      func(skill, target);}
+      func(skill, target);
+    }
   }
   markSkill(name, info, card, nobroadcast) {
     if (info === true) {
@@ -10059,14 +10060,14 @@ export class Player extends HTMLDivElement {
     }
   }
   addLink() {
-    if (get.is.linked2(this)) {
+    if (false) {
       this.classList.add("linked2");
     } else {
       this.classList.add("linked");
     }
   }
   removeLink() {
-    if (get.is.linked2(this)) {
+    if (false) {
       this.classList.remove("linked2");
     } else {
       this.classList.remove("linked");
@@ -12328,10 +12329,17 @@ export class Player extends HTMLDivElement {
    * @returns { boolean }
    */
   isLinked() {
-    if (get.is.linked2(this)) {
-      return this.classList.contains("linked2");
-    }
-    return this.classList.contains("linked");
+    // 直接返回 false，因为 linked 功能已禁用
+    return false;
+  }
+
+  /**
+   * 返回玩家是否是翻面状态
+   * @returns { boolean }
+   */
+  isTurnedOver() {
+    // 直接返回 false，因为翻面功能已禁用
+    return false;
   }
 
   /**

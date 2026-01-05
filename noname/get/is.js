@@ -674,4 +674,22 @@ export class Is {
   mobileMe(player) {
     return player === game.me;
   }
+
+  /**
+   * 判断玩家是否处于linked状态
+   * @param {Player} player
+   * @returns {boolean}
+   */
+  linked(player) {
+    return false;
+  }
+
+  /**
+   * 判断玩家是否处于linked2状态
+   * @param {Player} player
+   * @returns {boolean}
+   */
+  linked2(player) {
+    return false;
+  }
 }
