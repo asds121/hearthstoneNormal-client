@@ -2518,7 +2518,7 @@ export class Create {
     if (lib.config.glass_ui) {
       ui.window.classList.add("glass_ui");
     }
-    if (lib.config.custom_button) {
+    if (lib.config.custom_button && lib.configMenu.appearence?.config?.custom_button?.onclick) {
       lib.configMenu.appearence.config.custom_button.onclick("skip");
     }
 

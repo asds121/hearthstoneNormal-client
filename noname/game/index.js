@@ -6488,12 +6488,18 @@ export class Game extends GameCompatible {
     if (!info) {
       return false;
     }
-    lib.skill.global.add(skill);
+    // 确保技能不重复添加到global数组
+    if (!lib.skill.global.includes(skill)) {
+      lib.skill.global.push(skill);
+    }
     if (player) {
       if (!lib.skill.globalmap[skill]) {
         lib.skill.globalmap[skill] = [];
       }
-      lib.skill.globalmap[skill].add(player);
+      // 确保玩家不重复添加到globalmap数组
+      if (!lib.skill.globalmap[skill].includes(player)) {
+        lib.skill.globalmap[skill].push(player);
+      }
     }
     if (info.trigger) {
       let setTrigger = function (i, evt) {
@@ -6501,7 +6507,10 @@ export class Game extends GameCompatible {
         if (!lib.hook.globalskill[name]) {
           lib.hook.globalskill[name] = [];
         }
-        lib.hook.globalskill[name].add(skill);
+        // 确保技能不重复添加到globalskill数组
+        if (!lib.hook.globalskill[name].includes(skill)) {
+          lib.hook.globalskill[name].push(skill);
+        }
         lib.hookmap[evt] = true;
       };
       for (let i in info.trigger) {
@@ -6523,15 +6532,20 @@ export class Game extends GameCompatible {
   removeGlobalSkill(skill, player) {
     const players = lib.skill.globalmap[skill];
     if (player && Array.isArray(players)) {
-      lib.skill.globalmap[skill].remove(player);
-      if (players.length) {
+      // 使用filter()方法删除特定玩家
+      lib.skill.globalmap[skill] = players.filter((p) => p !== player);
+      if (lib.skill.globalmap[skill].length > 0) {
         return;
       }
     }
-    lib.skill.global.remove(skill);
+    // 使用filter()方法删除特定技能
+    lib.skill.global = lib.skill.global.filter((s) => s !== skill);
     delete lib.skill.globalmap[skill];
     for (let i in lib.hook.globalskill) {
-      lib.hook.globalskill[i].remove(skill);
+      // 使用filter()方法删除特定技能
+      lib.hook.globalskill[i] = lib.hook.globalskill[i].filter(
+        (s) => s !== skill
+      );
     }
   }
   resetSkills() {
