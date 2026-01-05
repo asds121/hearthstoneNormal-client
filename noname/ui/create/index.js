@@ -1104,7 +1104,6 @@ export class Create {
         }
       }
 
-
       if (lib.config.banned.includes(i)) {
         continue;
       }
@@ -1294,7 +1293,6 @@ export class Create {
               continue;
             }
           }
-
 
           if (lib.character[i].isUnseen) {
             continue;
@@ -3559,7 +3557,6 @@ export class Create {
       }
       node.link = item;
 
-
       if (
         type == "characterx" &&
         lib.characterReplace[node._link] &&
@@ -3661,21 +3658,21 @@ export class Create {
         }
         if (infoitem[1]) {
           if (infoitem.doubleGroup) {
-              node.node.group.innerHTML = infoitem.doubleGroup.reduce(
-                (previousValue, currentValue) =>
-                  `${previousValue}<div data-nature="${get.groupnature(currentValue)}">${get.translation(currentValue)}</div>`,
-                ""
-              );
-              if (infoitem.doubleGroup.length > 4) {
-                if (new Set([5, 6, 9]).has(infoitem.doubleGroup.length)) {
-                  node.node.group.style.height = "48px";
-                } else {
-                  node.node.group.style.height = "64px";
-                }
+            node.node.group.innerHTML = infoitem.doubleGroup.reduce(
+              (previousValue, currentValue) =>
+                `${previousValue}<div data-nature="${get.groupnature(currentValue)}">${get.translation(currentValue)}</div>`,
+              ""
+            );
+            if (infoitem.doubleGroup.length > 4) {
+              if (new Set([5, 6, 9]).has(infoitem.doubleGroup.length)) {
+                node.node.group.style.height = "48px";
+              } else {
+                node.node.group.style.height = "64px";
               }
-            } else {
-              node.node.group.innerHTML = `<div>${get.translation(infoitem[1])}</div>`;
             }
+          } else {
+            node.node.group.innerHTML = `<div>${get.translation(infoitem[1])}</div>`;
+          }
           node.node.group.style.backgroundColor = get.translation(
             `${get.bordergroup(infoitem)}Color`
           );

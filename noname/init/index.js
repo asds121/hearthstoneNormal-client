@@ -598,6 +598,11 @@ export async function boot() {
     }
   }
 
+  // 初始化扩展管理器
+  const { extensionManager } = await import('../extension/index.js');
+  await extensionManager.init();
+  
+  // 生成扩展列表用于后续处理
   if (!localStorage.getItem(lib.configprefix + "disable_extension")) {
     if (config.has("extensions") && config.get("extensions").length) {
       Reflect.set(window, "resetExtension", () => {
@@ -614,29 +619,6 @@ export async function boot() {
     for (var name = 0; name < config.get("plays").length; name++) {
       if (config.get("all").plays.includes(config.get("plays")[name])) {
         extensionlist.push(config.get("plays")[name]);
-      }
-    }
-
-    for (var name = 0; name < config.get("extensions").length; name++) {
-      const extName = config.get("extensions")[name];
-      if (Reflect.get(window, "bannedExtensions").includes(extName)) {
-        continue;
-      }
-      var extcontent = localStorage.getItem(
-        lib.configprefix + "extension_" + extName
-      );
-      if (extcontent) {
-        //var backup_onload=lib.init.onload;
-        _status.evaluatingExtension = true;
-        try {
-          security.eval(extcontent); // 喵？
-        } catch (e) {
-          console.log(e);
-        }
-        //lib.init.onload=backup_onload;
-        _status.evaluatingExtension = false;
-      } else {
-        extensionlist.push(extName);
       }
     }
   }

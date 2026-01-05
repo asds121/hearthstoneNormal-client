@@ -1,43 +1,65 @@
-# 炉石普通
+# 炉石普通扩展
 
-#### 介绍
-一个无名杀扩展，可以玩炉石。
+## 介绍
+炉石普通是基于无名杀模块化框架开发的炉石传说游戏扩展，支持动态加载和运行。
 
-#### 软件架构
-本扩展不能独立运行，只能通过无名杀导入，实现各种功能。
-本扩展为纯js编写。
+## 软件架构
 
+本扩展基于无名杀模块化框架开发，采用现代模块化设计，包含以下主要组件：
 
-#### 安装教程
+- **核心扩展逻辑**：extension.js（入口文件）和info.json（扩展元信息）
+- **实验性组件**：experiment/目录下包含扩展的核心功能实现
+  - assembly/：游戏核心逻辑和组件
+  - package/：卡牌、角色、游戏模式等内容定义
+- **样式文件**：style/目录下包含扩展的CSS样式
 
-1.  安装无名杀
-2.  导入此扩展
-3.  进入炉石普通模式，点开启
+## 安装与使用
 
-#### 使用说明
+### 基于模块化客户端使用
+1. 确保已部署无名杀多游戏扩展客户端
+2. 将本扩展放置在客户端的extension/目录下
+3. 启动客户端，扩展会被自动加载
 
-想玩炉石普通，必须关闭十周年UI和其他美化扩展。
-目前最优设置是：
-布局：新版
-缩放：80%
-角色高度：矮
-边框宽度：宽
-手牌显示：默认
-历史记录栏：关闭
+### 扩展优先级
+- 本扩展默认设置为高优先级（priority: 100）
+- 在多扩展环境中会被优先加载
 
-#### 参与贡献
+### 最佳设置
+- 布局：新版
+- 缩放：80%
+- 角色高度：矮
+- 边框宽度：宽
+- 手牌显示：默认
+- 历史记录栏：关闭
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+## 扩展开发
 
+### 目录结构
+```
+炉石普通/
+├── LICENSE
+├── README.md
+├── extension.js         # 扩展入口文件
+├── info.json            # 扩展元信息
+├── experiment/          # 实验性功能
+│   ├── assembly/        # 游戏核心组件
+│   ├── package/         # 游戏内容定义
+│   └── style/           # 样式文件
+└── style/               # 扩展样式
+```
 
-#### 特技
+### 扩展元信息
+info.json包含扩展的基本信息，如名称、版本、描述、作者、许可证和优先级等。
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+### 扩展入口
+extension.js是扩展的主入口，负责初始化扩展内容和管理扩展生命周期。
+
+## 参与贡献
+
+1. Fork本仓库
+2. 新建Feat_xxx分支
+3. 提交代码
+4. 新建Pull Request
+
+## 许可证
+GNU GENERAL PUBLIC LICENSE Version 3

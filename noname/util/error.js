@@ -1,6 +1,7 @@
 // WebSocket连接管理
 let ws = null;
 let wsReconnectTimer = null;
+let errorQueue = [];
 
 // 连接WebSocket
 function connectWebSocket() {
@@ -42,6 +43,19 @@ function connectWebSocket() {
           clearTimeout(wsReconnectTimer);
           wsReconnectTimer = null;
         }
+
+        // 发送队列中的错误信息
+        if (errorQueue.length > 0) {
+          errorQueue.forEach((errorInfo) => {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                error: errorInfo,
+              })
+            );
+          });
+          errorQueue = [];
+        }
       };
 
       ws.onclose = () => {
@@ -82,12 +96,19 @@ function sendErrorToServer(errorInfo) {
         error: errorInfo,
       })
     );
+  } else {
+    // 如果WebSocket未连接，将错误信息加入队列
+    errorQueue.push(errorInfo);
+    // 限制队列长度，防止内存溢出
+    if (errorQueue.length > 100) {
+      errorQueue.shift();
+    }
   }
 }
 
 // 初始化WebSocket连接
 if (typeof window !== "undefined") {
-  setTimeout(connectWebSocket, 1000);
+  connectWebSocket(); // 立即建立WebSocket连接，不延迟
 }
 
 class CodeSnippet {
@@ -510,10 +531,25 @@ if (typeof window !== "undefined") {
     return false; // 允许浏览器继续处理错误
   };
 
-  // 捕获异步错误
+  // 捕获异步错误和模块加载错误
   window.onunhandledrejection = (event) => {
     const error = event.reason;
-    const errorInfo = `${error?.message || error}\n${error?.stack || ""}`;
+    let errorInfo;
+
+    // 检查是否是模块加载错误
+    if (
+      error?.name === "TypeError" &&
+      error?.message?.includes("Failed to fetch")
+    ) {
+      // 尝试从错误信息中提取模块URL
+      const urlMatch = error?.message?.match(/'([^']+)'/);
+      const moduleUrl = urlMatch ? urlMatch[1] : "未知模块";
+      errorInfo = `js资源加载失败: ${moduleUrl}\n状态码: 404 Not Found\n错误信息: ${error.message}`;
+    } else {
+      // 普通异步错误
+      errorInfo = `${error?.message || error}\n${error?.stack || ""}`;
+    }
+
     sendErrorToServer(errorInfo);
   };
 
@@ -522,24 +558,81 @@ if (typeof window !== "undefined") {
     "error",
     (event) => {
       // 检查是否是资源加载错误
-      if (
-        event.target instanceof HTMLElement &&
-        ["SCRIPT", "LINK", "IMG", "AUDIO", "VIDEO"].includes(
-          event.target.tagName
-        )
-      ) {
-        // 提取资源信息
-        const target = event.target;
-        const resourceUrl = target.src || target.href || "未知资源";
-        const resourceType = target.tagName.toLowerCase();
-        const errorMessage = `${resourceType}资源加载失败: ${resourceUrl}\n状态码: ${event.loaded === 0 ? "无法连接" : "未知错误"}`;
+      if (event.target) {
+        let resourceUrl = "未知资源";
+        let resourceType = "unknown";
 
-        // 发送资源加载错误到终端
-        sendErrorToServer(errorMessage);
+        // 处理HTMLElement资源
+        if (event.target instanceof HTMLElement) {
+          resourceUrl = event.target.src || event.target.href || resourceUrl;
+          resourceType = event.target.tagName.toLowerCase();
+
+          // 特殊处理LINK标签
+          if (resourceType === "link") {
+            if (event.target.rel && event.target.rel.includes("stylesheet")) {
+              resourceType = "css";
+            }
+          }
+          // 特殊处理SCRIPT标签
+          else if (resourceType === "script") {
+            resourceType = "js";
+          }
+        }
+        // 处理FontFaceSetLoadEvent（字体加载错误）
+        else if (event.target instanceof FontFace) {
+          resourceUrl = event.target.src || resourceUrl;
+          resourceType = "font";
+        }
+        // 处理其他资源类型（包括script标签加载失败）
+        else if (event.target.src) {
+          resourceUrl = event.target.src;
+          // 尝试从URL推断资源类型
+          const urlParts = resourceUrl.split(".");
+          const ext = urlParts[urlParts.length - 1].toLowerCase();
+          resourceType = ext;
+
+          // 特殊处理JavaScript文件
+          if (ext === "js") {
+            resourceType = "js";
+          }
+        }
+
+        // 只有当resourceUrl有效且不是空字符串时才发送错误
+        if (resourceUrl && resourceUrl !== "未知资源") {
+          // 发送资源加载错误到终端
+          const errorMessage = `${resourceType}资源加载失败: ${resourceUrl}\n状态码: 404 Not Found\n错误信息: ${event.message || "资源加载失败"}`;
+          sendErrorToServer(errorMessage);
+        }
       }
     },
     true
   ); // useCapture=true，捕获阶段处理
+
+  // 捕获字体加载错误（FontFaceSet）
+  window.addEventListener(
+    "fontfaceerror",
+    (event) => {
+      const fontFace = event.fontface;
+      const resourceUrl = fontFace.src || "未知字体资源";
+      const errorMessage = `font资源加载失败: ${resourceUrl}\n状态码: 未知错误`;
+
+      // 发送字体加载错误到终端
+      sendErrorToServer(errorMessage);
+    },
+    true
+  ); // useCapture=true，捕获阶段处理
+
+  // 捕获FontFaceSet加载错误（针对CSS @font-face加载）
+  if (typeof document !== "undefined" && document.fonts) {
+    document.fonts.addEventListener("loadingerror", (event) => {
+      // event.fontfaces 包含所有加载失败的字体
+      for (const fontFace of event.fontfaces) {
+        const resourceUrl = fontFace.src || "未知字体资源";
+        const errorMessage = `font资源加载失败: ${resourceUrl}\n状态码: 加载错误`;
+        sendErrorToServer(errorMessage);
+      }
+    });
+  }
 }
 
 export { CodeSnippet, ErrorReporter, ErrorManager };
