@@ -3,6 +3,7 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import { WebSocketServer } from "ws";
+import { spawn } from "child_process";
 
 // 配置
 const PORT = 8080;
@@ -42,6 +43,22 @@ const server = http.createServer((req, res) => {
     if (err) {
       res.statusCode = err.code === "ENOENT" ? 404 : 500;
       res.end(err.message);
+
+      // 记录404和500错误
+      if (res.statusCode === 404) {
+        // 404错误去重
+        const errorKey = req.url;
+        if (!errorCache.http404.has(errorKey)) {
+          errorCache.http404.add(errorKey);
+          console.error(`🔴 404 Not Found: ${req.url}`);
+          console.error(
+            `   Request from: ${req.headers.referer || "直接访问"}`
+          );
+        }
+      } else {
+        console.error(`🔴 Server Error (${res.statusCode}): ${req.url}`);
+        console.error(`   Error: ${err.message}`);
+      }
     } else {
       res.statusCode = 200;
       res.end(data);
@@ -52,17 +69,69 @@ const server = http.createServer((req, res) => {
 // 创建WebSocket服务器
 const wss = new WebSocketServer({ server });
 
+// 错误日志去重缓存
+const errorCache = {
+  http404: new Set(),
+  fontError: 0,
+  audioError: 0,
+};
+
+// 定期清理缓存
+setInterval(() => {
+  errorCache.http404.clear();
+  errorCache.fontError = 0;
+  errorCache.audioError = 0;
+}, 30000); // 每30秒清理一次
+
+let connectionCount = 0;
+
 wss.on("connection", (ws) => {
-  console.log("✅ 前端已连接，开始接收错误信息...");
+  connectionCount++;
+  console.log(
+    `✅ 前端已连接，开始接收错误信息... (连接数: ${connectionCount})`
+  );
 
   ws.on("message", (message) => {
     try {
       const data = JSON.parse(message);
       if (data.type === "error") {
-        console.error("\n🔴 前端错误:");
-        console.error("=".repeat(50));
-        console.error(data.error);
-        console.error("=".repeat(50));
+        const errorMsg = data.error;
+
+        // 合并字体资源错误
+        if (errorMsg.includes("font资源加载失败")) {
+          errorCache.fontError++;
+          if (errorCache.fontError === 1) {
+            console.error("\n🔴 前端错误:");
+            console.error("=".repeat(50));
+            console.error(errorMsg);
+            console.error("=".repeat(50));
+          } else if (errorCache.fontError % 5 === 0) {
+            console.error(
+              `\n🔴 前端错误: 已收到 ${errorCache.fontError} 个重复的字体资源加载失败错误`
+            );
+          }
+        }
+        // 合并音频资源错误
+        else if (errorMsg.includes("audio资源加载失败")) {
+          errorCache.audioError++;
+          if (errorCache.audioError === 1) {
+            console.error("\n🔴 前端错误:");
+            console.error("=".repeat(50));
+            console.error(errorMsg);
+            console.error("=".repeat(50));
+          } else if (errorCache.audioError % 3 === 0) {
+            console.error(
+              `\n🔴 前端错误: 已收到 ${errorCache.audioError} 个重复的音频资源加载失败错误`
+            );
+          }
+        }
+        // 其他错误正常记录
+        else {
+          console.error("\n🔴 前端错误:");
+          console.error("=".repeat(50));
+          console.error(errorMsg);
+          console.error("=".repeat(50));
+        }
       }
     } catch (e) {
       console.error("❌ 消息解析失败:", message);
@@ -70,7 +139,8 @@ wss.on("connection", (ws) => {
   });
 
   ws.on("close", () => {
-    console.log("❌ 前端已断开连接");
+    connectionCount--;
+    console.log(`❌ 前端已断开连接 (剩余连接数: ${connectionCount})`);
   });
 
   ws.on("error", (error) => {
@@ -80,6 +150,29 @@ wss.on("connection", (ws) => {
 
 // 启动服务器
 server.listen(PORT, () => {
-  console.log(`🚀 服务器已启动，访问地址: http://localhost:${PORT}`);
+  const url = `http://localhost:${PORT}`;
+  console.log(`🚀 服务器已启动，访问地址: ${url}`);
   console.log("📝 前端错误将显示在终端中\n");
+
+  // 自动打开网页
+  const opn = (url) => {
+    const platform = process.platform;
+    let cmd = "";
+    let args = [];
+
+    if (platform === "win32") {
+      cmd = "cmd";
+      args = ["/c", "start", url];
+    } else if (platform === "darwin") {
+      cmd = "open";
+      args = [url];
+    } else {
+      cmd = "xdg-open";
+      args = [url];
+    }
+
+    spawn(cmd, args, { stdio: "ignore", detached: true });
+  };
+
+  opn(url);
 });
