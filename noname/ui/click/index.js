@@ -3687,18 +3687,18 @@ export class Click {
             }
           }
         };
-      } else {
+      }
+      // 获取角色信息，用于后续处理
+      const nameInfo = get.character(name);
+      if (!intro) {
         // 样式一
         //TODO: 这里的数据也暂时没有改成新格式，需要后续的修改
-        const nameInfo = get.character(name),
-          showCharacterNamePinyin = lib.config.show_characternamepinyin;
+        const showCharacterNamePinyin = lib.config.show_characternamepinyin;
         intro = ui.create.div(".characterintro", uiintro);
+        let characterIntroTable;
         if (showCharacterNamePinyin != "doNotShow") {
-          const characterIntroTable = ui.create.div(
-              ".character-intro-table",
-              intro
-            ),
-            span = document.createElement("span");
+          characterIntroTable = ui.create.div(".character-intro-table", intro);
+          const span = document.createElement("span");
           span.style.fontWeight = "bold";
           const exInfo = nameInfo.trashBin,
             characterName =
@@ -3798,6 +3798,8 @@ export class Click {
               () =>
                 (characterGroupDiv.innerHTML = get.translation(characterGroup))
             );
+        } else {
+          characterIntroTable = ui.create.div(".character-intro-table", intro);
         }
         const hpDiv = ui.create.div(".hp", characterIntroTable),
           nameInfoHP = nameInfo[2],

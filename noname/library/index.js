@@ -3352,7 +3352,66 @@ export class Library {
     },
   };
   extensionMenu = {};
-  mode = {};
+  mode = {
+    single: {
+      name: "单挑",
+      //todo：删掉属性connect
+      config: {
+        single_mode: {
+          name: "游戏模式",
+          init: "dianjiang",
+          item: {
+            dianjiang: "点将单挑",
+          },
+          restart: true,
+          frequent: true,
+        },
+        change_card: {
+          name: "开启手气卡",
+          init: "unlimited",
+          item: {
+            disabled: "禁用",
+            unlimited: "无限",
+          },
+        },
+        single_control: {
+          name: "单人控制",
+          intro: "由玩家操作点将单挑的两名游戏角色",
+          init: false,
+          restart: true,
+        },
+        free_choose: {
+          name: "自由选将",
+          init: true,
+          onclick(bool) {
+            game.saveConfig("free_choose", bool, this._link.config.mode);
+            if (
+              get.mode() != this._link.config.mode ||
+              (!_status.event.getParent().showConfig &&
+                !_status.event.showConfig)
+            ) {
+              return;
+            }
+            if (!ui.cheat2 && get.config("free_choose")) {
+              ui.create.cheat2();
+            } else if (ui.cheat2 && !get.config("free_choose")) {
+              ui.cheat2.close();
+              delete ui.cheat2;
+            }
+          },
+        },
+        update: function (config, map) {
+          // 只访问实际存在的map属性
+          if (map.enable_jin) map.enable_jin.hide();
+          if (map.change_card) map.change_card.hide();
+          if (map.double_character) map.double_character.hide();
+          if (map.double_hp) map.double_hp.hide();
+          if (map.single_control) map.single_control.hide();
+          if (map.free_choose) map.free_choose.show();
+        },
+      },
+    },
+  };
   status = {
     running: false,
     canvas: false,
@@ -4957,12 +5016,6 @@ export class Library {
       };
       let list = ["s", "ap", "a", "am", "bp", "b", "bm", "c", "d"];
       let str = "";
-      for (let i = 0; i < list.length; i++) {
-        if (str) {
-          str += " 、 ";
-        }
-        str += list[i] + "-" + lib.rank[list[i]].length;
-      }
       log(str);
       for (let i in lib.characterPack) {
         if (!bool && lib.config.all.sgscharacters.includes(i)) {
@@ -4991,21 +5044,11 @@ export class Library {
         }
       }
 
-      let list2 = lib.rank.s
-        .concat(lib.rank.ap)
-        .concat(lib.rank.a)
-        .concat(lib.rank.am)
-        .concat(lib.rank.bp)
-        .concat(lib.rank.b)
-        .concat(lib.rank.bm)
-        .concat(lib.rank.c)
-        .concat(lib.rank.d);
       Object.keys(lib.character).forEach((key) => {
         if (
           !lib.config.forbidai.includes(key) &&
           !key.startsWith("boss_") &&
-          !key.startsWith("tafang_") &&
-          !list2.includes(key)
+          !key.startsWith("tafang_")
         ) {
           log(get.translation(key), key);
         }

@@ -848,19 +848,6 @@ export class Game extends GameCompatible {
    * @param {string} name
    */
   getRarity(name) {
-    var rank = lib.rank.rarity;
-    if (rank.legend.includes(name)) {
-      return "legend";
-    }
-    if (rank.epic.includes(name)) {
-      return "epic";
-    }
-    if (rank.rare.includes(name)) {
-      return "rare";
-    }
-    if (rank.junk.includes(name)) {
-      return "junk";
-    }
     return "common";
   }
   /**

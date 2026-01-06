@@ -1996,23 +1996,6 @@ export class Get extends GetCompatible {
       return num ? Math.round((7 * (num - 1)) / 8 + 1) : "ap";
     }
 
-    const RANK_MAP = [
-      { key: "s", factor: 8, ref: lib.rank.s },
-      { key: "ap", factor: 7, ref: lib.rank.ap },
-      { key: "a", factor: 6, ref: lib.rank.a },
-      { key: "am", factor: 5, ref: lib.rank.am },
-      { key: "bp", factor: 4, ref: lib.rank.bp }, // 中位数等级
-      { key: "b", factor: 3, ref: lib.rank.b },
-      { key: "bm", factor: 2, ref: lib.rank.bm },
-      { key: "c", factor: 1, ref: lib.rank.c },
-      { key: "d", factor: 0, ref: lib.rank.d },
-    ];
-    for (const { key, factor, ref } of RANK_MAP) {
-      if (ref.includes(name)) {
-        return num ? Math.round((factor * (num - 1)) / 8 + 1) : key;
-      }
-    }
-
     const charInfo = lib.character[name];
     if (charInfo?.isBoss || charInfo?.isBossAllowed || charInfo?.isHiddenBoss) {
       return num ? Math.round((9 * (num - 1)) / 8 + 1) : "sp";
