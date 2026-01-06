@@ -70,6 +70,9 @@ coverage/
 
 # Root image folder
 /image/
+/font/
+/card/standard/
+/mode/identity.js
 
 # Hearthstone resource folder
 extension/炉石普通/resource/
