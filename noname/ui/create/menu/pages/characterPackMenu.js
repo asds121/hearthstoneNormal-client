@@ -286,7 +286,6 @@ export const characterPackMenu = function (connectMenu) {
         if (
           mode.startsWith("mode_") &&
           !mode.startsWith("mode_extension_") &&
-          mode != "mode_favourite" &&
           mode != "mode_banned"
         ) {
           if (!connectMenu && lib.config.show_charactercard) {
@@ -490,31 +489,7 @@ export const characterPackMenu = function (connectMenu) {
     }
     return node;
   };
-  if (
-    lib.config.show_favourite_menu &&
-    !connectMenu &&
-    Array.isArray(lib.config.favouriteCharacter)
-  ) {
-    lib.characterPack.mode_favourite = {};
-    for (var i = 0; i < lib.config.favouriteCharacter.length; i++) {
-      var favname = lib.config.favouriteCharacter[i];
-      if (lib.character[favname]) {
-        lib.characterPack.mode_favourite[favname] = lib.character[favname];
-      }
-    }
-    var favouriteCharacterNode = createModeConfig(
-      "mode_favourite",
-      start.firstChild
-    );
-    if (!favouriteCharacterNode.link) {
-      favouriteCharacterNode._initLink();
-    }
-    ui.favouriteCharacter = favouriteCharacterNode.link;
-    if (get.is.empty(lib.characterPack.mode_favourite)) {
-      ui.favouriteCharacter.node.style.display = "none";
-    }
-    delete lib.characterPack.mode_favourite;
-  }
+
   if (!connectMenu && lib.config.show_ban_menu) {
     lib.characterPack.mode_banned = {};
     for (var i = 0; i < lib.config.all.mode.length; i++) {

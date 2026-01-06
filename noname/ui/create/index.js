@@ -910,8 +910,6 @@ export class Create {
       var pack = null;
       if (packname == "最近") {
         pack = get.config("recentCharacter") || [];
-      } else if (packname == "收藏") {
-        pack = lib.config.favouriteCharacter;
       }
       var node = ui.create.div(
         ".dialogbutton.menubutton.large",
@@ -1314,9 +1312,7 @@ export class Create {
         );
         newlined.appendChild(span);
         node[namecapt[i]] = span;
-        if (namecapt[i] == "收藏") {
-          span._nature = "fire";
-        } else {
+        {
           span._nature = "wood";
         }
       } else {
@@ -2278,7 +2274,10 @@ export class Create {
     if (lib.config.glass_ui) {
       ui.window.classList.add("glass_ui");
     }
-    if (lib.config.custom_button && lib.configMenu.appearence?.config?.custom_button?.onclick) {
+    if (
+      lib.config.custom_button &&
+      lib.configMenu.appearence?.config?.custom_button?.onclick
+    ) {
       lib.configMenu.appearence.config.custom_button.onclick("skip");
     }
 
@@ -2966,75 +2965,14 @@ export class Create {
     ui.shortcut.autobutton.dataset.position = 2;
     ui.favmodelist = ui.create.div(".favmodelist", ui.shortcut);
     ui.favmodelist.update = function () {
-      const favouriteMode = lib.config.favouriteMode;
-      let removed = false;
-      for (let index = 0; index < favouriteMode.length; index++) {
-        if (typeof favouriteMode[index] == "string") {
-          continue;
-        }
-        favouriteMode.splice(index--, 1);
-        if (!removed) {
-          removed = true;
-        }
-      }
-      if (removed) {
-        game.saveConfigValue("favouriteMode");
-      }
+      // 收藏功能已移除，不执行任何操作
       this.innerHTML = "";
-      favouriteMode
-        .slice(0, 6)
-        .forEach((value, index) => this.add(value, index));
-      let mode = lib.config.mode;
-      const config = get.config(`${mode}_mode`);
-      if (typeof config == "string") {
-        mode += `|${config}`;
-      }
-      if (favouriteMode.includes(mode)) {
-        ui.favmode.classList.add("glow");
-      } else {
-        ui.favmode.classList.remove("glow");
-      }
     };
     ui.favmodelist.add = function (name, index) {
-      const info = name.split("|"),
-        mode = info[0],
-        submode = info[1],
-        node = ui.create.div(".menubutton.large", this),
-        dataset = node.dataset;
-      dataset.type =
-        Math.min(6, lib.config.favouriteMode.length) % 2 == 0 ? "even" : "odd";
-      dataset.position = index;
-      let str = lib.translate[name] || lib.translate[mode] || "";
-      if (str.length == 2) {
-        str += "模式";
-      }
-      node.innerHTML = str;
-      node.listen(() => {
-        game.saveConfig("mode", mode);
-        if (submode) {
-          game.saveConfig(`${mode}_mode`, submode, mode);
-        }
-        game.reload();
-      });
+      // 收藏功能已移除，不执行任何操作
     };
-    ui.favmode = ui.create.system("收藏", function () {
-      const mode =
-        typeof _status.mode == "string"
-          ? `${lib.config.mode}|${_status.mode}`
-          : lib.config.mode;
-      if (this.classList.contains("glow")) {
-        this.classList.remove("glow");
-        lib.config.favouriteMode.remove(mode);
-      } else {
-        this.classList.add("glow");
-        lib.config.favouriteMode.add(mode);
-      }
-      game.saveConfig("favouriteMode", lib.config.favouriteMode);
-      ui.favmodelist.update();
-      _status.clicked = true;
-    });
-    ui.favmode.style.display = "none";
-    ui.favmodelist.update();
+    // 收藏功能已移除，不再创建收藏按钮
+    // ui.favmodelist.update();
     // ui.create.div('.menubutton.round','<span>菜单</span>',ui.shortcut,ui.click.config).dataset.position=5;
 
     if (_status.connectMode) {

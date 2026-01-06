@@ -6742,7 +6742,9 @@ export class Game extends GameCompatible {
       ui.arena.classList.add("choose-character");
       ui.me.hide();
       ui.mebg.hide();
-      ui.autonode.hide();
+      if (ui.autonode) {
+        ui.autonode.hide();
+      }
       if (lib.config.radius_size != "off") {
         ui.historybar.style.borderRadius = "0 0 0 4px";
       }

@@ -1,8 +1,14 @@
 window.noname_package = {
-  character: {},
-  card: {},
+  character: {
+    standard: "标准包",
+  },
+  card: {
+    standard: "标准包",
+  },
   play: {},
-  mode: {},
+  mode: {
+    single: "单挑",
+  },
   submode: {},
 
   background: {

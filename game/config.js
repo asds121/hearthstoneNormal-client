@@ -8,8 +8,8 @@ window.config = {
   all: {
     sgscharacters: [],
     sgscards: [],
-    sgsmodes: ["hs_hearthstone"],
-    stockmode: ["hs_hearthstone"],
+    sgsmodes: ["single", "hs_hearthstone"],
+    stockmode: ["single", "hs_hearthstone"],
     stockextension: [],
     layout: ["default", "newlayout"],
     theme: ["woodden", "music", "simple"],
@@ -30,9 +30,10 @@ window.config = {
   game: "sgs",
   duration: 500,
   hoveration: 1000,
+  choose_all_button: true,
   cheat: false,
-  volumn_background: 8,
-  volumn_audio: 8,
+  volumn_background: 1,
+  volumn_audio: 6,
 
   config_menu: true,
   auto_popped_config: true,
@@ -63,8 +64,6 @@ window.config = {
   hiddenPlayPack: [],
   hiddenBackgroundPack: [],
   customBackgroundPack: [],
-  favouriteCharacter: [],
-  favouriteMode: [],
   recentIP: [],
   brokenFile: [],
 
@@ -72,6 +71,7 @@ window.config = {
   theme: "simple",
   layout: "nova",
   cardback_style: "liusha",
+  //todo：多出来的一个
   card_style: "default",
   cardshape: "default",
   hp_style: "glass",
@@ -125,7 +125,7 @@ window.config = {
 
   cards: [],
   characters: [],
-  moderned_chracters: [],
+  moderned_chracters: ["standard"],
   moderned_modes: [],
   plays: [],
   extensions: ["炉石普通"],
@@ -152,3 +152,4 @@ window.config = {
   customforbid: [],
   forbid: [],
 };
+window["bannedExtensions"] = [];

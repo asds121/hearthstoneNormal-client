@@ -692,4 +692,13 @@ export class Is {
   linked2(player) {
     return false;
   }
+
+  /**
+   * TODO: 未来要删除
+   * 始终返回false
+   * @returns {boolean}
+   */
+  versus() {
+    return false;
+  }
 }

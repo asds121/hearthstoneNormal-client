@@ -953,9 +953,6 @@ export class Library {
     khquanjiu: ["jiu", (card, player) => get.number(card, player) == 9],
   };
   characterDialogGroup = {
-    收藏: function (name, capt) {
-      return lib.config.favouriteCharacter.includes(name) ? capt : null;
-    },
     最近: function (name, capt) {
       var list = get.config("recentCharacter") || [];
       return list.includes(name) ? capt : null;
@@ -2525,7 +2522,6 @@ export class Library {
           intro: "点击自由选将时默认显示的条目",
           init: "最近",
           item: {
-            收藏: "收藏",
             最近: "最近",
             all: "全部",
           },
@@ -2576,24 +2572,6 @@ export class Library {
         show_charactercard: {
           name: "显示武将资料",
           intro: "在武将界面单击时弹出武将资料卡",
-          init: true,
-          unfrequent: true,
-        },
-        show_favourite: {
-          name: "显示添加收藏",
-          intro: "在角色的右键菜单中显示添加收藏",
-          init: false,
-          unfrequent: true,
-        },
-        show_favmode: {
-          name: "显示模式收藏",
-          intro: "快捷菜单中显示收藏模式",
-          init: true,
-          unfrequent: true,
-        },
-        show_favourite_menu: {
-          name: "显示收藏菜单",
-          intro: "在选项-武将中显示收藏一栏",
           init: true,
           unfrequent: true,
         },
@@ -4419,15 +4397,12 @@ export class Library {
       const characters = lib.config.all.characters.slice(0);
       characters.remove("standard");
       characters.remove("old");
-      game.saveConfig("favouriteCharacter", favs);
-      game.saveConfig("favouriteMode", favmodes);
       game.saveConfig("theme", "simple");
       game.saveConfig("player_border", "slim");
       game.saveConfig("cards", lib.config.all.cards);
       game.saveConfig("characters", characters);
       game.saveConfig("change_skin", false);
       game.saveConfig("show_splash", "off");
-      game.saveConfig("show_favourite", false);
       game.saveConfig("animation", false);
       game.saveConfig("hover_all", false);
       game.saveConfig("asset_version", "v1.9");

@@ -5123,13 +5123,13 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
               get.skillInfoTranslation(skills[i], node) + "</div></div>";
             uiintro.add(forbidstr);
           } else if (!skills2.includes(skills[i])) {
-              uiintro.add(
-                '<div style="opacity:0.5"><div class="skill">' +
-                  translation +
-                  "</div><div>" +
-                  get.skillInfoTranslation(skills[i], node) +
-                  "</div></div>"
-              );
+            uiintro.add(
+              '<div style="opacity:0.5"><div class="skill">' +
+                translation +
+                "</div><div>" +
+                get.skillInfoTranslation(skills[i], node) +
+                "</div></div>"
+            );
           } else if (
             lib.skill[skills[i]].temp ||
             !node.skills.includes(skills[i]) ||
@@ -5342,9 +5342,6 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         table.style.marginLeft = "10px";
 
         uiintro.content.appendChild(table);
-        if (!lib.config.show_favourite) {
-          table.style.paddingBottom = "5px";
-        }
       }
       if (!simple || get.is.phoneLayout()) {
         var es = node.getCards("e");
@@ -5512,24 +5509,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
         }
         uiintro.content.appendChild(table);
       }
-      var modepack = lib.characterPack["mode_" + get.mode()];
-      if (
-        lib.config.show_favourite &&
-        lib.character[node.name] &&
-        game.players.includes(node) &&
-        (!modepack || !modepack[node.name]) &&
-        (!simple || get.is.phoneLayout())
-      ) {
-        var addFavourite = ui.create.div(".text.center.pointerdiv");
-        addFavourite.link = node.name;
-        if (lib.config.favouriteCharacter.includes(node.name)) {
-          addFavourite.innerHTML = "移除收藏";
-        } else {
-          addFavourite.innerHTML = "添加收藏";
-        }
-        addFavourite.listen(ui.click.favouriteCharacter);
-        uiintro.add(addFavourite);
-      }
+
       if (!simple || get.is.phoneLayout()) {
         if ((lib.config.change_skin || lib.skin) && !node.isUnseen()) {
           var num = 1;
@@ -6215,26 +6195,7 @@ else if (entry[1] !== void 0) stringifying[key] = JSON.stringify(entry[1]);*/
             }
           }
         }
-        var modepack = lib.characterPack["mode_" + get.mode()];
-        if (
-          lib.config.show_favourite &&
-          lib.character[node.link] &&
-          (!modepack || !modepack[node.link]) &&
-          (!simple || get.is.phoneLayout())
-        ) {
-          var addFavourite = ui.create.div(".text.center.pointerdiv");
-          addFavourite.link = node.link;
-          addFavourite.style.marginBottom = "15px";
-          if (lib.config.favouriteCharacter.includes(node.link)) {
-            addFavourite.innerHTML = "移除收藏";
-          } else {
-            addFavourite.innerHTML = "添加收藏";
-          }
-          addFavourite.listen(ui.click.favouriteCharacter);
-          uiintro.add(addFavourite);
-        } else {
-          uiintro.add(ui.create.div(".placeholder.slim"));
-        }
+
         var addskin = false;
         if (node.parentNode.classList.contains("menu-buttons")) {
           addskin = !lib.config.show_charactercard;

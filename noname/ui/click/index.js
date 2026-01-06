@@ -180,16 +180,14 @@ export class Click {
       ui.shortcut.classList.toggle("hidden");
     }
     if (ui.shortcut.classList.contains("hidden")) {
-      ui.favmode.style.display = "none";
+      // 收藏功能已移除，不再访问ui.favmode
       if (window.StatusBar && lib.config.show_statusbar_ios == "auto") {
         document.body.classList.remove("statusbar");
         window.StatusBar.hide();
       }
       ui.window.classList.remove("shortcutpaused");
     } else {
-      if (lib.config.show_favmode) {
-        ui.favmode.style.display = "";
-      }
+      // 收藏功能已移除，不再访问ui.favmode
       if (window.StatusBar && lib.config.show_statusbar_ios == "auto") {
         document.body.classList.add("statusbar");
         window.StatusBar.overlaysWebView(true);
@@ -203,60 +201,6 @@ export class Click {
       }
       ui.window.classList.add("shortcutpaused");
     }
-  }
-  favouriteCharacter(e) {
-    if (typeof this.link == "string") {
-      if (this.innerHTML == "添加收藏") {
-        this.innerHTML = "移除收藏";
-        lib.config.favouriteCharacter.add(this.link);
-      } else {
-        this.innerHTML = "添加收藏";
-        lib.config.favouriteCharacter.remove(this.link);
-      }
-      if (ui.favouriteCharacter) {
-        if (lib.config.favouriteCharacter.includes(this.link)) {
-          for (var i = 0; i < ui.favouriteCharacter.childElementCount; i++) {
-            if (ui.favouriteCharacter.childNodes[i].link == this.link) {
-              break;
-            }
-          }
-          if (i == ui.favouriteCharacter.childElementCount) {
-            ui.create
-              .button(this.link, "character", ui.favouriteCharacter)
-              .listen(function (e) {
-                this._banning = "offline";
-                ui.click.touchpop();
-                ui.click.intro.call(this, e);
-                _status.clicked = false;
-                delete this._banning;
-              })
-              .classList.add("noclick");
-          }
-        } else {
-          for (var i = 0; i < ui.favouriteCharacter.childElementCount; i++) {
-            if (ui.favouriteCharacter.childNodes[i].link == this.link) {
-              ui.favouriteCharacter.childNodes[i].remove();
-              break;
-            }
-          }
-        }
-        var shownode = false;
-        for (var i = 0; i < lib.config.favouriteCharacter.length; i++) {
-          var favname = lib.config.favouriteCharacter[i];
-          if (lib.character[favname]) {
-            shownode = true;
-            break;
-          }
-        }
-        if (shownode) {
-          ui.favouriteCharacter.node.style.display = "";
-        } else {
-          ui.favouriteCharacter.node.style.display = "none";
-        }
-      }
-      game.saveConfig("favouriteCharacter", lib.config.favouriteCharacter);
-    }
-    e.stopPropagation();
   }
   buttonnameenter() {
     if (this.buttonscrollinterval) {
@@ -3346,28 +3290,11 @@ export class Click {
       }
     };
     ban.updateBanned();
-    var fav = ui.create.div(
-      ".menubutton.large.fav",
-      uiintro,
-      "收藏",
-      function () {
-        if (this.classList.contains("unselectable")) {
-          return;
-        }
-        this.classList.toggle("active");
-        if (this.classList.contains("active")) {
-          lib.config.favouriteCharacter.add(name);
-        } else {
-          lib.config.favouriteCharacter.remove(name);
-        }
-        game.saveConfig("favouriteCharacter", lib.config.favouriteCharacter);
-      }
-    );
+    //todo：fav不应该存在
+    var fav = null;
     if (noedit === true) {
       fav.classList.add("unselectable");
       ban.classList.add("unselectable");
-    } else if (lib.config.favouriteCharacter.includes(name)) {
-      fav.classList.add("active");
     }
 
     let intro,

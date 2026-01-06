@@ -169,7 +169,9 @@ export async function onload() {
 	Object.keys(lib.character)
 		.toSorted(lib.sort.capt)
 		.forEach(character => {
-			lib.mode.connect.config.connect_avatar.item[character] = lib.translate[character];
+			if (lib.mode.connect && lib.mode.connect.config && lib.mode.connect.config.connect_avatar) {
+				lib.mode.connect.config.connect_avatar.item[character] = lib.translate[character];
+			}
 		});
 
 	loadCardPile();
