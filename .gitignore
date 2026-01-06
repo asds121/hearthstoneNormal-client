@@ -73,6 +73,7 @@ coverage/
 /font/
 /card/standard/
 /mode/identity.js
+/tests/
 
 # Hearthstone resource folder
 extension/炉石普通/resource/
