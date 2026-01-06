@@ -71,7 +71,6 @@ coverage/
 # Root image folder
 /image/
 /font/
-/card/standard/
 /mode/identity.js
 /tests/
 
