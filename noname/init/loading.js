@@ -695,12 +695,6 @@ function mixinLibrary(config, lib) {
   lib.element = mixinElement(config, lib.element);
   lib.config.banned = lib.config[`${lib.config.mode}_banned`] || [];
   lib.config.bannedcards = lib.config[`${lib.config.mode}_bannedcards`] || [];
-  // @ts-expect-error ignore
-  if (window.noname_character_replace && typeof window.noname_character_replace === 'object') {
-    Object.keys(window.noname_character_replace).forEach(
-      (i) => (lib.characterReplace[i] = window.noname_character_replace[i])
-    );
-  }
   
   // @ts-expect-error ignore
   if (window.noname_character_perfectPairs && typeof window.noname_character_perfectPairs === 'object') {

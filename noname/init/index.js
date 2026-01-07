@@ -599,9 +599,9 @@ export async function boot() {
   }
 
   // 初始化扩展管理器
-  const { extensionManager } = await import('../extension/index.js');
+  const { extensionManager } = await import("../extension/index.js");
   await extensionManager.init();
-  
+
   // 生成扩展列表用于后续处理
   if (!localStorage.getItem(lib.configprefix + "disable_extension")) {
     if (config.has("extensions") && config.get("extensions").length) {
@@ -893,7 +893,23 @@ export async function boot() {
   for (const characterPack of config.get("all").characters) {
     toLoad.push(importCharacterPack(characterPack));
   }
-  toLoad.push(lib.init.promises.js(`${lib.assetURL}character`, "replace"));
+
+  // 导入 replace.js (ES6 模块)
+  toLoad.push(
+    (async () => {
+      try {
+        const replaceModule = await import(`../../character/replace.js`);
+        if (
+          replaceModule.default &&
+          typeof replaceModule.default === "object"
+        ) {
+          Object.assign(lib.characterReplace, replaceModule.default);
+        }
+      } catch (error) {
+        console.error("加载 replace.js 失败:", error);
+      }
+    })()
+  );
 
   if (_status.javaScriptExtensions) {
     const loadJavaScriptExtension = async (
@@ -1485,7 +1501,9 @@ async function setOnError() {
       }
       // 创建错误对象并报告，确保发送到后端
       const error = new Error(msg);
-      error.stack = err ? err.stack : `Error: ${msg}\n    at ${src}:${line}:${column}`;
+      error.stack = err
+        ? err.stack
+        : `Error: ${msg}\n    at ${src}:${line}:${column}`;
       const reporter = new ErrorReporter(error);
       game.print(reporter.report(str + "\n代码出现错误"));
     }
