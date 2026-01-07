@@ -211,16 +211,6 @@ export default {
           fan: "反贼",
         },
       },
-      ban_identity2: {
-        name: "屏蔽身份2",
-        init: "off",
-        item: {
-          off: "关闭",
-          zhu: "主公",
-          zhong: "忠臣",
-          fan: "反贼",
-        },
-      },
       difficulty: {
         name: "AI对人类态度",
         init: "normal",

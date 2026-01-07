@@ -1,0 +1,15 @@
+export default {
+  zhu: "主",
+  zhong: "忠",
+  fan: "反",
+  cai: "猜",
+  cai2: "猜",
+  zhu2: "主公",
+  zhong2: "忠臣",
+  fan2: "反贼",
+  random2: "随机",
+  enemy: "敌",
+  friend: "友",
+  enemy2: "敌方",
+  friend2: "友方",
+};

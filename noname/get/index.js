@@ -427,14 +427,14 @@ export class Get extends GetCompatible {
         if (identityLists) {
           const identityList = identityLists[numberOfPlayers - 2];
           if (Array.isArray(identityList)) {
-            return identityList.slice();
+            // 移除列表中的内奸身份
+            return identityList.filter(identity => identity !== "nei");
           }
         }
       }
     }
     const numberOfPlayersExceptLord = numberOfPlayers - 1,
-      numberOfLoyalists = Math.round((numberOfPlayersExceptLord * 3) / 9),
-      numberOfSpys = Math.round((numberOfPlayersExceptLord * 2) / 9);
+      numberOfLoyalists = Math.round((numberOfPlayersExceptLord * 3) / 9);
     return ["zhu"].concat(
       Array.from(
         {
@@ -444,13 +444,7 @@ export class Get extends GetCompatible {
       ),
       Array.from(
         {
-          length: numberOfSpys,
-        },
-        () => "nei"
-      ),
-      Array.from(
-        {
-          length: numberOfPlayersExceptLord - numberOfLoyalists - numberOfSpys,
+          length: numberOfPlayersExceptLord - numberOfLoyalists,
         },
         () => "fan"
       )
