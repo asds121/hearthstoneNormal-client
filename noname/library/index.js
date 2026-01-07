@@ -1,14 +1,3 @@
-/**
- * @typedef { InstanceType<typeof lib.element.Player> } Player
- * @typedef { InstanceType<typeof lib.element.Card> } Card
- * @typedef { InstanceType<typeof lib.element.VCard> } VCard
- * @typedef { InstanceType<typeof lib.element.Button> } Button
- * @typedef { InstanceType<typeof lib.element.Dialog> } Dialog
- * @typedef { InstanceType<typeof lib.element.GameEvent> } GameEvent
- * @typedef { GameEvent & InstanceType<typeof lib.element.GameEventPromise> } GameEventPromise
- * @typedef { InstanceType<typeof lib.element.NodeWS> } NodeWS
- * @typedef { InstanceType<typeof lib.element.Control> } Control
- */
 import {
   nonameInitialized,
   assetURL,
@@ -36,12 +25,36 @@ import cheat from "./index/skill.js";
 import filter from "./index/filter.js";
 import message from "./index/message.js";
 import namePrefix from "./index/namePrefix.js";
+import sort from "./index/sort.js";
 
 import { defaultHooks } from "./hooks/index.js";
 import { freezeButExtensible } from "../util/index.js";
 import security from "../util/security.js";
 import { ErrorManager } from "../util/error.js";
 import { Concurrent } from "./concurrent/index.js";
+import {
+  CONFIG_PREFIX,
+  VERSION_OL,
+  LAYOUT_FIXED,
+  PINYIN_METADATA,
+  ACTUAL_CARD_NAME,
+  RESPOND_MAP,
+  EMOTION_LIST,
+  TRANSLATE_MAP,
+  PACK_SORT,
+  CHARACTER_GUOZHAN_FILTER,
+  SUIT,
+  SUITS,
+  COLOR_GROUP,
+  GROUP,
+  LINKED,
+  SELECT_GROUP,
+  GROUP_NATURE,
+  LINE_COLOR,
+  PHASE_NAME,
+  QUICK_VOICE,
+  INIT_FILTER,
+} from "./constant.js";
 
 import { defaultSplashs } from "../init/onload/index.js";
 import dedent from "../../game/dedent.js";
@@ -49,8 +62,8 @@ import dedent from "../../game/dedent.js";
 const html = dedent;
 
 export class Library {
-  configprefix = "noname_0.9_";
-  versionOL = 27;
+  configprefix = CONFIG_PREFIX;
+  versionOL = VERSION_OL;
 
   hallURL = "";
   assetURL = assetURL;
@@ -147,7 +160,7 @@ export class Library {
   characterSubstitute = {};
   characterAppend = {};
   characterInitFilter = {};
-  characterGuozhanFilter = ["mode_guozhan"];
+  characterGuozhanFilter = CHARACTER_GUOZHAN_FILTER;
   dynamicTranslate = {};
   cardPack = new Proxy(
     {},
@@ -196,22 +209,7 @@ export class Library {
   ondb = [];
   ondb2 = [];
   chatHistory = [];
-  emotionList = {
-    huangdou_emotion: 50,
-    shibing_emotion: 15,
-    wanglang_emotion: 20,
-    guojia_emotion: 20,
-    zhenji_emotion: 20,
-    xiaowu_emotion: 14,
-    xiaokuo_emotion: 8,
-    xiaosha_emotion: 20,
-    xiaotao_emotion: 20,
-    xiaojiu_emotion: 20,
-    biexiao_emotion: 18,
-    chaijun_emotion: 43,
-    maoshu_emotion: 18,
-    mobile_emotion: 15,
-  };
+  emotionList = EMOTION_LIST;
   animate = {
     skill: {},
     card: {},
@@ -227,30 +225,7 @@ export class Library {
     function () {
       _status.skillOwner = {};
       //武将包排序
-      let packSort = [
-        "standard",
-        "shenhua",
-        "yijiang",
-        "refresh",
-        "extra",
-        "sp",
-        "xinghuoliaoyuan",
-        "sp2",
-        "mobile",
-        "tw",
-        "yingbian",
-        "offline",
-        "sb",
-        "clan",
-        "huicui",
-        "shiji",
-        "xianding",
-        "jsrg",
-        "onlyOL",
-        "newjiang",
-        "sixiang",
-        "sxrm",
-      ];
+      let packSort = [...PACK_SORT];
       packSort = packSort.reverse();
       const packs = Object.keys(lib.characterPack).sort((a, b) => {
         return packSort.indexOf(b) - packSort.indexOf(a);
@@ -417,526 +392,16 @@ export class Library {
    * @type { { character?: SMap<importCharacterConfig>, card?: SMap<importCardConfig>, mode?: SMap<importModeConfig>, player?: SMap<importPlayerConfig>, extension?: SMap<importExtensionConfig>, play?: SMap<importPlayConfig> } }
    */
   imported = {};
-  layoutfixed = ["stone"];
+  layoutfixed = LAYOUT_FIXED;
   pinyins = {
-    _metadata: {
-      shengmu: [
-        "zh",
-        "ch",
-        "sh",
-        "b",
-        "p",
-        "m",
-        "f",
-        "d",
-        "t",
-        "l",
-        "n",
-        "g",
-        "k",
-        "h",
-        "j",
-        "q",
-        "x",
-        "r",
-        "z",
-        "c",
-        "s",
-        "y",
-        "w",
-      ],
-      special_shengmu: ["j", "q", "x", "y"],
-      feijiemu: {
-        i: ["ing", "iu", "ie", "in"],
-        u: ["ui", "un"],
-        ü: ["üe", "ün"],
-      },
-      zhengtirendu: ["zhi", "chi", "shi", "ri", "zi", "ci", "si"],
-      yunjiao: {
-        一麻: ["a", "ia", "ua"],
-        二波: ["o", "e", "uo"],
-        三皆: ["ie", "üe"],
-        四开: ["ai", "uai"],
-        五微: ["ei", "ui"],
-        六豪: ["ao", "iao"],
-        七尤: ["ou", "iu"],
-        八寒: ["an", "ian", "uan", "üan"],
-        九文: ["en", "in", "un", "ün"],
-        十唐: ["ang", "iang", "uang"],
-        十一庚: ["eng", "ing", "ong", "ung"],
-        十二齐: ["i", "er", "ü"],
-        十三支: ["-i"],
-        十四姑: ["u"],
-      },
-    },
-  };
-  /**
-   * Yingbian
-   *
-   * 应变
-   */
-  yingbian = {
-    condition: {
-      color: new Map([
-        ["zhuzhan", "wood"],
-        ["kongchao", "soil"],
-        ["fujia", "orange"],
-        ["canqu", "fire"],
-        ["force", "metal"],
-      ]),
-      complex: new Map([
-        [
-          "zhuzhan",
-          function (event) {
-            const yingbianZhuzhan = game.createEvent("yingbianZhuzhan");
-            yingbianZhuzhan.player = event.player;
-            yingbianZhuzhan.card = event.card;
-            yingbianZhuzhan._trigger = event;
-            yingbianZhuzhan.yingbianZhuzhanAI = event.yingbianZhuzhanAI;
-            yingbianZhuzhan.afterYingbianZhuzhan = event.afterYingbianZhuzhan;
-            yingbianZhuzhan.setContent(() => {
-              "step 0";
-              event._global_waiting = true;
-              event.send = (
-                player,
-                card,
-                source,
-                targets,
-                id,
-                id2,
-                yingbianZhuzhanAI,
-                skillState
-              ) => {
-                if (skillState) {
-                  player.applySkills(skillState);
-                }
-                var type = get.type2(card),
-                  str = get.translation(source);
-                if (targets && targets.length) {
-                  str += `对${get.translation(targets)}`;
-                }
-                str += `使用了${get.translation(card)}，是否弃置一张${get.translation(type)}为其助战？`;
-                player.chooseCard({
-                  filterCard: (card, player) =>
-                    get.type2(card) == type &&
-                    lib.filter.cardDiscardable(card, player),
-                  prompt: str,
-                  position: "h",
-                  _global_waiting: true,
-                  id: id,
-                  id2: id2,
-                  ai:
-                    typeof yingbianZhuzhanAI == "function"
-                      ? yingbianZhuzhanAI(player, card, source, targets)
-                      : (cardx) => {
-                          var info = get.info(card);
-                          if (info && info.ai && info.ai.yingbian) {
-                            var ai = info.ai.yingbian(
-                              card,
-                              source,
-                              targets,
-                              player
-                            );
-                            if (!ai) {
-                              return 0;
-                            }
-                            return ai - get.value(cardx);
-                          } else if (get.attitude(player, source) <= 0) {
-                            return 0;
-                          }
-                          return 5 - get.value(cardx);
-                        },
-                });
-                if (!game.online) {
-                  return;
-                }
-                _status.event._resultid = id;
-                game.resume();
-              };
-              ("step 1");
-              var type = get.type2(card);
-              event.list = game
-                .filterPlayer(
-                  (current) =>
-                    current != player &&
-                    current.countCards("h") &&
-                    (_status.connectMode ||
-                      current.hasCard((cardx) => get.type2(cardx) == type, "h"))
-                )
-                .sortBySeat(_status.currentPhase || player);
-              event.id = get.id();
-              ("step 2");
-              if (!event.list.length) {
-                event.finish();
-              } else if (
-                _status.connectMode &&
-                (event.list[0].isOnline() || event.list[0] == game.me)
-              ) {
-                event.goto(4);
-              } else {
-                event.send(
-                  (event.current = event.list.shift()),
-                  event.card,
-                  player,
-                  trigger.targets,
-                  event.id,
-                  trigger.parent.id,
-                  trigger.yingbianZhuzhanAI
-                );
-              }
-              ("step 3");
-              if (result.bool) {
-                event.zhuzhanresult = event.current;
-                event.zhuzhanresult2 = result;
-                if (event.current != game.me) {
-                  game.delayx();
-                }
-                event.goto(8);
-              } else {
-                event.goto(2);
-              }
-              ("step 4");
-              var id = event.id,
-                sendback = (result, player) => {
-                  if (
-                    result &&
-                    result.id == id &&
-                    !event.zhuzhanresult &&
-                    result.bool
-                  ) {
-                    event.zhuzhanresult = player;
-                    event.zhuzhanresult2 = result;
-                    game.broadcast("cancel", id);
-                    if (
-                      _status.event.id == id &&
-                      _status.event.name == "chooseCard" &&
-                      _status.paused
-                    ) {
-                      return () => {
-                        event.resultOL = _status.event.resultOL;
-                        ui.click.cancel();
-                        if (ui.confirm) {
-                          ui.confirm.close();
-                        }
-                      };
-                    }
-                  } else if (
-                    _status.event.id == id &&
-                    _status.event.name == "chooseCard" &&
-                    _status.paused
-                  ) {
-                    return () => (event.resultOL = _status.event.resultOL);
-                  }
-                },
-                withme = false,
-                withol = false,
-                list = event.list;
-              for (var i = 0; i < list.length; i++) {
-                var current = list[i];
-                if (current.isOnline()) {
-                  withol = true;
-                  current.wait(sendback);
-                  current.send(
-                    event.send,
-                    current,
-                    event.card,
-                    player,
-                    trigger.targets,
-                    event.id,
-                    trigger.parent.id,
-                    trigger.yingbianZhuzhanAI,
-                    get.skillState(current)
-                  );
-                  list.splice(i--, 1);
-                } else if (current == game.me) {
-                  withme = true;
-                  event.send(
-                    current,
-                    event.card,
-                    player,
-                    trigger.targets,
-                    event.id,
-                    trigger.parent.id,
-                    trigger.yingbianZhuzhanAI
-                  );
-                  list.splice(i--, 1);
-                }
-              }
-              if (!withme) {
-                event.goto(6);
-              }
-              if (_status.connectMode && (withme || withol)) {
-                game.players.forEach((value) => {
-                  if (value != player) {
-                    value.showTimer();
-                  }
-                });
-              }
-              event.withol = withol;
-              ("step 5");
-              if (!result || !result.bool || event.zhuzhanresult) {
-                return;
-              }
-              game.broadcast("cancel", event.id);
-              event.zhuzhanresult = game.me;
-              event.zhuzhanresult2 = result;
-              ("step 6");
-              if (event.withol && !event.resultOL) {
-                game.pause();
-              }
-              ("step 7");
-              game.players.forEach((value) => value.hideTimer());
-              ("step 8");
-              if (event.zhuzhanresult) {
-                var target = event.zhuzhanresult;
-                target.line(player, "green");
-                target.discard(event.zhuzhanresult2.cards).discarder = target;
-                if (typeof event.afterYingbianZhuzhan == "function") {
-                  event.afterYingbianZhuzhan(event, trigger);
-                }
-                var yingbianCondition = event.name.slice(8).toLowerCase(),
-                  yingbianConditionTag = `yingbian_${yingbianCondition}_tag`;
-                target.popup(
-                  yingbianConditionTag,
-                  lib.yingbian.condition.color.get(yingbianCondition)
-                );
-                game.log(
-                  target,
-                  "响应了",
-                  player,
-                  "发起的",
-                  yingbianConditionTag
-                );
-                target.addExpose(0.2);
-                event.result = {
-                  bool: true,
-                };
-              } else {
-                event.result = {
-                  bool: false,
-                };
-              }
-            });
-            yingbianZhuzhan._args = Array.from(arguments);
-            return yingbianZhuzhan;
-          },
-        ],
-      ]),
-      simple: new Map([
-        ["kongchao", (event) => !event.player.countCards("h")],
-        ["fujia", (event) => event.player.isMaxHandcard()],
-        ["canqu", (event) => event.player.getHp() == 1],
-      ]),
-    },
-    effect: new Map([
-      [
-        "add",
-        () => {
-          trigger.yingbian_addTarget = true;
-        },
-      ],
-      [
-        "remove",
-        () => {
-          trigger.yingbian_removeTarget = true;
-        },
-      ],
-      [
-        "damage",
-        () => {
-          if (typeof trigger.baseDamage != "number") {
-            trigger.baseDamage = 1;
-          }
-          trigger.baseDamage++;
-          game.log(card, "的伤害值基数+1");
-        },
-      ],
-      [
-        "draw",
-        () => {
-          player.draw();
-        },
-      ],
-      [
-        "gain",
-        () => {
-          const cardx = trigger.respondTo;
-          if (
-            cardx &&
-            cardx[1] &&
-            cardx[1].cards &&
-            cardx[1].cards.filterInD("od").length
-          ) {
-            player.gain(cardx[1].cards.filterInD("od"), "gain2");
-          }
-        },
-      ],
-      [
-        "hit",
-        () => {
-          trigger.directHit.addArray(game.players).addArray(game.dead);
-          game.log(card, "不可被响应");
-        },
-      ],
-      [
-        "all",
-        () => {
-          card.yingbian_all = true;
-          game.log(card, "执行所有选项");
-        },
-      ],
-    ]),
-    prompt: new Map([
-      ["add", "目标+1"],
-      ["remove", "目标-1"],
-      ["damage", "伤害+1"],
-      ["draw", "摸一张牌"],
-      ["gain", "获得响应的牌"],
-      ["hit", "此牌不可被响应"],
-      ["all", "无视条件执行所有选项"],
-    ]),
-  };
-  /**
-   * Stratagem buff
-   *
-   * 谋攻强化
-   */
-  stratagemBuff = {
-    cost: new Map([
-      ["sha", 1],
-      ["shan", 1],
-      ["juedou", 2],
-      ["huogong", 2],
-      ["tao", 3],
-    ]),
-    effect: new Map([
-      [
-        "sha",
-        (event, option) => {
-          if (event.step != 0 || option.state != "end") {
-            return;
-          }
-          game.log(event.player, "触发了强化效果");
-          game.log(
-            event.card,
-            "抵消所需要的",
-            new lib.element.VCard({
-              name: "shan",
-            }),
-            "数+1"
-          );
-          const map = event.customArgs;
-          game.players.concat(game.dead).forEach((current) => {
-            const id = current.playerid;
-            if (!map[id]) {
-              map[id] = {};
-            }
-            if (typeof map[id].shanRequired == "number") {
-              map[id].shanRequired++;
-            } else {
-              map[id].shanRequired = 2;
-            }
-          });
-        },
-      ],
-      [
-        "shan",
-        (event, option) => {
-          if (event.step != 0 || option.state != "end") {
-            return;
-          }
-          game.log(event.player, "触发了强化效果");
-          game.log(
-            "使用",
-            event.card,
-            "时视为两张",
-            new lib.element.VCard({
-              name: "shan",
-            }),
-            "的效果"
-          );
-          event.player
-            .when("useCard")
-            .filter((evt) => evt == event)
-            .then(() => {
-              trigger.getParent(2).decrease("shanRequired", 1);
-            });
-        },
-      ],
-      [
-        "juedou",
-        (event, option) => {
-          if (event.step != 0 || option.state != "end") {
-            return;
-          }
-          game.log(event.player, "触发了强化效果");
-          game.log("对", event.card, "的目标造成伤害时，伤害+1");
-          event.player
-            .when({
-              source: "damageBegin1",
-            })
-            .filter(
-              (evt) =>
-                evt.getParent(2) == event && event.targets.includes(evt.player)
-            )
-            .then(() => {
-              trigger.increase("num");
-            });
-        },
-      ],
-      [
-        "huogong",
-        (event, option) => {
-          if (event.step != 0 || option.state != "end") {
-            return;
-          }
-          game.log(event.player, "触发了强化效果");
-          game.log(event.card, "造成的伤害+1");
-          event.increase("baseDamage", 1);
-        },
-      ],
-      [
-        "tao",
-        (event, option) => {
-          if (event.step != 0 || option.state != "end") {
-            return;
-          }
-          game.log(event.player, "触发了强化效果");
-          game.log(event.card, "回复的体力+1");
-          event.increase("baseDamage", 1);
-        },
-      ],
-    ]),
-    prompt: new Map([
-      [
-        "sha",
-        /**
-         * @type {() => string}
-         */
-        () => `抵消所需要的【${get.translation("shan")}】数+1。`,
-      ],
-      [
-        "shan",
-        /**
-         * @type {() => string}
-         */
-        () => `使用时视为两张【${get.translation("shan")}】的效果。`,
-      ],
-      ["juedou", () => "对此牌的目标造成伤害时，伤害+1。"],
-      ["huogong", () => "造成的伤害+1。"],
-      ["tao", () => "回复的体力+1。"],
-    ]),
+    _metadata: PINYIN_METADATA,
   };
   /**
    * The actual card name
    *
    * 实际的卡牌名称
    */
-  actualCardName = new Map([
-    ["挟令", "挟天子以令诸侯"],
-    ["霹雳投石车", "霹雳车"],
-    ["金箍棒", "如意金箍棒"],
-  ]);
+  actualCardName = ACTUAL_CARD_NAME;
   /**
    * the cards which can respond card
    *
@@ -944,22 +409,7 @@ export class Library {
    * 例如可响应杀的主要就是闪，或者本体的草船借箭，以此类推；
    * 类似劝酒这种复杂条件的，可以放函数，但仅检测实体牌
    */
-  respondMap = {
-    sha: ["shan"],
-    wanjian: ["shan"],
-    qizhengxiangsheng: ["sha", "shan"],
-    juedou: ["sha"],
-    nanman: ["sha"],
-    jiedao: ["jiedao"],
-    //所有锦囊都可以用无懈可击响应
-    trick: ["wuxie"],
-    //所有伤害牌都可以用草船借箭响应
-    damage: ["caochuan"],
-    //所有基本牌或普通锦囊牌都可以响应
-    all: [],
-    //也可以放函数
-    khquanjiu: ["jiu", (card, player) => get.number(card, player) == 9],
-  };
+  respondMap = RESPOND_MAP;
   characterDialogGroup = {
     最近: function (name, capt) {
       var list = get.config("recentCharacter") || [];
@@ -1654,255 +1104,7 @@ export class Library {
   };
   init = new LibInit();
   cheat = cheat;
-  translate = {
-    flower: "鲜花",
-    egg: "鸡蛋",
-    wine: "酒杯",
-    shoe: "拖鞋",
-    yuxisx: "玉玺",
-    jiasuo: "枷锁",
-    junk: "平凡",
-    common: "普通",
-    rare: "精品",
-    epic: "史诗",
-    legend: "传说",
-    default: "默认",
-    special: "特殊",
-    zhenfa: "阵法",
-    aozhan: "鏖战",
-    mode_derivation_card_config: "衍生",
-    mode_banned_card_config: "禁卡",
-    mode_favourite_character_config: "收藏",
-    mode_banned_character_config: "禁将",
-    heart: "♥︎",
-    diamond: "♦︎",
-    spade: "♠︎",
-    club: "♣︎",
-    none: "◈",
-    ghujia: "护甲",
-    ghujia_bg: "甲",
-    heart2: "红桃",
-    diamond2: "方片",
-    spade2: "黑桃",
-    club2: "梅花",
-    none2: "无色",
-    red: "红色",
-    black: "黑色",
-    red2: "红色",
-    black2: "黑色",
-    ok: "确定",
-    ok2: "确定",
-    cancel: "取消",
-    cancel2: "取消",
-    restart: "重新开始",
-    setting: "设置",
-    start: "开始",
-    random: "随机",
-    _out: "无效",
-    agree: "同意",
-    refuse: "拒绝",
-    fire: "火",
-    thunder: "雷",
-    poison: "毒",
-    kami: "神",
-    ice: "冰",
-    stab: "刺",
-    wei: "魏",
-    shu: "蜀",
-    wu: "吴",
-    qun: "群",
-    shen: "神",
-    devil: "魔",
-    western: "西",
-    key: "键",
-    jin: "晋",
-    ye: "野",
-    double: "双",
-    wei2: "魏国",
-    shu2: "蜀国",
-    wu2: "吴国",
-    qun2: "群雄",
-    shen2: "神明",
-    devil2: "入魔",
-    western2: "西方",
-    key2: "KEY",
-    jin2: "晋朝",
-    ye2: "野心家",
-    double2: "双势力",
-    male: "男",
-    female: "女",
-    mad: "混乱",
-    mad_bg: "疯",
-    draw_card: "摸牌",
-    discard_card: "弃牌",
-    take_damage: "受伤害",
-    reset_character: "复原武将牌",
-    recover_hp: "回复体力",
-    lose_hp: "失去体力",
-    get_damage: "受伤害",
-    weiColor: "#b0d0e2",
-    shuColor: "#ffddb9",
-    wuColor: "#b2d9a9",
-    qunColor: "#f6f6f6",
-    shenColor: "#ffe14c",
-    westernColor: "#ffe14c",
-    jinColor: "#ffe14c",
-    keyColor: "#c9b1fd",
-    devilColor: "#9b2234",
-    basic: "基本",
-    equip: "装备",
-    trick: "锦囊",
-    delay: "延时锦囊",
-    special_delay: "技能机制",
-    character: "角色",
-    revive: "复活",
-    equip1: "武器",
-    equip2: "防具",
-    equip3: "防御马",
-    equip3_4: "坐骑",
-    equip4: "攻击马",
-    equip5: "宝物",
-    equip6: "特殊装备",
-    zero: "零",
-    one: "一",
-    two: "二",
-    three: "三",
-    four: "四",
-    five: "五",
-    six: "六",
-    seven: "七",
-    eight: "八",
-    nine: "九",
-    ten: "十",
-    _recasting: "重铸",
-    _lianhuan: "连环",
-    _lianhuan2: "连环",
-    _kamisha: "神杀",
-    _icesha: "冰杀",
-    qianxing: "潜行",
-    mianyi: "免疫",
-    fengyin: "封印",
-    baiban: "白板",
-    _disableJudge: "判定区",
-
-    xiaowu_emotion: "小无表情",
-    wanglang_emotion: "王朗表情",
-    guojia_emotion: "郭嘉表情",
-    zhenji_emotion: "甄姬表情",
-    shibing_emotion: "士兵表情",
-    xiaosha_emotion: "小杀表情",
-    xiaotao_emotion: "小桃表情",
-    xiaojiu_emotion: "小酒表情",
-    xiaokuo_emotion: "小扩表情",
-    biexiao_emotion: "憋笑表情",
-    chaijun_emotion: "柴郡表情",
-    huangdou_emotion: "黄豆表情",
-    maoshu_emotion: "猫鼠表情",
-    mobile_emotion: "手杀表情",
-
-    pause: "暂停",
-    config: "选项",
-    auto: "托管",
-
-    unknown: "未知",
-    unknown0: "一号位",
-    unknown1: "二号位",
-    unknown2: "三号位",
-    unknown3: "四号位",
-    unknown4: "五号位",
-    unknown5: "六号位",
-    unknown6: "七号位",
-    unknown7: "八号位",
-    unknown8: "九号位",
-    unknown9: "十号位",
-    unknown10: "十一号位",
-    unknown11: "十二号位",
-
-    feichu_equip1: "已废除",
-    feichu_equip1_info: "武器栏已废除",
-    feichu_equip2: "已废除",
-    feichu_equip2_info: "防具栏已废除",
-    feichu_equip3: "已废除",
-    feichu_equip3_info: "防御坐骑栏已废除",
-    feichu_equip4: "已废除",
-    feichu_equip4_info: "攻击坐骑栏已废除",
-    feichu_equip5: "已废除",
-    feichu_equip5_info: "宝物栏已废除",
-    feichu_equip6: "已废除",
-    feichu_equip6_info: "特殊装备栏已废除",
-    feichu_equip1_bg: "废",
-    feichu_equip2_bg: "废",
-    feichu_equip3_bg: "废",
-    feichu_equip4_bg: "废",
-    feichu_equip5_bg: "废",
-    feichu_equip6_bg: "废",
-    disable_judge: "已废除",
-    disable_judge_info: "判定区已废除",
-    disable_judge_bg: "废",
-    pss: "手势",
-    pss_paper: "布",
-    pss_scissor: "剪刀",
-    pss_stone: "石头",
-    pss_paper_info: "石头剪刀布时的一种手势。克制石头，但被剪刀克制。",
-    pss_scissor_info: "石头剪刀布时的一种手势。克制布，但被石头克制。",
-    pss_stone_info: "石头剪刀布时的一种手势。克制剪刀，但被布克制。",
-    renku: "仁库",
-    group_wei: "魏势力",
-    group_shu: "蜀势力",
-    group_wu: "吴势力",
-    group_qun: "群势力",
-    group_key: "键势力",
-    group_jin: "晋势力",
-    group_wei_bg: "魏",
-    group_shu_bg: "蜀",
-    group_wu_bg: "吴",
-    group_qun_bg: "群",
-    group_key_bg: "键",
-    group_jin_bg: "晋",
-    zhengsu: "整肃",
-    zhengsu_leijin: "擂进",
-    zhengsu_bianzhen: "变阵",
-    zhengsu_mingzhi: "鸣止",
-    zhengsu_leijin_info: "回合内所有于出牌阶段使用的牌点数递增且不少于三张。",
-    zhengsu_bianzhen_info: "回合内所有于出牌阶段使用的牌花色相同且不少于两张。",
-    zhengsu_mingzhi_info:
-      "回合内所有于弃牌阶段弃置的牌花色均不相同且不少于两张。",
-    db_atk: "策略",
-    db_atk1: "全军出击",
-    db_atk2: "分兵围城",
-    db_def: "策略",
-    db_def1: "奇袭粮道",
-    db_def2: "开城诱敌",
-    cooperation_damage: "同仇",
-    cooperation_damage_info: "双方累计造成至少4点伤害",
-    cooperation_draw: "并进",
-    cooperation_draw_info: "双方累计摸至少八张牌",
-    cooperation_discard: "疏财",
-    cooperation_discard_info: "双方累计弃置至少4种花色的牌",
-    cooperation_use: "戮力",
-    cooperation_use_info: "双方累计使用至少4种花色的牌",
-    charge: "蓄力值",
-    expandedSlots: "扩展装备栏",
-    stratagem_fury: "怒气",
-    _stratagem_add_buff: "强化",
-
-    phaseZhunbei: "准备阶段",
-    phaseJudge: "判定阶段",
-    phaseDraw: "摸牌阶段",
-    phaseUse: "出牌阶段",
-    phaseDiscard: "弃牌阶段",
-    phaseJieshu: "结束阶段",
-
-    dongcha: "洞察",
-    dongcha_info:
-      "①游戏开始时，随机一名反贼的身份对你可见。②准备阶段，你可以弃置场上的一张牌。",
-    sheshen: "舍身",
-    sheshen_info:
-      "锁定技。当主公即将死亡时，你令其增加1点体力上限并回复体力至X点（X为你的体力值），然后其获得你的所有牌。若如此做，你死亡。",
-    identity_mingcha: "明察",
-    identity_mingcha_info:
-      "游戏开始时，你可以查看一名角色的身份是否为反贼（对所有玩家可见）。",
-  };
+  translate = TRANSLATE_MAP;
 
   experimental = experimental;
 
@@ -2157,266 +1359,7 @@ export class Library {
     },
   };
   filter = filter;
-  sort = {
-    nature: function (a, b) {
-      return (lib.nature.get(b) || 0) - (lib.nature.get(a) || 0);
-    },
-    group: function (a, b) {
-      const groupSort = function (group) {
-        let base = 0;
-        if (group == "wei") {
-          return base;
-        }
-        if (group == "shu") {
-          return base + 1;
-        }
-        if (group == "wu") {
-          return base + 2;
-        }
-        if (group == "qun") {
-          return base + 3;
-        }
-        if (group == "jin") {
-          return base + 4;
-        }
-        if (group == "key") {
-          return base + 5;
-        }
-        if (group == "western") {
-          return base + 6;
-        }
-        if (group == "shen") {
-          return base + 7;
-        }
-        if (group == "devil") {
-          return base + 7;
-        }
-        if (group == "double") {
-          return base + 8;
-        }
-        return base + 9;
-      };
-      return groupSort(a) - groupSort(b);
-    },
-    character: function (a, b) {
-      const groupSort = function (name) {
-        const info = get.character(name);
-        if (!info) {
-          return 7;
-        }
-        let base = 0;
-        const group = info[1];
-        if (group == "shen" || group == "devil") {
-          return base - 1;
-        }
-        if (group == "wei") {
-          return base;
-        }
-        if (group == "shu") {
-          return base + 1;
-        }
-        if (group == "wu") {
-          return base + 2;
-        }
-        if (group == "qun") {
-          return base + 3;
-        }
-        if (group == "jin") {
-          return base + 4;
-        }
-        if (group == "key") {
-          return base + 5;
-        }
-        if (group == "western") {
-          return base + 6;
-        }
-        return base + 7;
-      };
-      const del = groupSort(a) - groupSort(b);
-      if (del != 0) {
-        return del;
-      }
-      var aa = a,
-        bb = b;
-      var firstUnderscoreIndexA = a.indexOf("_");
-      var firstUnderscoreIndexB = b.indexOf("_");
-      var secondUnderscoreIndexA =
-        firstUnderscoreIndexA != -1
-          ? a.indexOf("_", firstUnderscoreIndexA + 1)
-          : -1;
-      var secondUnderscoreIndexB =
-        firstUnderscoreIndexB != -1
-          ? b.indexOf("_", firstUnderscoreIndexB + 1)
-          : -1;
-
-      if (secondUnderscoreIndexA != -1) {
-        a = a.slice(secondUnderscoreIndexA + 1);
-      } else if (firstUnderscoreIndexA != -1) {
-        a = a.slice(firstUnderscoreIndexA + 1);
-      }
-
-      if (secondUnderscoreIndexB != -1) {
-        b = b.slice(secondUnderscoreIndexB + 1);
-      } else if (firstUnderscoreIndexB != -1) {
-        b = b.slice(firstUnderscoreIndexB + 1);
-      }
-
-      if (a != b) {
-        return a > b ? 1 : -1;
-      }
-      return aa > bb ? 1 : -1;
-    },
-    card: function (a, b) {
-      var typeSort = function (name) {
-        var type = get.type(name);
-        if (!type) {
-          return 10;
-        }
-        if (type == "basic") {
-          return -1;
-        }
-        if (type == "trick") {
-          return 0;
-        }
-        if (type == "delay") {
-          return 1;
-        }
-        if (type == "equip") {
-          var type2 = get.subtype(name, false);
-          if (type2 && type2.slice) {
-            return 1 + parseInt(type2.slice(5) || 7);
-          }
-          return 8.5;
-        }
-        return 9;
-      };
-      var del = typeSort(a) - typeSort(b);
-      if (del != 0) {
-        return del;
-      }
-      var aa = a,
-        bb = b;
-      var firstUnderscoreIndexA = a.indexOf("_");
-      var firstUnderscoreIndexB = b.indexOf("_");
-      var secondUnderscoreIndexA =
-        firstUnderscoreIndexA != -1
-          ? a.indexOf("_", firstUnderscoreIndexA + 1)
-          : -1;
-      var secondUnderscoreIndexB =
-        firstUnderscoreIndexB != -1
-          ? b.indexOf("_", firstUnderscoreIndexB + 1)
-          : -1;
-
-      if (secondUnderscoreIndexA != -1) {
-        a = a.slice(secondUnderscoreIndexA + 1);
-      } else if (firstUnderscoreIndexA != -1) {
-        a = a.slice(firstUnderscoreIndexA + 1);
-      }
-
-      if (secondUnderscoreIndexB != -1) {
-        b = b.slice(secondUnderscoreIndexB + 1);
-      } else if (firstUnderscoreIndexB != -1) {
-        b = b.slice(firstUnderscoreIndexB + 1);
-      }
-
-      if (a != b) {
-        return a > b ? 1 : -1;
-      }
-      return aa > bb ? 1 : -1;
-    },
-    random: function () {
-      return Math.random() - 0.5;
-    },
-    seat: function (a, b) {
-      var player =
-        lib.tempSortSeat || _status.event.player || game.me || game.players[0];
-      var delta =
-        get.distance(player, a, "absolute") -
-        get.distance(player, b, "absolute");
-      if (delta) {
-        return delta;
-      }
-      delta = parseInt(a.dataset.position) - parseInt(b.dataset.position);
-      if (player.side == game.me.side) {
-        return delta;
-      }
-      return -delta;
-    },
-    position: function (a, b) {
-      return parseInt(a.dataset.position) - parseInt(b.dataset.position);
-    },
-    priority: function (a, b) {
-      var i1 = get.info(a[0]),
-        i2 = get.info(b[0]);
-      if (i1.priority == undefined) {
-        i1.priority = 0;
-      }
-      if (i2.priority == undefined) {
-        i2.priority = 0;
-      }
-      if (i1.priority == i2.priority) {
-        if (i1.forced == undefined && i2.forced == undefined) {
-          return 0;
-        }
-        if (i1.forced && i2.forced) {
-          return 0;
-        }
-        if (i1.forced) {
-          return 1;
-        }
-        if (i2.forced) {
-          return -1;
-        }
-      }
-      return i2.priority - i1.priority;
-    },
-    number: function (a, b) {
-      return get.number(a) - get.number(b);
-    },
-    number2: function (a, b) {
-      return get.number(b) - get.number(a);
-    },
-    capt: function (a, b) {
-      var aa = a,
-        bb = b;
-      var firstUnderscoreIndexAA = aa.indexOf("_");
-      var firstUnderscoreIndexBB = bb.indexOf("_");
-      var secondUnderscoreIndexAA =
-        firstUnderscoreIndexAA != -1
-          ? aa.indexOf("_", firstUnderscoreIndexAA + 1)
-          : -1;
-      var secondUnderscoreIndexBB =
-        firstUnderscoreIndexBB != -1
-          ? bb.indexOf("_", firstUnderscoreIndexBB + 1)
-          : -1;
-
-      if (secondUnderscoreIndexAA != -1) {
-        aa = aa.slice(secondUnderscoreIndexAA + 1);
-      } else if (firstUnderscoreIndexAA != -1) {
-        aa = aa.slice(firstUnderscoreIndexAA + 1);
-      }
-
-      if (secondUnderscoreIndexBB != -1) {
-        bb = bb.slice(secondUnderscoreIndexBB + 1);
-      } else if (firstUnderscoreIndexBB != -1) {
-        bb = bb.slice(firstUnderscoreIndexBB + 1);
-      }
-
-      if (aa != bb) {
-        return aa > bb ? 1 : -1;
-      }
-      return a > b ? 1 : -1;
-    },
-    name: function (a, b) {
-      if (a > b) {
-        return 1;
-      }
-      if (a < b) {
-        return -1;
-      }
-      return 0;
-    },
-  };
+  sort = sort;
   /**
    * @type {{
    * 	global: string[];
@@ -2450,14 +1393,12 @@ export class Library {
     [12, "Q"],
     [13, "K"],
   ]);
-  suit = ["club", "spade", "diamond", "heart"];
-  suits = ["club", "spade", "diamond", "heart", "none"];
-  color = {
-    black: ["club", "spade"],
-    red: ["diamond", "heart"],
-    none: ["none"],
-  };
-  group = ["wei", "shu", "wu", "qun", "jin", "shen"];
+  suit = SUIT;
+  suits = SUITS;
+
+  color = COLOR_GROUP;
+
+  group = GROUP;
   //数值代表各元素在名称中排列的先后顺序
   nature = new Map([
     ["fire", 20],
@@ -2506,76 +1447,19 @@ export class Library {
 			*/
     },
   };
-  linked = ["fire", "thunder", "kami", "ice"];
+  linked = LINKED;
   natureBg = new Map([["stab", "image/card/cisha.png"]]);
   natureSeparator = "|";
   namePrefix = namePrefix;
-  groupnature = {
-    shen: "shen",
-    wei: "water",
-    shu: "soil",
-    wu: "wood",
-    qun: "qun",
-    western: "thunder",
-    key: "key",
-    jin: "thunder",
-    ye: "thunder",
-    devil: "devil",
-  };
-  lineColor = new Map([
-    ["fire", [255, 146, 68]],
-    ["yellow", [255, 255, 122]],
-    ["blue", [150, 202, 255]],
-    ["green", [141, 255, 216]],
-    ["ice", [59, 98, 115]],
-    ["thunder", [141, 216, 255]],
-    ["kami", [90, 118, 99]],
-    ["white", [255, 255, 255]],
-    ["poison", [104, 221, 127]],
-    ["brown", [195, 161, 223]],
-    ["legend", [233, 131, 255]],
-  ]);
-  selectGroup = ["shen", "western", "devil"];
-  phaseName = [
-    "phaseZhunbei",
-    "phaseJudge",
-    "phaseDraw",
-    "phaseUse",
-    "phaseDiscard",
-    "phaseJieshu",
-  ];
-  quickVoice = [
-    "我从未见过如此厚颜无耻之人！",
-    "这波不亏",
-    "请收下我的膝盖",
-    "你咋不上天呢",
-    "放开我的队友，冲我来",
-    "你随便杀，闪不了算我输",
-    "见证奇迹的时刻到了",
-    "能不能快一点啊，兵贵神速啊",
-    "主公，别开枪，自己人",
-    "小内再不跳，后面还怎么玩儿啊",
-    "你们忍心，就这么让我酱油了？",
-    "我，我惹你们了吗",
-    "姑娘，你真是条汉子",
-    "三十六计，走为上，容我去去便回",
-    "人心散了，队伍不好带啊",
-    "昏君，昏君啊！",
-    "风吹鸡蛋壳，牌去人安乐",
-    "小内啊，您老悠着点儿",
-    "不好意思，刚才卡了",
-    "你可以打得再烂一点吗",
-    "哥们，给力点儿行嘛",
-    "哥哥，交个朋友吧",
-    "妹子，交个朋友吧",
-  ];
+  groupnature = GROUP_NATURE;
+  lineColor = LINE_COLOR;
+  selectGroup = SELECT_GROUP;
+  phaseName = PHASE_NAME;
+  quickVoice = QUICK_VOICE;
   other = {
     ignore: () => void 0,
   };
-  InitFilter = {
-    noZhuHp: "不享受主公的额外体力上限",
-    noZhuSkill: "不享受地主的额外技能",
-  };
+  InitFilter = INIT_FILTER;
 }
 
 /**
