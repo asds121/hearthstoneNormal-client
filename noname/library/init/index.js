@@ -132,9 +132,7 @@ export class LibInit {
         }
       };
       setTimeout(loop, 500);
-      if (!_status.new_tutorial) {
-        game.saveConfig("menu_loadondemand", true, lib.config.mode);
-      }
+      game.saveConfig("menu_loadondemand", true, lib.config.mode);
     }
   }
 

@@ -4,8 +4,8 @@ import skill from "./skill.js";
 import translate from "./translate.js";
 import list from "./list.js";
 
-export function aaa() {
-  return { name: "standard", connect: true, card, skill, translate, list };
-}
+export const type = "card";
 
-game.import("card", aaa);
+export default () => {
+  return { name: "standard", connect: true, card, skill, translate, list };
+};

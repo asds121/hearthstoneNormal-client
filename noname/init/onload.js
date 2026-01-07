@@ -155,7 +155,15 @@ export async function onload() {
 	lib.connectCharacterPack = [];
 	lib.connectCardPack = [];
 
-	const currentMode = lib.imported.mode[lib.config.mode];
+	// Wait for all mode importing promises to resolve
+	if (Array.isArray(_status.importing?.mode)) {
+		await Promise.allSettled(_status.importing.mode);
+	}
+
+	const currentMode = lib.imported.mode?.[lib.config.mode];
+	if (!currentMode) {
+		throw new Error(`Failed to load mode: ${lib.config.mode}`);
+	}
 	loadMode(currentMode);
 	// 为了模式扩展，两个东西删不了
 	lib.init.start = currentMode.start;

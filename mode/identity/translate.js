@@ -1,0 +1,16 @@
+export default {
+  zhu: "主",
+  zhong: "忠",
+  fan: "反",
+  cai: "猜",
+  zhu2: "主公",
+  zhong2: "忠臣",
+  fan2: "反贼",
+  random2: "随机",
+  ai_strategy_1: "均衡",
+  ai_strategy_2: "偏反",
+  ai_strategy_3: "偏主",
+  ai_strategy_4: "酱油",
+  ai_strategy_5: "天使",
+  ai_strategy_6: "仇主",
+};

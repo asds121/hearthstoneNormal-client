@@ -12,22 +12,24 @@ import perfectPairs from "./perfectPairs.js";
 import voices from "./voices.js";
 import { characterSort, characterSortTranslate } from "./sort.js";
 
-game.import("character", function () {
-	return {
-		name: "standard",
-		connect: true,
-		character: { ...characters },
-		characterSort: {
-			standard: characterSort,
-		},
-		characterFilter: { ...characterFilters },
-		characterTitle: { ...characterTitles },
-		dynamicTranslate: { ...dynamicTranslates },
-		characterIntro: { ...characterIntros },
-		card: { ...cards },
-		skill: { ...skills },
-		perfectPair: { ...perfectPairs },
-		translate: { ...translates, ...voices, ...characterSortTranslate },
-		pinyins: { ...pinyins },
-	};
-});
+export const type = "character";
+
+export default () => {
+  return {
+    name: "standard",
+    connect: true,
+    character: { ...characters },
+    characterSort: {
+      standard: characterSort,
+    },
+    characterFilter: { ...characterFilters },
+    characterTitle: { ...characterTitles },
+    dynamicTranslate: { ...dynamicTranslates },
+    characterIntro: { ...characterIntros },
+    card: { ...cards },
+    skill: { ...skills },
+    perfectPair: { ...perfectPairs },
+    translate: { ...translates, ...voices, ...characterSortTranslate },
+    pinyins: { ...pinyins },
+  };
+};

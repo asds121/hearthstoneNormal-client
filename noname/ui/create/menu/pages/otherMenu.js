@@ -162,7 +162,8 @@ export const otherMenu = function (
     // };
     li1.innerHTML =
       "游戏版本：" +
-      lib.version +
+      //lib.version +
+      "炉石专用 v1.0.0" +
       '<p style="margin-top:8px;white-space:nowrap"></p>';
     li2.innerHTML =
       "素材版本：" +
@@ -619,49 +620,6 @@ export const otherMenu = function (
       };
       ui.updateUpdate();
     })();
-
-    // button4 = document.createElement('button');
-    // button4.innerHTML = '设置更新地址';
-    // button4.onclick = function () {
-    // 	game.prompt('设置更新地址', function (str) {
-    // 		if (str) {
-    // 			game.saveConfig('updateURL', str);
-    // 			li3.querySelector('span').innerHTML = trimURL(str);
-    // 			button5.style.display = '';
-    // 			button6.style.display = 'none';
-    // 		}
-    // 	});
-    // };
-    // li3.lastChild.appendChild(button4);
-
-    // var button6 = document.createElement('button');
-    // button6.innerHTML = '设为备用镜像';
-    // button6.style.display = 'none';// coding
-    // button6.style.marginLeft='5px';
-    // button6.onclick = function () {
-    // 	game.saveConfig('updateURL', lib.mirrorURL);
-    // 	// button5.style.display = '';
-    // 	button6.style.display = 'none';
-    // 	li3.querySelector('span').innerHTML = trimURL(lib.mirrorURL);
-    // };
-    // li3.lastChild.appendChild(button6);
-
-    // button5 = document.createElement('button');
-    // button5.innerHTML = '设为默认镜像';
-    // button5.style.marginLeft='5px';
-    // button5.onclick = function () {
-    // 	game.saveConfig('updateURL');
-    // 	button5.style.display = 'none';
-    // 	button6.style.display = '';
-    // 	li3.querySelector('span').innerHTML = trimURL(lib.updateURL);
-    // };
-    // li3.lastChild.appendChild(button5);
-    // if (!lib.config.updateURL) {
-    // 	button5.style.display = 'none';
-    // }
-    // else {
-    // 	button6.style.display = 'none';
-    // }
 
     checkAssetButton = document.createElement("button");
     checkAssetButton.innerHTML = "检查素材更新";

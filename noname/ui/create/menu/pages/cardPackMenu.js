@@ -191,7 +191,7 @@ export const cardPackMenu = function (connectMenu) {
   };
 
   var createModeConfig = function (mode, position) {
-    var info = lib.cardPack[mode];
+    var info = lib.cardPack[mode] || [];
     let cardPack = lib.cardPackInfo[mode];
     if (
       !lib.cardPile[mode] &&
