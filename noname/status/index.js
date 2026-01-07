@@ -78,14 +78,7 @@ export class status {
    * @type { Promise<any>[] | undefined }
    */
   extensionLoading = undefined;
-  /**
-   * @type { { [key: string]: Promise<any>[] } | undefined }
-   */
   importing = undefined;
-  /**
-   * @type { Function | boolean | undefined }
-   */
-  new_tutorial = undefined;
   /**
    * @type { Player | undefined }
    */

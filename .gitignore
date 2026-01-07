@@ -71,7 +71,6 @@ coverage/
 # Root image folder
 /image/
 /font/
-/mode/identity.js
 /tests/
 
 # Hearthstone resource folder

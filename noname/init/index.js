@@ -30,11 +30,6 @@ function isHttpProtocol() {
   return location.protocol.startsWith("http");
 }
 
-// 辅助函数：检查是否是首次启动
-function isFirstStartup() {
-  return !config.get("new_tutorial");
-}
-
 // 辅助函数：检查是否是手机端(Cordova平台)
 function isCordovaPlatform() {
   return typeof window.cordova === "object" && window.cordova !== null;
@@ -88,10 +83,10 @@ export function canUseHttpProtocol() {
     return false;
   }
 
-  // 首次启动不更新(即还没进行过新手教程)
-  if (isFirstStartup()) {
-    return false;
-  }
+  // 已移除新手教程，此检查不再需要
+  // if (isFirstStartup()) {
+  //   return false;
+  // }
 
   if (typeof nonameInitialized === "string") {
     // 手机端

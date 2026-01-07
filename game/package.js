@@ -7,6 +7,7 @@ window.noname_package = {
   },
   play: {},
   mode: {
+    identity: "身份",
     single: "单挑",
   },
   submode: {},
