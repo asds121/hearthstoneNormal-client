@@ -8900,7 +8900,7 @@ export class Game extends GameCompatible {
       (mode == "identity" || (mode == "guozhan" && _status.mode == "four"))
     ) {
       lib.translate[iInfo] = lib.translate[`${iInfo}_zhu`];
-    } else if (lib.translate[`${iInfo}_combat`] && get.is.versus()) {
+    } else if (lib.translate[`${iInfo}_combat`] && get.mode() === "versus") {
       lib.translate[iInfo] = lib.translate[`${iInfo}_combat`];
     }
     let deleteSkill = function (skill, iInfo) {
@@ -9162,7 +9162,7 @@ export class Game extends GameCompatible {
         (mode == "identity" || (mode == "guozhan" && _status.mode == "four"))
       ) {
         lib.translate[info] = lib.translate[`${info}_zhu`];
-      } else if (lib.translate[`${info}_combat`] && get.is.versus()) {
+      } else if (lib.translate[`${info}_combat`] && get.mode() === "versus") {
         lib.translate[info] = lib.translate[`${info}_combat`];
       }
       const card = lib.card[libCardKey];

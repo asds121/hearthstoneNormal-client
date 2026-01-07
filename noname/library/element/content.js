@@ -10401,7 +10401,7 @@ player.removeVirtualEquip(card);
       if (event.forceDie) {
         next.forceDie = true;
       }
-    } else if (info.reverseOrder && get.is.versus() && targets.length > 1) {
+    } else if (info.reverseOrder && get.mode() === "versus" && targets.length > 1) {
       var next = game.createEvent(card.name + "ContentBefore");
       next.setContent("reverseOrder");
       next.targets = targets;

@@ -822,7 +822,8 @@ export class Get extends GetCompatible {
    * @returns { String[] }
    */
   zhinangs(filter) {
-    var list = (_status.connectMode ? lib.configOL : lib.config).zhinang_tricks;
+    var list =
+      (_status.connectMode ? lib.configOL : lib.config).zhinang_tricks || [];
     if (!list || !list.filter || !list.length) {
       return get.inpile("trick", "trick").randomGets(3);
     }
@@ -1827,8 +1828,9 @@ export class Get extends GetCompatible {
   charactersOL(func) {
     let list = [];
     let libCharacter = {};
-    for (let i = 0; i < lib.configOL.characterPack.length; i++) {
-      const pack = lib.characterPack[lib.configOL.characterPack[i]];
+    var characterPack = lib.config.characterPack || lib.config.characters;
+    for (let i = 0; i < characterPack.length; i++) {
+      const pack = lib.characterPack[characterPack[i]];
       for (let j in pack) {
         if (typeof func == "function" && func(j)) {
           continue;

@@ -32,7 +32,7 @@ export default {
                 card !== _status.zhuge_temp && !ui.selected.cards.includes(card)
             )
           ) {
-            if (get.is.versus() || get.is.changban()) {
+            if (get.mode() === "versus" || get.is.changban()) {
               return num + 3;
             }
             return Infinity;

@@ -1839,7 +1839,7 @@ export default {
     },
     modTarget: true,
     content: function () {
-      if (get.is.versus()) {
+      if (get.mode() === "versus") {
         if (game.friend.includes(target)) {
           if (game.friend.length < game.enemy.length) {
             target.draw(3);

@@ -348,11 +348,11 @@ export default {
       return true;
     }
     if (_status.connectMode) {
-      if (lib.configOL.banned.includes(i) || lib.connectBanned.includes(i)) {
+      if ((lib.configOL.banned || []).includes(i) || lib.connectBanned.includes(i)) {
         return true;
       }
     } else {
-      if (lib.config.banned.includes(i)) {
+      if ((lib.config.banned || []).includes(i)) {
         return true;
       }
       var double_character = false;
