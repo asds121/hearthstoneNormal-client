@@ -39,7 +39,6 @@ export default () => {
         event.finish();
       } else game.prepareArena();
       ("step 2");
-      game.showChangeLog();
       ("step 3");
       ("step 4");
       for (var i = 0; i < game.players.length; i++) {

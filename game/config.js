@@ -12,8 +12,8 @@ window.config = {
   all: {
     sgscharacters: ["standard"],
     sgscards: ["standard"],
-    sgsmodes: ["identity", "single", "hs_hearthstone"],
-    stockmode: ["identity", "single", "hs_hearthstone"],
+    sgsmodes: ["identity", "single", "doudizhu", "hs_hearthstone"],
+    stockmode: ["identity", "single", "doudizhu", "hs_hearthstone"],
     stockextension: [],
     layout: ["default", "newlayout"],
     theme: ["woodden", "music", "simple"],
@@ -144,7 +144,7 @@ window.config = {
   mode: "hs_hearthstone",
   mode_config: {
     global: {
-      player_number: 8,
+      player_number: 4,
       auto_identity: "off",
       save_progress: true,
       free_choose: true,

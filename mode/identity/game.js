@@ -137,114 +137,6 @@ export default {
   },
   checkResult: function () {
     var me = game.me._trueMe || game.me;
-    if (_status.brawl && _status.brawl.checkResult) {
-      _status.brawl.checkResult();
-      return;
-    } else if (_status.mode == "purple") {
-      var winner = [];
-      var loser = [];
-      var ye = game.filterPlayer(
-        function (current) {
-          return ["rYe", "bYe"].includes(current.identity);
-        },
-        null,
-        true
-      );
-      var red = game.filterPlayer(
-        function (current) {
-          return ["rZhu", "rZhong"].includes(current.identity);
-        },
-        null,
-        true
-      );
-      var blue = game.filterPlayer(
-        function (current) {
-          return ["bZhu", "bZhong"].includes(current.identity);
-        },
-        null,
-        true
-      );
-      game.countPlayer2(function (current) {
-        switch (current.identity) {
-          case "rZhu":
-            if (ye.length == 0 && game.bZhu.isDead()) {
-              winner.push(current);
-            }
-            if (current.isDead()) {
-              loser.push(current);
-            }
-            break;
-          case "rZhong":
-            if (ye.length == 0 && game.bZhu.isDead()) {
-              winner.push(current);
-            }
-            if (game.rZhu.isDead()) {
-              loser.push(current);
-            }
-            break;
-          case "bZhu":
-            if (ye.length == 0 && game.rZhu.isDead()) {
-              winner.push(current);
-            }
-            if (current.isDead()) {
-              loser.push(current);
-            }
-            break;
-          case "bZhong":
-            if (ye.length == 0 && game.rZhu.isDead()) {
-              winner.push(current);
-            }
-            if (game.bZhu.isDead()) {
-              loser.push(current);
-            }
-            break;
-          default:
-            if (red.length + blue.length == 0) {
-              winner.push(current);
-            } else if (game.rZhu.isDead() && game.bZhu.isDead()) {
-              loser.push(current);
-            }
-            break;
-        }
-      }, true);
-      var winner2 = winner.slice(0);
-      var loser2 = loser.slice(0);
-      for (var i = 0; i < winner.length; i++) {
-        if (winner[i].isDead()) {
-          winner.splice(i--, 1);
-        }
-      }
-      for (var i = 0; i < loser.length; i++) {
-        if (loser[i].isDead()) {
-          loser.splice(i--, 1);
-        }
-      }
-      if (winner.length > 0 || loser.length == game.players.length) {
-        game.broadcastAll(
-          function (winner, loser) {
-            _status.winner = winner;
-            _status.loser = loser;
-          },
-          winner,
-          loser
-        );
-        if (loser.length == game.players.length) {
-          game.showIdentity();
-          game.over("游戏平局");
-        } else if (winner2.includes(me)) {
-          game.showIdentity();
-          if (loser2.includes(me)) {
-            game.over(false);
-          } else {
-            game.over(true);
-          }
-        } else {
-          game.showIdentity();
-          game.over(false);
-        }
-      }
-      return;
-    }
     if (!game.zhu) {
       if (get.population("fan") == 0) {
         switch (me.identity) {
@@ -252,9 +144,6 @@ export default {
             game.over(false);
             break;
           case "zhong":
-            game.over(true);
-            break;
-          case "commoner":
             game.over(true);
             break;
           default:
@@ -268,9 +157,6 @@ export default {
             break;
           case "zhong":
             game.over(false);
-            break;
-          case "commoner":
-            game.over(true);
             break;
           default:
             game.over();
@@ -286,11 +172,7 @@ export default {
       game.zhong.identity = "zhong";
     }
     game.showIdentity();
-    if (
-      me.identity == "zhu" ||
-      me.identity == "zhong" ||
-      me.identity == "mingzhong"
-    ) {
+    if (me.identity == "zhu" || me.identity == "zhong") {
       if (game.zhu.classList.contains("dead")) {
         game.over(false);
       } else {
@@ -305,8 +187,6 @@ export default {
       } else {
         game.over(false);
       }
-    } else if (me.identity == "commoner") {
-      game.over(true);
     }
   },
   chooseCharacter: function () {
@@ -325,8 +205,7 @@ export default {
       return game.players.randomGet(game.me, game.zhu);
     };
     next.ai = function (player, list, list2, back) {
-      if (false) {
-      } else if (player.identity == "zhu") {
+      if (player.identity == "zhu") {
         list2.randomSort();
         var choice, choice2;
         if (
@@ -557,7 +436,7 @@ export default {
               } else {
                 this.classList.add("bluebg");
               }
-              num = get.config("choice_" + link);
+              num = 3;
               _status.event.parent.swapnodialog = function (dialog, list) {
                 var buttons = ui.create.div(".buttons");
                 var node = dialog.buttons[0].parentNode;
@@ -718,7 +597,7 @@ export default {
         }
       }
       for (i = 0; i < game.players.length; i++) {
-        if (_status.brawl && _status.brawl.identityShown) {
+        if (false) {
           if (game.players[i].identity == "zhu") {
             game.zhu = game.players[i];
           }
@@ -729,16 +608,8 @@ export default {
           game.players[i].node.identity.classList.add("guessing");
           game.players[i].identity = identityList[i];
           game.players[i].setIdentity("cai");
-          if (false) {
-            if (identityList[i] == "mingzhong") {
-              game.zhu = game.players[i];
-            } else if (identityList[i] == "zhu") {
-              game.zhu2 = game.players[i];
-            }
-          } else {
-            if (identityList[i] == "zhu") {
-              game.zhu = game.players[i];
-            }
+          if (identityList[i] == "zhu") {
+            game.zhu = game.players[i];
           }
           game.players[i].identityShown = false;
         }
@@ -747,12 +618,10 @@ export default {
       if (!game.zhu) {
         game.zhu = game.me;
       } else {
-        if (true) {
-          game.zhu.setIdentity();
-          game.zhu.isZhu = game.zhu.identity == "zhu";
-          game.zhu.identityShown = true;
-          game.zhu.node.identity.classList.remove("guessing");
-        }
+        game.zhu.setIdentity();
+        game.zhu.isZhu = game.zhu.identity == "zhu";
+        game.zhu.identityShown = true;
+        game.zhu.node.identity.classList.remove("guessing");
         game.me.setIdentity();
         game.me.node.identity.classList.remove("guessing");
       }
@@ -793,70 +662,26 @@ export default {
         }
         event.list.push(i);
         list4.push(i);
-        if (true && lib.character[i].isZhugong) {
+        if (lib.character[i].isZhugong) {
           list2.push(i);
         } else {
           list3.push(i);
         }
       }
       var getZhuList = function () {
-        if (stratagemMode) {
-          list2.sort(lib.sort.character);
-          return list2;
-        }
-        var limit_zhu = get.config("limit_zhu");
-        if (!limit_zhu || limit_zhu == "off") {
-          return list2.slice(0).sort(lib.sort.character);
-        }
-        if (limit_zhu != "group") {
-          var num = parseInt(limit_zhu) || 6;
-          return list2.randomGets(num).sort(lib.sort.character);
-        }
-        var getGroup = function (name) {
-          var characterReplace = lib.characterReplace[name];
-          if (
-            characterReplace &&
-            characterReplace[0] &&
-            lib.character[characterReplace[0]]
-          ) {
-            return lib.character[characterReplace[0]][1];
-          }
-          return lib.character[name][1];
-        };
-        var list2x = list2.slice(0);
-        list2x.randomSort();
-        for (var i = 0; i < list2x.length; i++) {
-          for (var j = i + 1; j < list2x.length; j++) {
-            if (getGroup(list2x[i]) == getGroup(list2x[j])) {
-              list2x.splice(j--, 1);
-            }
-          }
-        }
-        list2x.sort(lib.sort.character);
-        return list2x;
+        return list2.slice(0).sort(lib.sort.character);
       };
       event.list.randomSort();
       _status.characterlist = list4.slice(0).randomSort();
       list3.randomSort();
-      if (_status.brawl && _status.brawl.chooseCharacterFilter) {
-        _status.brawl.chooseCharacterFilter(event.list, getZhuList(), list3);
-      }
-      var num = get.config("choice_" + game.me.identity);
+      var num = 3;
 
-      if (false) {
-        list = event.list.slice(0, num);
-      } else if (game.zhu != game.me) {
+      if (game.zhu != game.me) {
         event.ai(game.zhu, event.list, getZhuList());
         event.list.remove(get.sourceCharacter(game.zhu.name1));
         event.list.remove(get.sourceCharacter(game.zhu.name2));
-        if (_status.brawl && _status.brawl.chooseCharacter) {
-          list = _status.brawl.chooseCharacter(event.list, num);
-          if (list === false || list === "nozhu") {
-            list = event.list.slice(0, num);
-          }
-        } else {
-          list = event.list.slice(0, num);
-        }
+
+        list = event.list.slice(0, num);
       } else {
         list = getZhuList().concat(list3.slice(0, num));
       }
@@ -891,9 +716,6 @@ export default {
           if (ui.cheat2 && ui.cheat2.dialog == _status.event.dialog) {
             return;
           }
-          if (game.changeCoin) {
-            game.changeCoin(-3);
-          }
           if (game.zhu != game.me) {
             event.list.randomSort();
             if (_status.brawl && _status.brawl.chooseCharacter) {
@@ -907,17 +729,7 @@ export default {
           } else {
             getZhuList().sort(lib.sort.character);
             list3.randomSort();
-            if (_status.brawl && _status.brawl.chooseCharacter) {
-              list = _status.brawl.chooseCharacter(getZhuList(), list3, num);
-              if (list === false) {
-                list = getZhuList().concat(list3.slice(0, num));
-              } else if (list === "nozhu") {
-                event.list.randomSort();
-                list = event.list.slice(0, num);
-              }
-            } else {
-              list = getZhuList().concat(list3.slice(0, num));
-            }
+            list = getZhuList().concat(list3.slice(0, num));
           }
           var buttons = ui.create.div(".buttons");
           var node = _status.event.dialog.buttons[0].parentNode;
@@ -1016,10 +828,7 @@ export default {
         game.addRecentCharacter(result.buttons[0].link);
       }
       var name = event.choosed[0];
-      if (false) {
-        game.me._groupChosen = "double";
-        game.me.chooseControl([]).set("prompt", "请选择你的势力");
-      } else if (
+      if (
         lib.selectGroup.includes(lib.character[name].group) &&
         !lib.character[name].hasHiddenSkill &&
         get.config("choose_group")
@@ -1055,15 +864,7 @@ export default {
           game.players[i] != game.me
         ) {
           event.list.randomSort();
-          event.ai(
-            game.players[i],
-            event.list.splice(
-              0,
-              get.config("choice_" + game.players[i].identity)
-            ),
-            null,
-            event.list
-          );
+          event.ai(game.players[i], event.list.splice(0, 3), null, event.list);
         }
       }
       ("step 3");

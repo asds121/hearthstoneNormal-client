@@ -933,22 +933,9 @@ export const otherMenu = function (
             case "复活":
               target.revive(target.maxHp);
               break;
-            case "换人": {
-              if (_status.event.isMine()) {
-                if (!ui.auto.classList.contains("hidden")) {
-                  setTimeout(function () {
-                    ui.click.auto();
-                    setTimeout(function () {
-                      ui.click.auto();
-                      game.swapPlayer(target);
-                    }, 500);
-                  });
-                }
-              } else {
-                game.swapPlayer(target);
-              }
+            case "换人":
+              game.swapPlayer(target);
               break;
-            }
           }
         }
         clickContainer.call(cacheMenuContainer, connectMenu);
@@ -1109,6 +1096,7 @@ export const otherMenu = function (
           nodereplace.classList.add("unselectable");
         } else if (
           _status.event.isMine() &&
+          ui.auto &&
           ui.auto.classList.contains("hidden")
         ) {
           nodereplace.classList.add("unselectable");

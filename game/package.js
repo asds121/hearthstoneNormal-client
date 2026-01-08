@@ -9,6 +9,7 @@ window.noname_package = {
   mode: {
     identity: "身份",
     single: "单挑",
+    doudizhu: "斗地主",
   },
   submode: {},
 
