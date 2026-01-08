@@ -1419,7 +1419,7 @@ export const otherMenu = function (
                   .replace(/>/g, "&gt;")
                   .replace(/"/g, "&quot;")
                   .replace(/'/g, "&#39;");
-              } else if (typeof arg == "object") {
+              } else if (typeof arg == "object" && arg !== null) {
                 let msg = "";
                 for (const name of Object.getOwnPropertyNames(arg)) {
                   msg += `${name}: ${parse(arg[name])}<br>`;

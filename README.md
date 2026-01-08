@@ -26,16 +26,19 @@
 ## 项目结构
 
 ```
+├── card/                  # 卡牌相关文件
 ├── character/             # 角色相关文件
 ├── extension/             # 扩展包目录
 │   └── 炉石普通/          # 炉石普通扩展包
 ├── game/                  # 游戏核心逻辑
 ├── layout/                # 布局相关文件
+├── mode/                  # 游戏模式相关文件
 ├── noname/                # 无名杀游戏框架（模块化重构后的核心）
 │   ├── ai/                # AI 相关逻辑
 │   ├── extension/         # 扩展管理
 │   ├── game/              # 游戏核心状态和事件管理
 │   ├── get/               # 工具函数集合
+│   ├── gnc/               # 其他核心功能
 │   ├── init/              # 初始化管理
 │   ├── library/           # 核心库
 │   ├── status/            # 状态管理
@@ -48,7 +51,9 @@
 ├── extension-development-guide.md  # 扩展开发指南
 ├── index.html
 ├── noname.js
-└── package.json           # 项目配置
+├── package-lock.json
+├── package.json           # 项目配置
+└── server.js              # 本地服务器脚本
 ```
 
 ## 许可证
