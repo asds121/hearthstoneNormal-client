@@ -1,4 +1,8 @@
 window.config = {
+  /**
+   * 重置游戏按钮，如果游戏进不去就改成true
+   */
+  enable_restart_button: false,
   forbidai: [],
   forbidai_user: [],
   forbidall: [],
