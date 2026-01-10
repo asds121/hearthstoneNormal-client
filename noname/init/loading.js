@@ -39,10 +39,7 @@ export function loadCard(cardConfig) {
       case "name":
       case "mode":
       case "forbid":
-        break;
       case "connect":
-        // @ts-expect-error ignore
-        lib.connectCardPack.push(cardConfigName);
         break;
       case "list":
         if (lib.config.mode === "connect") {
@@ -176,10 +173,7 @@ export function loadCharacter(character) {
       case "name":
       case "mode":
       case "forbid":
-        break;
       case "connect":
-        // @ts-expect-error ignore
-        lib.connectCharacterPack.push(name);
         break;
       case "character":
         if (
@@ -321,8 +315,8 @@ export async function loadExtension(extension) {
         // @ts-expect-error ignore
         if (!lib.config.extension_alert) {
           console.error(
-          `加载《${extension[0]}》扩展的content时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(e.stack)}`
-        );
+            `加载《${extension[0]}》扩展的content时出现错误。\n该错误本身可能并不影响扩展运行。您可以在“设置→通用→无视扩展报错”中关闭此弹窗。\n${decodeURI(e.stack)}`
+          );
         }
       }
     }
@@ -695,9 +689,12 @@ function mixinLibrary(config, lib) {
   lib.element = mixinElement(config, lib.element);
   lib.config.banned = lib.config[`${lib.config.mode}_banned`] || [];
   lib.config.bannedcards = lib.config[`${lib.config.mode}_bannedcards`] || [];
-  
+
   // @ts-expect-error ignore
-  if (window.noname_character_perfectPairs && typeof window.noname_character_perfectPairs === 'object') {
+  if (
+    window.noname_character_perfectPairs &&
+    typeof window.noname_character_perfectPairs === "object"
+  ) {
     Object.keys(window.noname_character_perfectPairs).forEach(
       (i) => (lib.perfectPair[i] = window.noname_character_perfectPairs[i])
     );

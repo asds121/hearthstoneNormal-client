@@ -185,7 +185,6 @@ export async function onload() {
   const libOnload2 = lib.onload2;
   delete lib.onload2;
   await runCustomContents(libOnload2);
-
   await Promise.allSettled(loadingCustomStyle);
   delete window.game;
 
@@ -194,7 +193,7 @@ export async function onload() {
     await Promise.allSettled(_status.importing.mode);
   }
 
-  console.error(lib.imported.mode[lib.config.mode]);
+  //console.error(lib.imported.mode[lib.config.mode]);
   const currentMode = lib.imported.mode?.[lib.config.mode];
   if (!currentMode) {
     throw new Error(`Failed to load mode: ${lib.config.mode}`);

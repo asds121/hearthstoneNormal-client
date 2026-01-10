@@ -1,16 +1,8 @@
 window.noname_package = {
-  character: {
-    standard: "标准包",
-  },
-  card: {
-    standard: "标准包",
-  },
+  character: {},
+  card: {},
   play: {},
-  mode: {
-    identity: "身份",
-    single: "单挑",
-    doudizhu: "斗地主",
-  },
+  mode: {},
   submode: {},
 
   background: {
