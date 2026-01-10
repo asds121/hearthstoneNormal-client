@@ -75,6 +75,7 @@ coverage/
 
 # Hearthstone resource folder
 extension/炉石普通/resource/
+extension/三国杀标准/
 
 # Text files
 *.txt
