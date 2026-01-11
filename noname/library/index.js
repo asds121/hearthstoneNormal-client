@@ -1382,7 +1382,6 @@ export class Library {
       },
     }
   );
-  perfectPair = {};
   cardPile = {};
   message = message;
   //为lib.numstrList属性set数字对应花色，即可在get.strNumber和get.numString中获取使用

@@ -117,7 +117,6 @@ export class InitManager {
 
         try {
           await step.initFunction();
-          console.log(`初始化步骤 ${step.name} 完成`);
         } catch (error) {
           console.error(`初始化步骤 ${step.name} 失败:`, error);
           this.initStatus.errors.push({

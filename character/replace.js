@@ -6,4 +6,3 @@ const characterReplace = {
 };
 
 window.noname_character_replace = characterReplace;
-window.noname_character_perfectPairs = {};
