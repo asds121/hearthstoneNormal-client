@@ -5,6 +5,7 @@ import { game } from "../game/index.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
+import { initManager } from "./InitManager.js";
 import {
   userAgentLowerCase,
   nonameInitialized,
@@ -198,6 +199,44 @@ export async function boot() {
   // 加载polyfill内容
   await import("./polyfill.js");
 
+  // 注册初始化步骤
+  // initManager.registerInitStep(
+  //   "coreServices",
+  //   initManager.initCoreServices.bind(initManager),
+  //   10
+  // );
+  // initManager.registerInitStep(
+  //   "gameObjects",
+  //   initManager.initGameObjects.bind(initManager),
+  //   20
+  // );
+  // initManager.registerInitStep(
+  //   "config",
+  //   initManager.initConfig.bind(initManager),
+  //   30
+  // );
+  // initManager.registerInitStep("UI", initManager.initUI.bind(initManager), 40);
+  // initManager.registerInitStep(
+  //   "extensions",
+  //   initManager.initExtensions.bind(initManager),
+  //   50
+  // );
+  // initManager.registerInitStep(
+  //   "gameModes",
+  //   initManager.initGameModes.bind(initManager),
+  //   60
+  // );
+  // initManager.registerInitStep(
+  //   "gameData",
+  //   initManager.initGameData.bind(initManager),
+  //   70
+  // );
+  // initManager.registerInitStep(
+  //   "eventListeners",
+  //   initManager.initEventListeners.bind(initManager),
+  //   80
+  // );
+
   // 设定游戏加载时间，超过时间未加载就提醒
   const configLoadTime = localStorage.getItem(lib.configprefix + "loadtime");
   // 现在不暴露到全局变量里了，直接传给onload
@@ -390,6 +429,9 @@ export async function boot() {
     _status,
     gnc,
   });
+
+  // 执行初始化
+  // await initManager.init();
 
   if (Reflect.get(window, "isNonameServer")) {
     config.set("mode", "connect");
@@ -1013,9 +1055,6 @@ export async function boot() {
 }
 
 export { onload } from "./onload.js";
-
-// autoImportExtensions 函数已移除，该函数定义了但未被调用
-// 如需重新启用，请恢复此函数并添加调用
 
 function initSheet(libConfig) {
   if (

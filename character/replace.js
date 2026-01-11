@@ -4,5 +4,5 @@ const characterReplace = {
    */
   //key_yuri: ["key_yuri", "sp_key_yuri"],
 };
-
-export default characterReplace;
+window.noname_character_replace = {};
+window.noname_character_perfectPairs = {};

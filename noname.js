@@ -8,6 +8,7 @@ export { Library, lib, setLibrary } from "./noname/library/index.js";
 export { status, _status, setStatus } from "./noname/status/index.js";
 export { UI, ui, setUI } from "./noname/ui/index.js";
 export { boot, onload } from "./noname/init/index.js";
+export { InitManager, initManager } from "./noname/init/InitManager.js";
 
 // 导出模块化组件
 export { GameState, gameState } from "./noname/game/GameState.js";

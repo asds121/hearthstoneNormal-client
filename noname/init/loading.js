@@ -685,6 +685,12 @@ function mixinLibrary(config, lib) {
     "startBefore",
   ];
 
+  // 检查config是否为null或undefined
+  if (!config) {
+    console.error("mixinLibrary: config参数为null或undefined");
+    return;
+  }
+
   // @ts-expect-error ignore
   lib.element = mixinElement(config, lib.element);
   lib.config.banned = lib.config[`${lib.config.mode}_banned`] || [];
