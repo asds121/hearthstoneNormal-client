@@ -133,7 +133,7 @@ window.config = {
   moderned_modes: ["identity"],
   moderned_cards: ["standard"],
   plays: [],
-  extensions: ["炉石普通"],
+  extensions: ["炉石普通", "三国杀标准"],
   banned: [],
   bannedcards: [],
   forbidlist: [],

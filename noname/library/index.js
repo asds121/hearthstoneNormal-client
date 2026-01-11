@@ -19,7 +19,6 @@ import { experimental } from "./experimental/index.js";
 import * as Element from "./element/index.js";
 //todo：我拆分的
 import configMenu from "./index/configMenu.js";
-import mode from "./index/mode.js";
 import skill from "./index/skill.js";
 import cheat from "./index/skill.js";
 import filter from "./index/filter.js";
@@ -432,7 +431,7 @@ export class Library {
   }
   configMenu = configMenu;
   extensionMenu = {};
-  mode = mode;
+  mode = {};
   status = {
     running: false,
     canvas: false,
