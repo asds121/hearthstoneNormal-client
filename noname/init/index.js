@@ -282,8 +282,6 @@ export async function boot() {
     }
   });
 
-  // 清瑤？過於先進以至於無法運行我們的落後本體，故也就不再檢測
-
   // Electron平台
   if (typeof window.require === "function") {
     const { nodeReady } = await import("./node.js");
