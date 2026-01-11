@@ -1,8 +1,9 @@
 {
   "name": "三国杀标准",
-  "version": "1.0.0",
-  "description": "三国杀标准模式扩展",
-  "author": "",
-  "license": "gpl v3.0",
+	"author": "无名杀移植",
+	"intro": "三国杀标准模式扩展",
+	"diskURL": "",
+	"forumURL": "",
+	"version": "1.0",
   "priority": 98
 }
