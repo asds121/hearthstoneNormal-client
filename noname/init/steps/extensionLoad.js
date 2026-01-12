@@ -2,6 +2,7 @@ import { lib } from "../../../noname.js";
 import { game } from "../../game/index.js";
 import { _status } from "../../status/index.js";
 import { importExtension } from "../import.js";
+import AssetManager from "../../library/AssetManager.js";
 
 /**
  * 扩展加载步骤
@@ -85,6 +86,14 @@ export async function extensionLoad(extensionlist, promiseErrorHandler) {
       lib.announce.publish("Noname.Init.Extension.onLoad", name);
       // @ts-expect-error ignore
       lib.announce.publish(`Noname.Init.Extension.${name}.onLoad`, void 0);
+
+      // 加载扩展的 assets.json 配置
+      AssetManager.load(name).catch((error) => {
+        console.warn(
+          `[AssetManager] Failed to load assets.json for extension "${name}":`,
+          error
+        );
+      });
     });
 
   delete _status.extensionLoading;

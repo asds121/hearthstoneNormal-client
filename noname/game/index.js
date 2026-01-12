@@ -13,6 +13,7 @@
 import { ai } from "../ai/index.js";
 import { get } from "../get/index.js";
 import { lib } from "../library/index.js";
+import AssetManager from "../library/AssetManager.js";
 import { _status } from "../status/index.js";
 import { ui } from "../ui/index.js";
 import { gnc } from "../gnc/index.js";
@@ -679,7 +680,9 @@ export class Game extends GameCompatible {
     } else if (background.startsWith("db:")) {
       uiBackground.setBackgroundDB(background.slice(3));
     } else if (background.startsWith("ext:")) {
-      uiBackground.setBackgroundImage(`extension/${background.slice(4)}`);
+      throw new Error(
+        `Invalid URL scheme: ext: is not allowed. Found: ${background}`
+      );
     } else if (background == "default") {
       uiBackground.addTempClass("start");
       style.backgroundImage = "none";
@@ -1983,7 +1986,9 @@ export class Game extends GameCompatible {
     if (["blob:", "data:"].some((prefix) => path.startsWith(prefix))) {
       parsedPath = path;
     } else if (path.startsWith("ext:")) {
-      parsedPath = path.replace(/^ext:/, "extension/");
+      throw new Error(
+        `Invalid URL scheme: ext: is not allowed. Found: ${path}`
+      );
     } else if (path.startsWith("db:")) {
       parsedPath = path.replace(/^(db:[^:]*)\//, (_, p) => p + ":");
     } else {
@@ -2365,7 +2370,8 @@ export class Game extends GameCompatible {
           .getDB("image", aozhan.slice(3))
           .then((result) => (ui.backgroundMusic.src = result));
       } else if (aozhan.startsWith("ext:")) {
-        ui.backgroundMusic.src = `${lib.assetURL}extension/${aozhan.slice(4)}`;
+        // 替换 ext:extensionName/ 为 extension/extensionName/resource/
+        ui.backgroundMusic.src = `${lib.assetURL}${aozhan.replace(/^ext:([^/]+)\//, "extension/$1/resource/")}`;
       } else {
         ui.backgroundMusic.src = `${lib.assetURL}audio/background/aozhan_${aozhan}.mp3`;
       }
@@ -2400,7 +2406,8 @@ export class Game extends GameCompatible {
         .getDB("image", music.slice(3))
         .then((result) => (ui.backgroundMusic.src = result));
     } else if (music.startsWith("ext:")) {
-      ui.backgroundMusic.src = `${lib.assetURL}extension/${music.slice(4)}`;
+      // 替换 ext:extensionName/ 为 extension/extensionName/resource/
+      ui.backgroundMusic.src = `${lib.assetURL}${music.replace(/^ext:([^/]+)\//, "extension/$1/resource/")}`;
     } else {
       ui.backgroundMusic.src = `${lib.assetURL}audio/background/${music}.mp3`;
     }
@@ -6175,9 +6182,9 @@ export class Game extends GameCompatible {
         information.skills || [],
         [
           _status.evaluatingExtension
-            ? `db:extension-${extensionName}:${name}.jpg`
-            : `ext:${extensionName}/${name}.jpg`,
-          `die:ext:${extensionName}/${name}.mp3`,
+            ? `db:extension-${extensionName}:character/${name}.jpg`
+            : `extension/${extensionName}/resource/character/${name}.jpg`,
+          `die:extension/${extensionName}/resource/character/${name}.mp3`,
         ],
       ];
     if (information.tags) {
@@ -6218,11 +6225,11 @@ export class Game extends GameCompatible {
           }
           let imgsrc;
           if (_status.evaluatingExtension) {
-            imgsrc = "db:extension-" + extname + ":" + j + ".jpg";
+            imgsrc = `db:extension-${extname}:character/${j}.jpg`;
           } else {
-            imgsrc = "ext:" + extname + "/" + j + ".jpg";
+            imgsrc = `extension/${extname}/resource/character/${j}.jpg`;
           }
-          const audiosrc = "die:ext:" + extname + "/" + j + ".mp3";
+          const audiosrc = `die:extension/${extname}/resource/character/${j}.mp3`;
           if (
             !pack[i][j][4].some(
               (str) =>
@@ -6259,7 +6266,7 @@ export class Game extends GameCompatible {
             typeof pack[i][j].audio == "number" ||
             typeof pack[i][j].audio == "boolean"
           ) {
-            pack[i][j].audio = "ext:" + extname + ":" + pack[i][j].audio;
+            pack[i][j].audio = `${extname}:${pack[i][j].audio}`;
           }
         }
         if (lib[i][j] == undefined) {
@@ -6295,20 +6302,20 @@ export class Game extends GameCompatible {
   addCard(name, info, info2) {
     var extname = _status.extension || info2.extension;
     if (info.audio == true) {
-      info.audio = "ext:" + extname;
+      info.audio = extname;
     }
     if (!info.image || typeof info.image !== "string") {
       if (info.fullskin) {
         if (_status.evaluatingExtension) {
           info.image = "db:extension-" + extname + ":" + name + ".png";
         } else {
-          info.image = "ext:" + extname + "/" + name + ".png";
+          info.image = `extension/${extname}/resource/${name}.png`;
         }
       } else if (info.fullimage) {
         if (_status.evaluatingExtension) {
           info.image = "db:extension-" + extname + ":" + name + ".jpg";
         } else {
-          info.image = "ext:" + extname + "/" + name + ".jpg";
+          info.image = `extension/${extname}/resource/${name}.jpg`;
         }
       }
     }
@@ -6361,20 +6368,20 @@ export class Game extends GameCompatible {
       for (let j in pack[i]) {
         if (i == "card") {
           if (pack[i][j].audio == true) {
-            pack[i][j].audio = "ext:" + extname;
+            pack[i][j].audio = extname;
           }
           if (!pack[i][j].image) {
             if (pack[i][j].fullskin) {
               if (_status.evaluatingExtension) {
                 pack[i][j].image = "db:extension-" + extname + ":" + j + ".png";
               } else {
-                pack[i][j].image = "ext:" + extname + "/" + j + ".png";
+                pack[i][j].image = `extension/${extname}/resource/${j}.png`;
               }
             } else if (pack[i][j].fullimage) {
               if (_status.evaluatingExtension) {
                 pack[i][j].image = "db:extension-" + extname + ":" + j + ".jpg";
               } else {
-                pack[i][j].image = "ext:" + extname + "/" + j + ".jpg";
+                pack[i][j].image = `extension/${extname}/resource/${j}.jpg`;
               }
             }
           }
@@ -6384,7 +6391,7 @@ export class Game extends GameCompatible {
             typeof pack[i][j].audio == "number" ||
             typeof pack[i][j].audio == "boolean"
           ) {
-            pack[i][j].audio = "ext:" + extname + ":" + pack[i][j].audio;
+            pack[i][j].audio = `${extname}:${pack[i][j].audio}`;
           }
         }
         if (lib[i][j] == undefined) {
@@ -6417,7 +6424,7 @@ export class Game extends GameCompatible {
       return false;
     }
     if (typeof info.audio == "number" || typeof info.audio == "boolean") {
-      info.audio = "ext:" + _status.extension + ":" + info.audio;
+      info.audio = `${_status.extension}:${info.audio}`;
     }
     lib.skill[name] = info;
     lib.translate[name] = translate;
@@ -6439,11 +6446,8 @@ export class Game extends GameCompatible {
     if (info.splash) {
       imgsrc = info.splash;
     } else {
-      if (_status.evaluatingExtension) {
-        imgsrc = "extension-" + extname + ":" + name + ".jpg";
-      } else {
-        imgsrc = "ext:" + extname + "/" + name + ".jpg";
-      }
+      // 不再使用ext:格式，统一使用extension-格式
+      imgsrc = "extension-" + extname + ":" + name + ".jpg";
     }
     lib.mode[name] = {
       name: info2.translate,

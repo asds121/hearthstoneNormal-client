@@ -80,6 +80,13 @@ export default {
   },
   addRecord: function (bool) {
     if (typeof bool == "boolean") {
+      // 确保游戏记录配置存在
+      if (!lib.config.gameRecord) {
+        lib.config.gameRecord = {};
+      }
+      if (!lib.config.gameRecord.identity) {
+        lib.config.gameRecord.identity = { data: {} };
+      }
       var data = lib.config.gameRecord.identity.data;
       var identity = game.me.identity;
       if (identity == "mingzhong") {

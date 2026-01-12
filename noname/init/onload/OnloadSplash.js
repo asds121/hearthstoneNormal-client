@@ -8,64 +8,76 @@ const html = dedent;
  * @type {import("vue").Component}
  */
 export default {
-	template: html`
-		<div class="hidden" v-for="(mode, index) in lib.config.all.mode" :key="mode" :link="mode" :index="index" ref="nodeList">
-			<div class="splashtext">{{ get.verticalStr(get.translation(mode)) }}</div>
-			<div class="avatar"></div>
-		</div>
-	`,
-	props: {
-		handle: Function,
-		click: Function,
-	},
+  template: html`
+    <div
+      class="hidden"
+      v-for="(mode, index) in lib.config.all.mode"
+      :key="mode"
+      :link="mode"
+      :index="index"
+      ref="nodeList"
+    >
+      <div class="splashtext">{{ get.verticalStr(get.translation(mode)) }}</div>
+      <div class="avatar"></div>
+    </div>
+  `,
+  props: {
+    handle: Function,
+    click: Function,
+  },
 
-	setup(props) {
-		let nodeList = ref([]);
+  setup(props) {
+    let nodeList = ref([]);
 
-		let clicked = false;
+    let clicked = false;
 
-		onMounted(() => {
-			nodeList.value.forEach(async node => {
-				let mode = node.getAttribute("link");
-				let index = parseInt(node.getAttribute("index"));
-				node.listen(() => {
-					if (!clicked) {
-						clicked = true;
-						props.click(mode, node);
-					}
-				});
+    onMounted(() => {
+      nodeList.value.forEach(async (node) => {
+        let mode = node.getAttribute("link");
+        let index = parseInt(node.getAttribute("index"));
+        node.listen(() => {
+          if (!clicked) {
+            clicked = true;
+            props.click(mode, node);
+          }
+        });
 
-				let avatar = node.querySelector(".avatar");
+        let avatar = node.querySelector(".avatar");
 
-				let background = lib.config.all.stockmode.includes(mode) ? props.handle(mode) : lib.mode[mode].splash;
-				if (background) {
-					try {
-						let link = lib.init.parseResourceAddress(background);
-						if (link.protocol === "db:") {
-							avatar.setBackgroundDB(link.href);
-						} else {
-							avatar.setBackgroundImage(link.href);
-						}
-					} catch (error) {
-						console.warn(`Failed to load background for mode ${mode}:`, error);
-					}
-				}
+        let background =
+          lib.mode[mode] && lib.mode[mode].fromextension
+            ? lib.mode[mode].splash
+            : props.handle(mode);
+        if (background) {
+          try {
+            let link = lib.init.parseResourceAddress(background);
+            if (link.protocol === "db:") {
+              avatar.setBackgroundDB(link.href);
+            } else {
+              avatar.setBackgroundImage(link.href);
+            }
+          } catch (error) {
+            console.warn(`Failed to load background for mode ${mode}:`, error);
+          }
+        }
 
-				if (!lib.config.touchscreen) {
-					node.addEventListener("mousedown", () => node.classList.add("glow"));
-					node.addEventListener("mouseup", () => node.classList.remove("glow"));
-					node.addEventListener("mouseleave", () => node.classList.remove("glow"));
-				}
+        if (!lib.config.touchscreen) {
+          node.addEventListener("mousedown", () => node.classList.add("glow"));
+          node.addEventListener("mouseup", () => node.classList.remove("glow"));
+          node.addEventListener("mouseleave", () =>
+            node.classList.remove("glow")
+          );
+        }
 
-				await delay(index * 100);
-				node.show();
-			});
-		});
+        await delay(index * 100);
+        node.show();
+      });
+    });
 
-		return {
-			lib,
-			get,
-			nodeList,
-		};
-	},
+    return {
+      lib,
+      get,
+      nodeList,
+    };
+  },
 };

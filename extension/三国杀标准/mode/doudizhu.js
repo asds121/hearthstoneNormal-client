@@ -66,6 +66,13 @@ export default () => {
       canReplaceViewpoint: () => true,
       addRecord(bool) {
         if (typeof bool == "boolean") {
+          // 确保游戏记录配置存在
+          if (!lib.config.gameRecord) {
+            lib.config.gameRecord = {};
+          }
+          if (!lib.config.gameRecord.doudizhu) {
+            lib.config.gameRecord.doudizhu = { data: {} };
+          }
           var data = lib.config.gameRecord.doudizhu.data;
           var identity = game.me.identity;
           if (!data[identity]) {

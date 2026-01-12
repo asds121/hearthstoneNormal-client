@@ -1,0 +1,13 @@
+{
+  "version": "1.0.0",
+  "extensionName": "三国杀标准",
+  "paths": {
+    "character": "extension/三国杀标准/resource/character/",
+    "card": "extension/三国杀标准/resource/card/",
+    "splash": "extension/三国杀标准/resource/splash/"
+  },
+  "extensions": {
+    "image": [".jpg", ".png"],
+    "audio": [".mp3", ".ogg"]
+  }
+}

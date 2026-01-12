@@ -1794,7 +1794,9 @@ player.removeVirtualEquip(card);
         }
         if (lib.config.background_audio) {
           if (beatmap.filename.startsWith("ext:")) {
-            game.playAudio(beatmap.filename);
+            throw new Error(
+              `Invalid URL scheme: ext: is not allowed. Found: ${beatmap.filename}`
+            );
           } else {
             game.playAudio("effect", beatmap.filename);
           }
@@ -1824,7 +1826,9 @@ player.removeVirtualEquip(card);
       var mapping = custom_mapping ? beatmap.mapping.slice() : beatmap.mapping;
       var hitsound = beatmap.hitsound || "hitsound.wav";
       if (hitsound.startsWith("ext:")) {
-        hitsound = lib.assetURL + "extension/" + hitsound.slice(4);
+        throw new Error(
+          `Invalid URL scheme: ext: is not allowed. Found: ${hitsound}`
+        );
       } else {
         hitsound = lib.assetURL + "audio/effect/" + hitsound;
       }
@@ -2073,7 +2077,9 @@ player.removeVirtualEquip(card);
             return;
           }
           if (beatmap.filename.startsWith("ext:")) {
-            game.playAudio(beatmap.filename);
+            throw new Error(
+              `Invalid URL scheme: ext: is not allowed. Found: ${beatmap.filename}`
+            );
           } else {
             game.playAudio("effect", beatmap.filename);
           }
@@ -10401,7 +10407,11 @@ player.removeVirtualEquip(card);
       if (event.forceDie) {
         next.forceDie = true;
       }
-    } else if (info.reverseOrder && get.mode() === "versus" && targets.length > 1) {
+    } else if (
+      info.reverseOrder &&
+      get.mode() === "versus" &&
+      targets.length > 1
+    ) {
       var next = game.createEvent(card.name + "ContentBefore");
       next.setContent("reverseOrder");
       next.targets = targets;

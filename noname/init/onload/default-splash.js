@@ -62,6 +62,9 @@ export class DefaultSplash {
 	}
 
 	handle(mode) {
+		if (mode === "hs_hearthstone") {
+			return `extension/炉石普通/resource/image/hs_hearthstone.jpg`;
+		}
 		return lib.path.join(this.path, `${mode}.jpg`);
 	}
 

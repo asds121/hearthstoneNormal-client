@@ -997,7 +997,29 @@ export class LibInit {
      */
     let resultUrl;
     if (linkString.startsWith("ext:")) {
-      let resultLink = `extension/${linkString.slice(4)}`;
+      throw new Error("ext协议已废除：" + linkString);
+    } else if (linkString.startsWith("extension-")) {
+      // 处理 extension-extensionName:modeName.jpg 格式
+      let [extensionPart, filename] = linkString.split(":");
+      let extensionName = extensionPart.slice(10);
+
+      // 获取扩展的 assets.json 配置
+      let assetsConfig =
+        lib.extensionAssets && lib.extensionAssets[extensionName]
+          ? lib.extensionAssets[extensionName]
+          : {
+              paths: {
+                character: `extension/${extensionName}/resource/character/`,
+                card: `extension/${extensionName}/resource/card/`,
+                splash: `extension/${extensionName}/resource/splash/`,
+              },
+            };
+
+      // 使用 splash 路径来构建正确的资源路径
+      let splashPath =
+        assetsConfig.paths.splash ||
+        `extension/${extensionName}/resource/splash/`;
+      let resultLink = `${splashPath}${filename}`;
       resultUrl = new URL(resultLink, rootURL);
     } else if (URL.canParse(linkString)) {
       resultUrl = new URL(linkString);

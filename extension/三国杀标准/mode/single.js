@@ -63,6 +63,13 @@ export default () => {
       canReplaceViewpoint: () => true,
       addRecord: function (bool) {
         if (typeof bool == "boolean") {
+          // 确保游戏记录配置存在
+          if (!lib.config.gameRecord) {
+            lib.config.gameRecord = {};
+          }
+          if (!lib.config.gameRecord.single) {
+            lib.config.gameRecord.single = { data: {} };
+          }
           var mode = _status.mode;
           var data = lib.config.gameRecord.single.data;
           if (!get.is.object(data[mode])) {

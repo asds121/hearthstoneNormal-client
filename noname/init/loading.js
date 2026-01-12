@@ -305,6 +305,34 @@ export async function loadExtension(extension) {
     _status.extension = extension[0];
     // @ts-expect-error ignore
     _status.evaluatingExtension = extension[3];
+
+    // 初始化lib.extensionAssets对象
+    if (!lib.extensionAssets) {
+      lib.extensionAssets = {};
+    }
+
+    // 加载并解析扩展的assets.json文件
+    try {
+      const assetsJsonPath = `extension/${extension[0]}/assets.json`;
+      const response = await fetch(assetsJsonPath);
+      if (response.ok) {
+        const assetsJson = await response.json();
+        lib.extensionAssets[extension[0]] = assetsJson;
+      }
+    } catch (e) {
+      console.warn(
+        `Failed to load assets.json for extension ${extension[0]}:`,
+        e
+      );
+      // 使用默认配置
+      lib.extensionAssets[extension[0]] = {
+        paths: {
+          character: `extension/${extension[0]}/resource/character/`,
+          card: `extension/${extension[0]}/resource/card/`,
+          splash: `extension/${extension[0]}/resource/splash/`,
+        },
+      };
+    }
     if (typeof extension[1] == "function") {
       try {
         await (
@@ -375,8 +403,8 @@ export async function loadExtension(extension) {
               )
             ) {
               const img = extension[3]
-                ? `db:extension-${extension[0]}:${charaName}.jpg`
-                : `ext:${extension[0]}/${charaName}.jpg`;
+                ? `db:extension-${extension[0]}:character/${charaName}.jpg`
+                : `extension/${extension[0]}/resource/character/${charaName}.jpg`;
               character[4].add(img);
             }
             if (
@@ -384,7 +412,7 @@ export async function loadExtension(extension) {
                 (str) => typeof str == "string" && /^die:.+/.test(str)
               )
             ) {
-              const audio = `die:ext:${extension[0]}/${charaName}.mp3`;
+              const audio = `die:extension/${extension[0]}/resource/character/${charaName}.mp3`;
               character[4].add(audio);
             }
 
@@ -399,12 +427,12 @@ export async function loadExtension(extension) {
             }
           } else {
             if (!character.img) {
-              const characterImage = `extension/${extension[0]}/${charaName}.jpg`;
+              const characterImage = `extension/${extension[0]}/resource/character/${charaName}.jpg`;
               character.img = characterImage;
             }
             if (!character.dieAudios) {
               character.dieAudios = [];
-              const characterDieAudio = `ext:${extension[0]}/${charaName}.mp3`;
+              const characterDieAudio = `extension/${extension[0]}/resource/character/${charaName}.mp3`;
               character.dieAudios.push(characterDieAudio);
             }
             if (character.isBoss || character.isHiddenBoss) {
@@ -451,16 +479,16 @@ export async function loadExtension(extension) {
         // 我就是被拷打，成为新的1103，受到白鼠群的嘲笑谩骂，我也绝不再次遍历！
         for (const [cardName, card] of Object.entries(content.card)) {
           if (card.audio === true) {
-            card.audio = `ext:${extension[0]}`;
+            card.audio = extension[0];
           }
           if (!card.image) {
             if (card.fullskin || card.fullimage) {
               const suffix = card.fullskin ? "png" : "jpg";
 
               if (extension[3]) {
-                card.image = `db:extension-${extension[0]}:${cardName}.${suffix}`;
+                card.image = `db:extension-${extension[0]}:card/${cardName}.${suffix}`;
               } else {
-                card.image = `ext:${extension[0]}/${cardName}.${suffix}`;
+                card.image = `extension/${extension[0]}/resource/card/${cardName}.${suffix}`;
               }
             }
           }

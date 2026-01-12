@@ -221,17 +221,11 @@ export class Create {
       if (img) {
         if (img.startsWith("db:")) {
           img = img.slice(3);
-        } else if (!img.startsWith("ext:")) {
-          img = null;
         }
       }
       if (lib.card[cardName].fullskin) {
         if (img) {
-          if (img.startsWith("ext:")) {
-            bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-          } else {
-            bg.setBackgroundDB(img);
-          }
+          bg.setBackgroundImage(img);
         } else {
           if (lib.card[cardName].modeimage) {
             bg.setBackgroundImage(
@@ -259,12 +253,8 @@ export class Create {
         }
       } else if (lib.card[cardName].fullimage) {
         if (img) {
-          if (img.startsWith("ext:")) {
-            bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-            bg.style.backgroundSize = "cover";
-          } else {
-            bg.setBackgroundDB(img);
-          }
+          bg.setBackgroundImage(img);
+          bg.style.backgroundSize = "cover";
         } else if (get.dynamicVariable(lib.card[cardName].image, card)) {
           if (
             get
@@ -302,12 +292,8 @@ export class Create {
         !lib.card[cardName].fullskin
       ) {
         if (img) {
-          if (img.startsWith("ext:")) {
-            bg.setBackgroundImage(img.replace(/^ext:/, "extension/"));
-            bg.style.backgroundSize = "cover";
-          } else {
-            bg.setBackgroundDB(img);
-          }
+          bg.setBackgroundImage(img);
+          bg.style.backgroundSize = "cover";
         } else {
           bg.setBackground(get.dynamicVariable(lib.card[cardName].image, card));
         }

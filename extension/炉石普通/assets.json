@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "extensionName": "炉石普通",
+  "paths": {
+    "splash":"extension/炉石普通/resource/image/",
+    "card": "extension/炉石普通/resource/asset/card/",
+    "character": "extension/炉石普通/resource/asset/duelist/",
+    "cardback": "extension/炉石普通/resource/asset/cardback/",
+    "decoration": "extension/炉石普通/resource/image/decoration/",
+    "nature": "extension/炉石普通/resource/image/nature/",
+    "heroskill": "extension/炉石普通/resource/image/heroskill/",
+    "boss": "extension/炉石普通/resource/image/boss/",
+    "bgm": "extension/炉石普通/resource/audio/bgm/",
+    "announcer": "extension/炉石普通/resource/audio/duelist/"
+  },
+  "extensions": {
+    "image": [".jpg", ".png"],
+    "audio": [".mp3", ".ogg"]
+  }
+}

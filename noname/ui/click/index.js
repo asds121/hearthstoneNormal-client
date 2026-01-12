@@ -3669,7 +3669,11 @@ export class Click {
             } else if (image.startsWith("db:")) {
               game.getDB("image", image.slice(3)).then(resolve, reject);
             } else if (image.startsWith("ext:")) {
-              resolve(`${lib.assetURL}${image.replace(/^ext:/, "extension/")}`);
+              reject(
+                new Error(
+                  `Invalid URL scheme: ext: is not allowed. Found: ${image}`
+                )
+              );
             } else {
               resolve(`${lib.assetURL}${image}`);
             }
@@ -3707,7 +3711,9 @@ export class Click {
                 return await game.getDB("image", image.slice(3));
               }
               if (image.startsWith("ext:")) {
-                return `${lib.assetURL}${image.replace(/^ext:/, "extension/")}`;
+                throw new Error(
+                  `Invalid URL scheme: ext: is not allowed. Found: ${image}`
+                );
               }
               return `${lib.assetURL}${image}`;
             })

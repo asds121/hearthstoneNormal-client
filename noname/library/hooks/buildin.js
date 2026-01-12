@@ -131,7 +131,7 @@ export const addNature = [
     if (!Array.isArray(lineColor) || lineColor.length != 3) {
       lineColor = [];
     } else if (background.startsWith("ext:")) {
-      background = background.replace(/^ext:/, "extension/");
+      throw new Error(`Invalid URL scheme: ext: is not allowed. Found: ${background}`);
     }
     if (linked) {
       lib.linked.add(nature);
