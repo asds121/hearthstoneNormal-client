@@ -190,25 +190,6 @@ export const optionsMenu = function () {
           }
         };
       }
-      if (typeof info.config.update === "function") {
-        // 保存当前的update函数引用，避免闭包问题
-        const updateFunc = info.config.update;
-        cfg.update = function () {
-          try {
-            // 检查map是否存在，并且包含需要的属性
-            if (map && map.touchscreen && typeof map.touchscreen.hide === "function") {
-              updateFunc(config, map);
-            } else {
-              console.warn("map或map.touchscreen未定义，跳过update函数调用");
-            }
-          } catch (error) {
-            console.error("调用update函数失败:", error);
-            console.error("错误原因:", error.message);
-            console.error("info.config.update类型:", typeof info.config.update);
-            console.error("updateFunc类型:", typeof updateFunc);
-          }
-        };
-      }
       var cfgnode = createConfig(cfg);
       if (cfg.type == "autoskill") {
         autoskillNodes.push(cfgnode);

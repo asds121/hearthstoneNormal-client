@@ -522,12 +522,6 @@ export default {
           }
         },
       },
-      auto_check_update: {
-        name: "自动检查游戏更新",
-        intro: "进入游戏时检查更新",
-        init: false,
-        unfrequent: true,
-      },
       lucky_star: {
         name: "幸运星模式",
         intro:
@@ -605,122 +599,11 @@ export default {
         init: false,
         unfrequent: true,
       },
-      update_link: {
-        name: "更新地址",
-        init: "coding",
-        unfrequent: true,
-        item: {
-          coding: "URC",
-          github: "GitHub",
-        },
-        onclick(item) {
-          game.saveConfig("update_link", item);
-          lib.updateURL = lib.updateURLS[item] || lib.updateURLS.coding;
-        },
-      },
-      extension_source: {
-        name: "获取扩展地址",
-        init: "GitHub Proxy",
-        unfrequent: true,
-        item: {},
-        intro: () =>
-          `获取在线扩展时的地址。当前地址：${document.createElement("br").outerHTML}${lib.config.extension_sources[lib.config.extension_source]}`,
-      },
-      extension_create: {
-        name: "添加获取扩展地址",
-        clear: true,
-        unfrequent: true,
-        onclick() {
-          game.prompt("请输入地址名称", function (str) {
-            if (str) {
-              var map = lib.config.extension_sources;
-              game.prompt("请输入" + str + "的地址", function (str2) {
-                if (str2) {
-                  delete map[str];
-                  map[str] = str2;
-                  game.saveConfig("extension_sources", map);
-                  game.saveConfig("extension_source", str);
-                  var nodexx = ui.extension_source;
-                  nodexx.updateInner();
-                  var nodeyy = nodexx._link.menu;
-                  var nodezz = nodexx._link.config;
-                  for (var i = 0; i < nodeyy.childElementCount; i++) {
-                    if (nodeyy.childNodes[i]._link == str) {
-                      nodeyy.childNodes[i].remove();
-                      break;
-                    }
-                  }
-                  var textMenu = ui.create.div("", str, nodeyy, function () {
-                    var node = this.parentNode._link;
-                    var config = node._link.config;
-                    node._link.current = this.link;
-                    var tmpName = node.lastChild.innerHTML;
-                    node.lastChild.innerHTML = config.item[this._link];
-                    if (config.onclick) {
-                      if (
-                        config.onclick.call(node, this._link, this) === false
-                      ) {
-                        node.lastChild.innerHTML = tmpName;
-                      }
-                    }
-                    if (config.update) {
-                      config.update();
-                    }
-                  });
-                  textMenu._link = str;
-                  nodezz.item[name] = str;
-                  alert("已添加扩展地址：" + str);
-                }
-              });
-            }
-          });
-        },
-      },
-      extension_delete: {
-        name: "删除当前扩展地址",
-        clear: true,
-        unfrequent: true,
-        onclick() {
-          var bool = false,
-            map = lib.config.extension_sources;
-          for (var i in map) {
-            if (i != lib.config.extension_source) {
-              bool = true;
-              break;
-            }
-          }
-          if (!bool) {
-            alert("不能删除最后一个扩展地址！");
-            return;
-          }
-          var name2 = lib.config.extension_source;
-          game.saveConfig("extension_source", i);
-          delete map[name2];
-          game.saveConfig("extension_sources", map);
-          var nodexx = ui.extension_source;
-          nodexx.updateInner();
-          var nodeyy = nodexx._link.menu;
-          var nodezz = nodexx._link.config;
-          for (var i = 0; i < nodeyy.childElementCount; i++) {
-            if (nodeyy.childNodes[i]._link == name2) {
-              nodeyy.childNodes[i].remove();
-              break;
-            }
-          }
-          delete nodezz.item[name2];
-          alert("已删除扩展地址：" + name2);
-        },
-      },
       update: function (config, map) {
         if ("ontouchstart" in document) {
           map.touchscreen.show();
         } else {
           map.touchscreen.hide();
-        }
-        if (lib.device || lib.node) {
-          map.auto_check_update.show();
-        } else {
-          map.auto_check_update.hide();
         }
         if (lib.device) {
           map.enable_vibrate.show();
@@ -798,8 +681,12 @@ export default {
     config: {
       theme: {
         name: "主题",
-        init: "woodden",
-        item: {},
+        init: "music",
+        item: {
+          woodden: "木纹",
+          music: "音乐",
+          simple: "简约",
+        },
         visualMenu: function (node, link) {
           if (!node.menu) {
             node.className = "button character themebutton " + link;
@@ -842,7 +729,6 @@ export default {
         name: "布局",
         init: "mobile",
         item: {
-          //default:'旧版',
           newlayout: "对称",
           mobile: "默认",
           long: "宽屏",
@@ -1000,25 +886,6 @@ export default {
           }
         },
       },
-      // fewplayer:{
-      //     name:'启用人数',
-      // 	intro:'设置启用新版布局的最小人数（不足时切换至默认布局）',
-      //     init:'3',
-      //     // unfrequent:true,
-      //     item:{
-      //      			'2':'两人',
-      //      			'3':'三人',
-      //      			'4':'四人',
-      //      			'5':'五人',
-      //      			'6':'六人',
-      //      			'7':'七人',
-      //      			'8':'八人',
-      //     },
-      //     onclick(item){
-      //      			game.saveConfig('fewplayer',item);
-      //      			if(ui.arena) ui.arena.setNumber(ui.arena.dataset.number);
-      //     }
-      // },
       player_height: {
         name: "角色高度",
         init: "default",
@@ -1047,42 +914,6 @@ export default {
           ui.arena.dataset.player_height_nova = item;
         },
       },
-      // background_color_music:{
-      // 	name:'背景色',
-      // 	init:'black',
-      // 	item:{
-      // 		blue:'蓝色',
-      // 		black:'黑色',
-      // 	},
-      // 	onclick(color){
-      // 		game.saveConfig('background_color_music',color);
-      // 		document.body.dataset.background_color_music=color;
-      // 	}
-      // },
-      // background_color_wood:{
-      // 	name:'背景色',
-      // 	init:'blue',
-      // 	item:{
-      // 		blue:'蓝色',
-      // 		black:'黑色',
-      // 	},
-      // 	onclick(color){
-      // 		game.saveConfig('background_color_wood',color);
-      // 		document.body.dataset.background_color_wood=color;
-      // 	}
-      // },
-      // theme_color_music:{
-      // 	name:'主题色',
-      // 	init:'black',
-      // 	item:{
-      // 		blue:'蓝色',
-      // 		black:'黑色',
-      // 	},
-      // 	onclick(color){
-      // 		game.saveConfig('theme_color_music',color);
-      // 		document.body.dataset.theme_color_music=color;
-      // 	}
-      // },
       ui_zoom: {
         name: "界面缩放",
         intro:
@@ -1125,8 +956,10 @@ export default {
       },
       image_background: {
         name: "游戏背景",
-        init: "default",
-        item: {},
+        init: "ol_bg",
+        item: {
+          ol_bg: "龙纹",
+        },
         visualBar: function (node, item, create) {
           if (node.created) {
             node.lastChild.classList.remove("active");
@@ -3225,7 +3058,15 @@ export default {
         name: "人名字体",
         init: "xingkai",
         unfrequent: true,
-        item: {},
+        item: {
+          default: "默认",
+          xiaozhuan: "方正小篆体",
+          xinwei: "华文新魏_GBK",
+          huangcao: "方正黄草_GBK",
+          yuanli: "方正北魏楷书_GBK",
+          xingkai: "方正行楷_GBK",
+          shousha: "方正隶变_GBK",
+        },
         textMenu: function (node, link) {
           if (link != "default") {
             node.style.fontFamily = link;
@@ -3241,7 +3082,15 @@ export default {
         name: "身份字体",
         init: "huangcao",
         unfrequent: true,
-        item: {},
+        item: {
+          default: "默认",
+          xiaozhuan: "方正小篆体",
+          xinwei: "华文新魏_GBK",
+          huangcao: "方正黄草_GBK",
+          yuanli: "方正北魏楷书_GBK",
+          xingkai: "方正行楷_GBK",
+          shousha: "方正隶变_GBK",
+        },
         textMenu: function (node, link) {
           if (link != "default") {
             node.style.fontFamily = link;
@@ -3257,7 +3106,15 @@ export default {
         name: "卡牌字体",
         init: "default",
         unfrequent: true,
-        item: {},
+        item: {
+          default: "默认",
+          xiaozhuan: "方正小篆体",
+          xinwei: "华文新魏_GBK",
+          huangcao: "方正黄草_GBK",
+          yuanli: "方正北魏楷书_GBK",
+          xingkai: "方正行楷_GBK",
+          shousha: "方正隶变_GBK",
+        },
         textMenu: function (node, link) {
           if (link != "default") {
             node.style.fontFamily = link;
@@ -3273,7 +3130,15 @@ export default {
         name: "界面字体",
         init: "default",
         unfrequent: true,
-        item: {},
+        item: {
+          default: "默认",
+          xiaozhuan: "方正小篆体",
+          xinwei: "华文新魏_GBK",
+          huangcao: "方正黄草_GBK",
+          yuanli: "方正北魏楷书_GBK",
+          xingkai: "方正行楷_GBK",
+          shousha: "方正隶变_GBK",
+        },
         textMenu: function (node, link) {
           if (link != "default") {
             node.style.fontFamily = link;
@@ -4218,6 +4083,7 @@ export default {
       },
     },
   },
+
   others: {
     name: "其它",
     config: {

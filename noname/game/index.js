@@ -618,18 +618,18 @@ export class Game extends GameCompatible {
       menu,
       function () {
         const node = this.parentNode._link,
-          config = node._link.config;
+          config2 = node._link.config;
         node._link.current = this.link;
         const tmpName = node.lastChild.innerHTML;
-        node.lastChild.innerHTML = config.item[this._link];
+        node.lastChild.innerHTML = config2.item[this._link];
         if (
-          config.onclick &&
-          config.onclick.call(node, this._link, this) === false
+          config2.onclick &&
+          config2.onclick.call(node, this._link, this) === false
         ) {
           node.lastChild.innerHTML = tmpName;
         }
-        if (config.update) {
-          config.update();
+        if (config2.update) {
+          config2.update();
         }
       },
       menu.childElementCount - 2
@@ -700,6 +700,7 @@ export class Game extends GameCompatible {
     style.backgroundSize = "cover";
     style.backgroundPosition = "50% 50%";
   }
+
   /**
    * Generate a beatmap using the given BPM, beats, and offset
    *
@@ -2404,6 +2405,7 @@ export class Game extends GameCompatible {
       ui.backgroundMusic.src = `${lib.assetURL}audio/background/${music}.mp3`;
     }
   }
+
   // 某种意义上，改不了，得重写
   // 等正式用import导入再说
   /**

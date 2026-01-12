@@ -72,7 +72,7 @@ window.config = {
   brokenFile: [],
 
   max_loadtime: "20000",
-  theme: "simple",
+  theme: "music",
   layout: "nova",
   cardback_style: "liusha",
   //todo：多出来的一个

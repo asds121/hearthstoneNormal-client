@@ -20,15 +20,17 @@ export class InitManager {
       { name: "platformDetection", priority: 40 },
       { name: "windowListenerSetup", priority: 50 },
       { name: "configLoad", priority: 60 },
-      { name: "cssLoad", priority: 70 },
-      { name: "sandboxInit", priority: 80 },
-      { name: "securityInit", priority: 90 },
-      { name: "extensionManagerInit", priority: 100 },
-      { name: "touchDeviceDetection", priority: 110 },
-      { name: "layoutSetup", priority: 120 },
-      { name: "extensionLoad", priority: 130 },
-      { name: "gameModeInit", priority: 140 },
-      { name: "gameDataLoad", priority: 150 },
+
+      { name: "sandboxInit", priority: 70 },
+      { name: "securityInit", priority: 80 },
+      { name: "extensionManagerInit", priority: 90 },
+      { name: "touchDeviceDetection", priority: 100 },
+      { name: "layoutSetup", priority: 110 },
+      { name: "cssLoad", priority: 120 },
+      //导入默认背景图片、音乐、字体、主题，suitsFont
+      { name: "extensionLoad", priority: 150 },
+      { name: "gameModeInit", priority: 160 },
+      { name: "gameDataLoad", priority: 170 },
     ];
   }
 
@@ -109,6 +111,11 @@ export class InitManager {
     this.initStatus.progress = 0;
 
     try {
+      // 存储步骤结果，用于后续步骤
+      const stepResults = {};
+      let extensionlist = [];
+      let promiseErrorHandler = null;
+
       // 执行所有初始化步骤
       for (let i = 0; i < this.initSteps.length; i++) {
         const step = this.initSteps[i];
@@ -116,7 +123,27 @@ export class InitManager {
         this.initStatus.progress = (i / this.initSteps.length) * 100;
 
         try {
-          await step.initFunction();
+          let result;
+          
+          // 特殊处理需要参数的步骤
+          if (step.name === "gameModeInit") {
+            // gameModeInit 需要 show_splash 参数
+            result = await step.initFunction(true);
+          } else if (step.name === "windowListenerSetup") {
+            // windowListenerSetup 返回 promiseErrorHandler
+            promiseErrorHandler = await step.initFunction();
+          } else if (step.name === "layoutSetup") {
+            // layoutSetup 返回 extensionlist
+            extensionlist = await step.initFunction();
+          } else if (step.name === "extensionLoad") {
+            // extensionLoad 需要 extensionlist 和 promiseErrorHandler 参数
+            await step.initFunction(extensionlist, promiseErrorHandler);
+          } else {
+            result = await step.initFunction();
+          }
+
+          // 存储步骤结果
+          stepResults[step.name] = result;
         } catch (error) {
           console.error(`初始化步骤 ${step.name} 失败:`, error);
           this.initStatus.errors.push({
