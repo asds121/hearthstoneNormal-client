@@ -28,6 +28,7 @@ export class InitManager {
       { name: "layoutSetup", priority: 110 },
       { name: "cssLoad", priority: 120 },
       //导入默认背景图片、音乐、字体、主题，suitsFont
+      { name: "packDataInit", priority: 130 },
       { name: "extensionLoad", priority: 150 },
       { name: "gameModeInit", priority: 160 },
       { name: "gameDataLoad", priority: 170 },
@@ -87,6 +88,7 @@ export class InitManager {
       touchDeviceDetection: (await import("./steps/touchDeviceDetection.js"))
         .touchDeviceDetection,
       layoutSetup: (await import("./steps/layoutSetup.js")).layoutSetup,
+      packDataInit: (await import("./steps/packDataInit.js")).packDataInit,
       extensionLoad: (await import("./steps/extensionLoad.js")).extensionLoad,
       gameModeInit: (await import("./steps/gameModeInit.js")).gameModeInit,
       gameDataLoad: (await import("./steps/gameDataLoad.js")).gameDataLoad,

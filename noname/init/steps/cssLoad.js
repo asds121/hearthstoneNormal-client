@@ -15,7 +15,7 @@ export async function cssLoad() {
   if (!ui.css) {
     ui.css = {};
   }
-  
+
   // 加载CSS样式
   await loadCss();
 
@@ -30,7 +30,7 @@ async function loadCss() {
   const menuCss = await lib.init.promises.css(lib.assetURL + "layout/default", "menu");
   const newmenuCss = await lib.init.promises.css(lib.assetURL + "layout/default", "newmenu");
   const defaultCss = await lib.init.promises.css(lib.assetURL + "layout/default", "layout");
-  
+
   // 初始化ui.css对象
   Reflect.set(ui, "css", {
     menu: menuCss,
