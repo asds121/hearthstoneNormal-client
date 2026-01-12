@@ -11,7 +11,6 @@ import { ui } from "../../ui/index.js";
  * - 生成扩展列表
  * - 处理布局配置
  * - 处理随机背景
- * - 处理更新日志
  * - 暴露game对象到window
  */
 export async function layoutSetup() {
@@ -98,8 +97,6 @@ export async function layoutSetup() {
     lib.init.background();
   }
   delete _status.htmlbg;
-
-
 
   // 暴露game对象到window
   Reflect.set(window, "game", {

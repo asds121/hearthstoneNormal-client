@@ -1,10 +1,4 @@
 window.noname_package = {
-  character: {},
-  card: {},
-  play: {},
-  mode: {},
-  submode: {},
-
   background: {
     ol_bg: "龙纹",
   },

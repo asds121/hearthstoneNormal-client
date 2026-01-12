@@ -9,7 +9,6 @@ import { ui } from "../../ui/index.js";
  * - 处理pack.music（背景音乐）
  * - 处理pack.theme（主题）
  * - 处理pack.font（字体）
- * - 处理extension_sources
  */
 export async function packDataInit() {
   var pack = Reflect.get(window, "noname_package");
@@ -18,29 +17,6 @@ export async function packDataInit() {
   if (!pack) {
     console.log("没有pack数据需要处理");
     return;
-  }
-
-  // 处理游戏模式
-  if (pack.mode) {
-    if (!get("gameRecord")) {
-      set("gameRecord", {});
-    }
-    for (const name in pack.mode) {
-      if (get("hiddenModePack").indexOf(name) == -1) {
-        get("all").mode.push(name);
-        lib.translate[name] = pack.mode[name];
-        if (!get("gameRecord")[name]) {
-          get("gameRecord")[name] = { data: {} };
-        }
-      }
-    }
-    if (get("all").mode.length == 0) {
-      get("all").mode.push("identity");
-      lib.translate.identity = "身份";
-      if (!get("gameRecord").identity) {
-        get("gameRecord").identity = { data: {} };
-      }
-    }
   }
 
   // 处理背景图片
@@ -92,13 +68,6 @@ export async function packDataInit() {
   if (pack.theme) {
     for (const name in pack.theme) {
       lib.configMenu.appearence.config.theme.item[name] = pack.theme[name];
-    }
-  }
-
-  // 处理扩展源
-  if (get("extension_sources")) {
-    for (const name in get("extension_sources")) {
-      lib.configMenu.general.config.extension_source.item[name] = name;
     }
   }
 

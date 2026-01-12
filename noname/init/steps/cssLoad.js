@@ -1,7 +1,5 @@
-import { lib, game } from "../../../noname.js";
+import { lib } from "../../../noname.js";
 import { ui } from "../../ui/index.js";
-import { get as get$1 } from "../../get/index.js";
-import { get } from "../../util/config.js";
 
 /**
  * CSS加载步骤
@@ -27,18 +25,37 @@ export async function cssLoad() {
  */
 async function loadCss() {
   // 加载基础样式
-  const menuCss = await lib.init.promises.css(lib.assetURL + "layout/default", "menu");
-  const newmenuCss = await lib.init.promises.css(lib.assetURL + "layout/default", "newmenu");
-  const defaultCss = await lib.init.promises.css(lib.assetURL + "layout/default", "layout");
+  const menuCss = await lib.init.promises.css(
+    lib.assetURL + "layout/default",
+    "menu"
+  );
+  const newmenuCss = await lib.init.promises.css(
+    lib.assetURL + "layout/default",
+    "newmenu"
+  );
+  const defaultCss = await lib.init.promises.css(
+    lib.assetURL + "layout/default",
+    "layout"
+  );
 
   // 初始化ui.css对象
   Reflect.set(ui, "css", {
     menu: menuCss,
     newmenu: newmenuCss,
     default: defaultCss,
-    _others: await lib.init.promises.css(lib.assetURL + "layout/others", "dialog", void 0, true),
-    _skill: await lib.init.promises.css(lib.assetURL + "layout/others", "skill", void 0, true),
+    _others: await lib.init.promises.css(
+      lib.assetURL + "layout/others",
+      "dialog",
+      void 0,
+      true
+    ),
+    _skill: await lib.init.promises.css(
+      lib.assetURL + "layout/others",
+      "skill",
+      void 0,
+      true
+    ),
     // 初始化styles属性，避免后续访问时出现undefined错误
-    styles: lib.init.sheet()
+    styles: lib.init.sheet(),
   });
 }
