@@ -36,7 +36,6 @@ export function characterModule() {
     characterIntro: {
       ...characterIntros,
     },
-    characterReplace: {},
     characterSubstitute: {},
     characterAppend: {},
     card: {

@@ -229,18 +229,7 @@ export default {
           choice = list[0];
           choice2 = list[1];
         }
-        if (
-          lib.characterReplace[choice] &&
-          lib.characterReplace[choice].length
-        ) {
-          choice = lib.characterReplace[choice].randomGet();
-        }
-        if (
-          lib.characterReplace[choice2] &&
-          lib.characterReplace[choice2].length
-        ) {
-          choice2 = lib.characterReplace[choice2].randomGet();
-        }
+
         player.init(choice);
         if (game.players.length > 4) {
           if (!player.isInitFilter("noZhuHp")) {
@@ -256,12 +245,7 @@ export default {
         true
       ) {
         var listc = list.slice(0);
-        for (var i = 0; i < listc.length; i++) {
-          var listx = lib.characterReplace[listc[i]];
-          if (listx && listx.length) {
-            listc[i] = listx.randomGet();
-          }
-        }
+        for (var i = 0; i < listc.length; i++) {}
         var choice = 0;
         for (var i = 0; i < listc.length; i++) {
           if (lib.character[listc[i]][1] == game.zhu.group) {
@@ -633,30 +617,7 @@ export default {
         game.me.node.identity.classList.remove("guessing");
       }
       //选将框分配
-      for (i in lib.characterReplace) {
-        var ix = lib.characterReplace[i];
-        for (var j = 0; j < ix.length; j++) {
-          if (chosen.includes(ix[j]) || lib.filter.characterDisabled(ix[j])) {
-            ix.splice(j--, 1);
-          }
-        }
-        if (ix.length) {
-          event.list.push(i);
-          list4.addArray(ix);
-          if (stratagemMode) {
-            list3.push(i);
-          } else {
-            var bool = false;
-            for (var j of ix) {
-              if (lib.character[j].isZhugong) {
-                bool = true;
-                break;
-              }
-            }
-            (bool ? list2 : list3).push(i);
-          }
-        }
-      }
+
       for (i in lib.character) {
         if (list4.includes(i)) {
           continue;

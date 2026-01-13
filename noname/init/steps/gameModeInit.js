@@ -50,22 +50,7 @@ export async function gameModeInit(show_splash) {
     toLoad.push(importCharacterPack(characterPack));
   }
 
-  // 导入 replace.js (ES6 模块)
-  toLoad.push(
-    (async () => {
-      try {
-        const replaceModule = await import(`../../../character/replace.js`);
-        if (
-          replaceModule.default &&
-          typeof replaceModule.default === "object"
-        ) {
-          Object.assign(lib.characterReplace, replaceModule.default);
-        }
-      } catch (error) {
-        console.error("加载 replace.js 失败:", error);
-      }
-    })()
-  );
+
 
   // 加载JavaScript扩展
   if (_status.javaScriptExtensions) {

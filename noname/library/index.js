@@ -155,7 +155,6 @@ export class Library {
       },
     }
   );
-  characterReplace = {};
   characterSubstitute = {};
   characterAppend = {};
   characterInitFilter = {};

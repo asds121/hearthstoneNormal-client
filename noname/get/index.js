@@ -866,13 +866,6 @@ export class Get extends GetCompatible {
    * get.sourceCharacter("re_caocao") == "caocao"
    */
   sourceCharacter(str) {
-    if (str) {
-      for (var i in lib.characterReplace) {
-        if (lib.characterReplace[i].includes(str)) {
-          return i;
-        }
-      }
-    }
     return str;
   }
   /**

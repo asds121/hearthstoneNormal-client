@@ -159,19 +159,7 @@ export default () => {
           if (!event.map) {
             event.map = {};
           }
-          for (i in lib.characterReplace) {
-            var ix = lib.characterReplace[i];
-            for (var j = 0; j < ix.length; j++) {
-              if (lib.filter.characterDisabled(ix[j])) {
-                ix.splice(j--, 1);
-              }
-            }
-            if (ix.length) {
-              var name = ix.randomGet();
-              event.list.push(name);
-              list4.addArray(ix);
-            }
-          }
+
           for (i in lib.character) {
             if (list4.includes(i) || lib.filter.characterDisabled(i)) {
               continue;

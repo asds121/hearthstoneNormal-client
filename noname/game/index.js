@@ -3909,33 +3909,7 @@ export class Game extends GameCompatible {
         }
       }
     },
-    changeSkin: function (player, map) {
-      if (!player || !map) {
-        return;
-      }
-      player.tempname.remove(map.from);
-      player.tempname.add(map.to);
-      player.skin[name] = map.to;
-      const goon = !lib.character[map.to];
-      if (goon) {
-        lib.character[map.to] = [
-          "",
-          "",
-          0,
-          [],
-          (map.list.find((i) => i[0] == map.to) || [map.to, []])[1],
-        ];
-      }
-      player.smoothAvatar(map.avatar2);
-      player.node["avatar" + map.name.slice(4)].setBackground(
-        map.to,
-        "character"
-      );
-      player.node["avatar" + map.name.slice(4)].show();
-      if (goon) {
-        delete lib.character[map.to];
-      }
-    },
+
     changeGroup: function (player, targetGroup) {
       if (!player || !targetGroup) {
         return;
