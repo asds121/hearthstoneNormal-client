@@ -1,6 +1,7 @@
-import { lib } from "../../../noname.js";
+import { lib, _status } from "../../../noname.js";
 import { get, set } from "../../util/config.js";
 import { ui } from "../../ui/index.js";
+import AssetManager from "../../library/AssetManager.js";
 
 /**
  * Pack数据初始化步骤
@@ -77,37 +78,91 @@ export async function packDataInit() {
     const appearenceConfig = lib.configMenu.appearence.config,
       fontSheet = Reflect.get(ui, "css").fontsheet.sheet,
       suitsFont = get("suits_font");
+    // 扩展已经在 extensionLoad 步骤中加载，这里只需要设置当前扩展
+    const extensionName = "三国杀标准";
+
+    try {
+      // 设置当前扩展
+      AssetManager.setExtension(extensionName);
+    } catch (error) {
+      console.error(`Failed to set extension ${extensionName}:`, error);
+      // 如果设置失败，尝试加载扩展
+      try {
+        await AssetManager.load(extensionName);
+        AssetManager.setExtension(extensionName);
+      } catch (retryError) {
+        console.error(
+          `Failed to load extension ${extensionName} on retry:`,
+          retryError
+        );
+      }
+    }
+
     Object.keys(pack.font).forEach((value) => {
       const font = pack.font[value];
       appearenceConfig.name_font.item[value] = font;
       appearenceConfig.identity_font.item[value] = font;
       appearenceConfig.cardtext_font.item[value] = font;
       appearenceConfig.global_font.item[value] = font;
-      fontSheet.insertRule(
-        `@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/${value}.woff2');}`,
-        0
-      );
-      if (suitsFont) {
+
+      try {
+        const fontPath = AssetManager.getPath("font", value, ".woff2");
         fontSheet.insertRule(
-          `@font-face {font-family: '${value}'; src: local('${font}'), url('${lib.assetURL}font/suits.woff2');}`,
+          `@font-face {font-family: '${value}'; src: local('${font}'), url('${fontPath}');}`,
           0
         );
+      } catch (e) {
+        console.error(`Failed to get font path for ${value}:`, e);
+      }
+
+      if (suitsFont) {
+        try {
+          const suitsFontPath = AssetManager.getPath("font", "suits", ".woff2");
+          fontSheet.insertRule(
+            `@font-face {font-family: '${value}'; src: local('${font}'), url('${suitsFontPath}');}`,
+            0
+          );
+        } catch (e) {
+          console.error(`Failed to get suits font path:`, e);
+        }
       }
     });
+
     if (suitsFont) {
+      try {
+        const suitsFontPath = AssetManager.getPath("font", "suits", ".woff2");
+        fontSheet.insertRule(
+          `@font-face {font-family: 'Suits'; src: url('${suitsFontPath}');}`,
+          0
+        );
+      } catch (e) {
+        console.error(`Failed to get Suits font path:`, e);
+      }
+    }
+
+    try {
+      const suitsFontPath = AssetManager.getPath("font", "suits", ".woff2");
       fontSheet.insertRule(
-        `@font-face {font-family: 'Suits'; src: url('${lib.assetURL}font/suits.woff2');}`,
+        `@font-face {font-family: 'NonameSuits'; src: url('${suitsFontPath}');}`,
         0
       );
+    } catch (e) {
+      console.error(`Failed to get NonameSuits font path:`, e);
     }
-    fontSheet.insertRule(
-      `@font-face {font-family: 'NonameSuits'; src: url('${lib.assetURL}font/suits.woff2');}`,
-      0
-    );
-    fontSheet.insertRule(
-      `@font-face {font-family: 'MotoyaLMaru'; src: url('${lib.assetURL}font/motoyamaru.woff2');}`,
-      0
-    );
+
+    try {
+      const motoyamaruFontPath = AssetManager.getPath(
+        "font",
+        "motoyamaru",
+        ".woff2"
+      );
+      fontSheet.insertRule(
+        `@font-face {font-family: 'MotoyaLMaru'; src: url('${motoyamaruFontPath}');}`,
+        0
+      );
+    } catch (e) {
+      console.error(`Failed to get MotoyaLMaru font path:`, e);
+    }
     appearenceConfig.cardtext_font.item.default = "默认";
     appearenceConfig.global_font.item.default = "默认";
   }

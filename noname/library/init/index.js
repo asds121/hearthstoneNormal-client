@@ -1007,24 +1007,27 @@ export class LibInit {
       let assetsConfig =
         lib.extensionAssets && lib.extensionAssets[extensionName]
           ? lib.extensionAssets[extensionName]
-          : {
-              paths: {
-                character: `extension/${extensionName}/resource/character/`,
-                card: `extension/${extensionName}/resource/card/`,
-                splash: `extension/${extensionName}/resource/splash/`,
-                splash1: `extension/${extensionName}/resource/splash/style1/`,
-                splash2: `extension/${extensionName}/resource/splash/style2/`,
-              },
-            };
+          : {};
 
       // 使用 splash 路径来构建正确的资源路径
       let splashStyle = lib.config?.splash_style || "style1";
-      let splashPath =
-        assetsConfig.paths[`splash${splashStyle.replace("style", "")}`] ||
-        assetsConfig.paths.splash ||
-        `extension/${extensionName}/resource/splash/${splashStyle}/`;
-      let resultLink = `${splashPath}${filename}`;
-      resultUrl = new URL(resultLink, rootURL);
+      let splashPath = null;
+      
+      // 只有当 assetsConfig.paths 存在时，才尝试访问它的属性
+      if (assetsConfig.paths) {
+        splashPath =
+          assetsConfig.paths[`splash${splashStyle.replace("style", "")}`] ||
+          assetsConfig.paths.splash;
+      }
+      
+      // 只使用 assets.json 中配置的路径，没有配置就返回不存在的路径
+      if (!splashPath) {
+        let resultLink = `extension/${extensionName}/image/splash/${splashStyle}/${filename}`;
+        resultUrl = new URL(resultLink, rootURL);
+      } else {
+        let resultLink = `${splashPath}${filename}`;
+        resultUrl = new URL(resultLink, rootURL);
+      }
     } else if (URL.canParse(linkString)) {
       resultUrl = new URL(linkString);
     } else if (dbNow) {

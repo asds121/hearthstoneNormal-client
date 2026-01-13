@@ -56,6 +56,8 @@ export async function layoutSetup() {
         localStorage.setItem(lib.configprefix + "disable_extension", true);
       });
     }
+
+    // 添加从plays中获取的扩展
     for (var name = 0; name < get("plays").length; name++) {
       if (get("all").plays.includes(get("plays")[name])) {
         extensionlist.push(get("plays")[name]);

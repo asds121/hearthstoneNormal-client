@@ -1952,22 +1952,46 @@ export class Game extends GameCompatible {
    * @param { ...string | number | ((evt: Event) => void) } args
    * @returns { HTMLAudioElement }
    */
-  playAudio(...args) {
-    const options =
-      args.length === 1 && get.objtype(args[0]) === "object"
-        ? args[0]
-        : {
-            path: args
-              .filter(
-                (arg) => typeof arg === "string" || typeof arg === "number"
-              )
-              .join("/"),
-            onError: args.find((arg) => typeof arg === "function"),
-          };
+  // 确保 AssetManager 已经加载了必要的扩展
+  ensureAssetManagerLoaded() {
+    const extensionName =
+      _status.extension || _status.currentExtension || "三国杀标准";
+
+    try {
+      // 如果扩展已经加载，直接设置
+      if (AssetManager.hasExtension(extensionName)) {
+        AssetManager.setExtension(extensionName);
+      }
+    } catch (error) {
+      console.error(`Failed to set extension ${extensionName}:`, error);
+    }
+  }
+
+  playAudio(options, ...args) {
+    this.ensureAssetManagerLoaded();
+
+    // 处理多个参数的情况，重定向到tryAudio方法
+    if (typeof options === "string") {
+      let audioList;
+      if (args.length > 1) {
+        // 格式：category, subcategory, filename
+        const [category, subcategory, filename] = [options, args[0], args[1]];
+        // 确保路径格式正确，避免URL编码问题
+        audioList = [`${category}/${subcategory}/${filename}`];
+      } else if (args.length > 0) {
+        // 格式：category, filename
+        const [category, filename] = [options, args[0]];
+        // 确保路径格式正确，避免URL编码问题
+        audioList = [`${category}/${filename}`];
+      } else {
+        // 单个字符串参数，直接使用
+        audioList = [options];
+      }
+      return this.tryAudio({ audioList, autoplay: true });
+    }
 
     const {
       path = "",
-      // broadcast = false,
       addVideo = true,
       video = false,
       onCanPlay = (evt) => void 0,
@@ -1976,27 +2000,7 @@ export class Game extends GameCompatible {
       onError = (evt) => void 0,
     } = options;
 
-    // 为了能更美观的写代码，默认返回audio而不额外加一个void类型
-    // @ts-expect-error ignore
     if (_status.video && !video) {
-      return;
-    }
-
-    let parsedPath = "";
-    if (["blob:", "data:"].some((prefix) => path.startsWith(prefix))) {
-      parsedPath = path;
-    } else if (path.startsWith("ext:")) {
-      throw new Error(
-        `Invalid URL scheme: ext: is not allowed. Found: ${path}`
-      );
-    } else if (path.startsWith("db:")) {
-      parsedPath = path.replace(/^(db:[^:]*)\//, (_, p) => p + ":");
-    } else {
-      parsedPath = `audio/${path}`;
-    }
-
-    // @ts-expect-error ignore
-    if (!lib.config.repeat_audio && _status.skillaudio.includes(parsedPath)) {
       return;
     }
 
@@ -2004,8 +2008,10 @@ export class Game extends GameCompatible {
     audio.volume = lib.config.volumn_audio / 8;
     audio.autoplay = true;
 
+    // 直接赋值src，不再处理路径
+    audio.src = path;
+
     audio.oncanplay = (ev) => {
-      //Some browsers do not support "autoplay", so "oncanplay" listening has been added
       Promise.resolve(audio.play()).catch((e) => console.error(e));
       if (_status.video || game.online) {
         return;
@@ -2013,9 +2019,6 @@ export class Game extends GameCompatible {
       onCanPlay(ev);
     };
     audio.onplay = (ev) => {
-      _status.skillaudio.add(parsedPath);
-      setTimeout(() => _status.skillaudio.remove(parsedPath), 1000);
-      // if (broadcast) game.broadcast(game.playAudio, options);
       if (addVideo) {
         game.addVideo("playAudio", null, path);
       }
@@ -2039,24 +2042,7 @@ export class Game extends GameCompatible {
       onError(ev);
     };
 
-    Promise.resolve().then(async () => {
-      let resolvedPath;
-      if (parsedPath.startsWith("db:")) {
-        resolvedPath = get.objectURL(
-          await game.getDB("image", parsedPath.slice(3))
-        );
-      } else if (lib.path.extname(parsedPath)) {
-        resolvedPath = `${lib.assetURL}${parsedPath}`;
-      } else if (URL.canParse(path)) {
-        resolvedPath = path;
-      } else {
-        resolvedPath = `${lib.assetURL}${parsedPath}.mp3`;
-      }
-
-      audio.src = resolvedPath;
-      ui.window.appendChild(audio);
-    });
-
+    ui.window.appendChild(audio);
     return audio;
   }
   /**
@@ -2096,12 +2082,71 @@ export class Game extends GameCompatible {
       }
       // @ts-expect-error ignore
       audio = random ? list.randomRemove() : list.shift();
-      return game.playAudio({
-        path: audio,
-        addVideo,
-        onCanPlay: () => (refresh = true),
-        onError: play,
-      });
+
+      // 检查是否为直接URL，如果是则直接使用
+      if (/^(http|https|blob|data):/.test(audio)) {
+        return game.playAudio({
+          path: audio,
+          addVideo,
+          onCanPlay: () => (refresh = true),
+          onError: play,
+        });
+      }
+
+      // 否则，使用AssetManager获取正确的音频路径
+      try {
+        // 确保AssetManager已经设置了当前扩展
+        const extensionName = _status.extension || _status.currentExtension;
+        if (extensionName) {
+          AssetManager.setExtension(extensionName);
+        }
+
+        // 处理音频路径，使用AssetManager获取正确的路径
+        const pathParts = audio.split("/");
+        let category, filename;
+
+        if (pathParts.length >= 2) {
+          // 路径格式：category/subcategory/filename.ext
+          // 例如：card/male/sha.mp3 或 card/male/sha 或 skill/longdan_sha1
+          category = pathParts[0];
+          filename = pathParts.slice(1).join("/");
+        } else {
+          // 只有文件名的情况，如 "sha" 或 "sha.mp3"
+          category = "audio";
+          filename = audio;
+        }
+
+        // 从文件名中移除扩展名（如果有的话），因为AssetManager.getPath会自动添加
+        filename = filename.replace(/\.(mp3|ogg|wav)$/i, "");
+
+        // 检查是否是卡牌音频且文件名包含扩展名称，避免播放错误的音频
+        if (category === "card" && filename.includes("三国杀标准")) {
+          return;
+        }
+
+        // 使用AssetManager获取正确的音频路径
+        const parsedPath = AssetManager.getPath(
+          `audio_${category}`,
+          filename,
+          ".mp3"
+        );
+
+        return game.playAudio({
+          path: parsedPath,
+          addVideo,
+          onCanPlay: () => (refresh = true),
+          onError: play,
+        });
+      } catch (e) {
+        console.error("Failed to get audio path:", e);
+        // 如果获取路径失败，尝试直接使用原始路径
+        return game.playAudio({
+          path: audio,
+          addVideo,
+          onCanPlay: () => (refresh = true),
+          onError: play,
+        });
+      }
     };
 
     if (autoplay) {
@@ -2229,6 +2274,8 @@ export class Game extends GameCompatible {
    * @returns
    */
   playSkillAudio(name, index) {
+    this.ensureAssetManagerLoaded();
+
     if (_status.video && arguments[1] != "video") {
       return;
     }
@@ -2243,11 +2290,20 @@ export class Game extends GameCompatible {
     setTimeout(function () {
       _status.skillaudio.remove(name);
     }, 1000);
-    var str = "audio/skill/";
     var audio = document.createElement("audio");
     audio.autoplay = true;
     audio.volume = lib.config.volumn_audio / 8;
-    audio.src = lib.assetURL + str + name + ".mp3";
+
+    // 使用 AssetManager 获取正确的音频路径
+    try {
+      audio.src =
+        lib.assetURL + AssetManager.getPath("audio_skill", name, ".mp3");
+    } catch (e) {
+      console.error("Failed to get audio path:", e);
+      this.remove();
+      return;
+    }
+
     audio.addEventListener("ended", function () {
       this.remove();
     });
@@ -2256,25 +2312,27 @@ export class Game extends GameCompatible {
     }
     audio._changed = 1;
     audio.onerror = function () {
-      switch (this._changed) {
-        case 1: {
-          audio.src = lib.assetURL + str + name + ".ogg";
-          this._changed = 2;
-          break;
+      try {
+        switch (this._changed) {
+          case 1: {
+            // 尝试.ogg格式
+            audio.src =
+              lib.assetURL + AssetManager.getPath("audio_skill", name, ".ogg");
+            this._changed = 2;
+            break;
+          }
+          case 2: {
+            // 不再尝试添加索引，直接移除音频元素
+            this.remove();
+            break;
+          }
+          default: {
+            this.remove();
+          }
         }
-        case 2: {
-          audio.src = lib.assetURL + str + name + index + ".mp3";
-          this._changed = 3;
-          break;
-        }
-        case 3: {
-          audio.src = lib.assetURL + str + name + index + ".ogg";
-          this._changed = 4;
-          break;
-        }
-        default: {
-          this.remove();
-        }
+      } catch (e) {
+        console.error("Failed to get audio path:", e);
+        this.remove();
       }
     };
     //Some browsers do not support "autoplay", so "oncanplay" listening has been added
@@ -2288,6 +2346,13 @@ export class Game extends GameCompatible {
    * @param { Player | Sex } sex
    */
   playCardAudio(card, sex) {
+    // 确保card是有效的卡牌对象，避免将扩展名称当作卡牌名
+    let cardName = typeof card === "string" ? card : card.name;
+    // 如果card名称是扩展名称，直接返回，不播放音频
+    if (cardName === "三国杀标准") {
+      throw new Error("cardName === '三国杀标准'");
+    }
+    // @ts-expect-error ignore
     if (typeof card === "string") {
       // @ts-expect-error ignore
       card = { name: card };
@@ -2370,10 +2435,16 @@ export class Game extends GameCompatible {
           .getDB("image", aozhan.slice(3))
           .then((result) => (ui.backgroundMusic.src = result));
       } else if (aozhan.startsWith("ext:")) {
-        // 替换 ext:extensionName/ 为 extension/extensionName/resource/
-        ui.backgroundMusic.src = `${lib.assetURL}${aozhan.replace(/^ext:([^/]+)\//, "extension/$1/resource/")}`;
+        // 替换 ext:extensionName/ 为 extension/extensionName/audio/
+        ui.backgroundMusic.src = `${lib.assetURL}${aozhan.replace(/^ext:([^/]+)\//, "extension/$1/audio/")}`;
       } else {
-        ui.backgroundMusic.src = `${lib.assetURL}audio/background/aozhan_${aozhan}.mp3`;
+        // 使用 AssetManager 获取正确的背景音乐路径
+        try {
+          ui.backgroundMusic.src = `${lib.assetURL}${AssetManager.getPath("audio_background", `aozhan_${aozhan}`, ".mp3")}`;
+        } catch (e) {
+          // 如果 AssetManager 无法获取路径，使用扩展中的音频文件
+          ui.backgroundMusic.src = `${lib.assetURL}extension/三国杀标准/audio/background/aozhan_${aozhan}.mp3`;
+        }
       }
       return;
     }
@@ -2406,10 +2477,16 @@ export class Game extends GameCompatible {
         .getDB("image", music.slice(3))
         .then((result) => (ui.backgroundMusic.src = result));
     } else if (music.startsWith("ext:")) {
-      // 替换 ext:extensionName/ 为 extension/extensionName/resource/
-      ui.backgroundMusic.src = `${lib.assetURL}${music.replace(/^ext:([^/]+)\//, "extension/$1/resource/")}`;
+      // 替换 ext:extensionName/ 为 extension/extensionName/audio/
+      ui.backgroundMusic.src = `${lib.assetURL}${music.replace(/^ext:([^/]+)\//, "extension/$1/audio/")}`;
     } else {
-      ui.backgroundMusic.src = `${lib.assetURL}audio/background/${music}.mp3`;
+      // 使用 AssetManager 获取正确的背景音乐路径
+      try {
+        ui.backgroundMusic.src = `${lib.assetURL}${AssetManager.getPath("audio_background", music, ".mp3")}`;
+      } catch (e) {
+        // 如果 AssetManager 无法获取路径，使用扩展中的音频文件
+        ui.backgroundMusic.src = `${lib.assetURL}extension/三国杀标准/audio/background/${music}.mp3`;
+      }
     }
   }
 

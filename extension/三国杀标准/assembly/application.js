@@ -22,6 +22,12 @@ class Application {
         default: { name, ...introduce },
       } = await import("../info.json", { with: { type: "json" } });
 
+      // 加载 package.js 文件，将其内容设置到全局变量中
+      const packageRes = await import("../package.js");
+      if (packageRes.default) {
+        window.noname_package = packageRes.default;
+      }
+
       const [characterRes, cardRes] = await Promise.allSettled([
         import("../character/standard/index.js"),
         import("../card/standard/index.js"),

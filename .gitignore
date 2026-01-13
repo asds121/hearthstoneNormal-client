@@ -56,26 +56,15 @@ coverage/
 *.tar.gz
 *.7z
 
-# Image files
-*/*.jpg
-*.jpeg
-*.png
-*.gif
-*.bmp
-*.svg
-*.webp
-*.ico
-*.tiff
-*.tif
-
 # Root image folder
 /image/
-/font/
 /tests/
 
 # Hearthstone resource folder
 extension/炉石普通/resource/
-extension/三国杀标准/resource/
+extension/三国杀标准/image/
+extension/三国杀标准/audio/
+extension/三国杀标准/font/
 
 # Text files
 *.txt

@@ -2,13 +2,23 @@
   "version": "1.0.0",
   "extensionName": "三国杀标准",
   "paths": {
-    "character": "ext:resource/character/",
-    "card": "ext:resource/card/",
-    "splash1": "ext:resource/splash/style1/",
-    "splash2": "ext:resource/splash/style2/"
+    "character": "ext:image/character/",
+    "card": "ext:image/card/",
+    "background": "ext:image/background/",
+    "splash": "ext:image/splash/",
+    "splash1": "ext:image/splash/style1/",
+    "splash2": "ext:image/splash/style2/",
+    "font": "ext:font/",
+    "audio": "ext:audio/",
+    "audio_background": "ext:audio/background/",
+    "audio_card": "ext:audio/card/",
+    "audio_die": "ext:audio/die/",
+    "audio_effect": "ext:audio/effect/",
+    "audio_skill": "ext:audio/skill/"
   },
   "extensions": {
     "image": [".jpg", ".png"],
-    "audio": [".mp3", ".ogg"]
+    "audio": [".mp3", ".ogg"],
+    "font": [".ttf", ".woff2"]
   }
 }

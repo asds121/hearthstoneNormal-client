@@ -398,7 +398,7 @@ export async function loadExtension(extension) {
             ) {
               const img = extension[3]
                 ? `db:extension-${extension[0]}:character/${charaName}.jpg`
-                : `extension/${extension[0]}/resource/character/${charaName}.jpg`;
+                : `extension/${extension[0]}/image/character/${charaName}.jpg`;
               character[4].add(img);
             }
             if (
@@ -406,7 +406,7 @@ export async function loadExtension(extension) {
                 (str) => typeof str == "string" && /^die:.+/.test(str)
               )
             ) {
-              const audio = `die:extension/${extension[0]}/resource/character/${charaName}.mp3`;
+              const audio = `die:extension/${extension[0]}/image/character/${charaName}.mp3`;
               character[4].add(audio);
             }
 
@@ -421,12 +421,12 @@ export async function loadExtension(extension) {
             }
           } else {
             if (!character.img) {
-              const characterImage = `extension/${extension[0]}/resource/character/${charaName}.jpg`;
+              const characterImage = `extension/${extension[0]}/image/character/${charaName}.jpg`;
               character.img = characterImage;
             }
             if (!character.dieAudios) {
               character.dieAudios = [];
-              const characterDieAudio = `extension/${extension[0]}/resource/character/${charaName}.mp3`;
+              const characterDieAudio = `extension/${extension[0]}/image/character/${charaName}.mp3`;
               character.dieAudios.push(characterDieAudio);
             }
             if (character.isBoss || character.isHiddenBoss) {
@@ -482,7 +482,7 @@ export async function loadExtension(extension) {
               if (extension[3]) {
                 card.image = `db:extension-${extension[0]}:card/${cardName}.${suffix}`;
               } else {
-                card.image = `extension/${extension[0]}/resource/card/${cardName}.${suffix}`;
+                card.image = `extension/${extension[0]}/image/card/${cardName}.${suffix}`;
               }
             }
           }

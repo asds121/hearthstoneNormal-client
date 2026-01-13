@@ -296,35 +296,39 @@ HTMLDivElement.prototype.setBackgroundImage = function (img) {
       return resourcePath;
     }
 
-    // Check if this is an extension-specific resource
+    // Check if this is an extension-specific resource from the old format
     const extensionName = _status.extension || _status.currentExtension;
     if (extensionName) {
       try {
         // Get the assets.json for the current extension
-        const assetsJsonPath = `extension/${extensionName}/assets.json`;
         const assetsJson = lib.extensionAssets[extensionName];
-        if (!assetsJson || !assetsJson.paths) {
-          return resourcePath;
-        }
-
-        // Resolve path based on assets.json configuration
-        // Handle splash paths specially based on current splash_style
-        if (resourcePath.includes('splash/')) {
-          const splashStyle = lib.config?.splash_style || 'style1';
-          const splashKey = `splash${splashStyle.replace('style', '')}`;
-          if (assetsJson.paths[splashKey]) {
-            const splashPath = assetsJson.paths[splashKey];
-            return resourcePath.replace(/^image\/splash\/[^/]+\//, splashPath);
+        if (assetsJson && assetsJson.paths) {
+          // Handle splash paths specially based on current splash_style
+          if (resourcePath.includes('splash/')) {
+            const splashStyle = lib.config?.splash_style || 'style1';
+            const splashKey = `splash${splashStyle.replace('style', '')}`;
+            if (assetsJson.paths[splashKey]) {
+              const splashPath = assetsJson.paths[splashKey];
+              // Replace the old format path with the configured path
+              return resourcePath.replace(/extension\/[^/]+\/resource\/splash\/[^/]+\//, splashPath);
+            }
           }
-        }
-        
-        for (const [key, path] of Object.entries(assetsJson.paths)) {
-          if (
-            resourcePath.startsWith(`${key}/`) ||
-            resourcePath.includes(`/${key}/`)
-          ) {
-            // Replace the base path with the configured path from assets.json
-            return resourcePath.replace(new RegExp(`^${key}/`), path);
+          
+          // Handle other resource types
+          for (const [key, path] of Object.entries(assetsJson.paths)) {
+            // Check if this is the old format path with resource/ prefix
+            const oldPathRegex = new RegExp(`extension\\/[^/]+\\/resource\\/([^/]+)\\/`);
+            const match = resourcePath.match(oldPathRegex);
+            if (match) {
+              const resourceType = match[1];
+              // Find the corresponding key in assets.json for this resource type
+              for (const [configKey, configPath] of Object.entries(assetsJson.paths)) {
+                if (configPath.includes(resourceType)) {
+                  // Replace the old format path with the configured path
+                  return resourcePath.replace(oldPathRegex, configPath);
+                }
+              }
+            }
           }
         }
       } catch (e) {

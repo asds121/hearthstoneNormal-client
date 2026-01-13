@@ -76,7 +76,9 @@ class AssetManager {
     // Handle ext: prefix
     let fullPath = basePath + finalFilename + finalExt;
     if (fullPath.startsWith('ext:')) {
-      fullPath = `extension/${this.#currentExtension}/${fullPath.substring(4)}`;
+      // 确保路径格式正确，避免URL编码问题
+      const extPath = fullPath.substring(4);
+      fullPath = `extension/${this.#currentExtension}/${extPath}`;
     }
     return fullPath;
   }

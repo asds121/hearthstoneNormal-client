@@ -27,9 +27,9 @@ export class InitManager {
       { name: "touchDeviceDetection", priority: 100 },
       { name: "layoutSetup", priority: 110 },
       { name: "cssLoad", priority: 120 },
-      //导入默认背景图片、音乐、字体、主题，suitsFont
-      { name: "packDataInit", priority: 130 },
-      { name: "extensionLoad", priority: 150 },
+      { name: "extensionLoad", priority: 125 }, // 先加载扩展
+      { name: "packDataInit", priority: 130 }, // 再处理package.js数据
+
       { name: "gameModeInit", priority: 160 },
       { name: "gameDataLoad", priority: 170 },
     ];
@@ -126,7 +126,7 @@ export class InitManager {
 
         try {
           let result;
-          
+
           // 特殊处理需要参数的步骤
           if (step.name === "gameModeInit") {
             // gameModeInit 需要 show_splash 参数

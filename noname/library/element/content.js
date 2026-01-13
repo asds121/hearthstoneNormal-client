@@ -7,6 +7,7 @@ import { ui } from "../../ui/index.js";
 import { gnc } from "../../gnc/index.js";
 import { GameEvent } from "./gameEvent.js";
 import { Player } from "./player.js";
+import AssetManager from "../AssetManager.js";
 
 // 未来再改
 export const Content = {
@@ -1830,7 +1831,12 @@ player.removeVirtualEquip(card);
           `Invalid URL scheme: ext: is not allowed. Found: ${hitsound}`
         );
       } else {
-        hitsound = lib.assetURL + "audio/effect/" + hitsound;
+        // 使用 AssetManager 获取正确的音频路径
+        try {
+          hitsound = lib.assetURL + AssetManager.getPath("audio_effect", hitsound);
+        } catch (e) {
+          console.error("Failed to get audio path:", e);
+        }
       }
       var hitsound_audio = new Audio(hitsound);
       hitsound_audio.volume = 0.25;
