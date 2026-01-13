@@ -1018,9 +1018,9 @@ export class LibInit {
             };
 
       // 使用 splash 路径来构建正确的资源路径
-      let splashStyle = lib.config?.splash_style || 'style1';
-      let splashPath = 
-        assetsConfig.paths[`splash${splashStyle.replace('style', '')}`] ||
+      let splashStyle = lib.config?.splash_style || "style1";
+      let splashPath =
+        assetsConfig.paths[`splash${splashStyle.replace("style", "")}`] ||
         assetsConfig.paths.splash ||
         `extension/${extensionName}/resource/splash/${splashStyle}/`;
       let resultLink = `${splashPath}${filename}`;

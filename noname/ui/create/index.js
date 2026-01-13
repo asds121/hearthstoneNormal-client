@@ -3235,7 +3235,12 @@ export class Create {
         type = "character";
       }
       if (type == "characterx") {
-        if (lib.characterReplace[item] && lib.characterReplace[item].length) {
+        // charcterreplace已废除，不再读取，添加安全检查
+        if (
+          lib.characterReplace &&
+          lib.characterReplace[item] &&
+          lib.characterReplace[item].length
+        ) {
           item = lib.characterReplace[item].randomGet();
         }
       }
@@ -3243,6 +3248,7 @@ export class Create {
 
       if (
         type == "characterx" &&
+        lib.characterReplace &&
         lib.characterReplace[node._link] &&
         lib.characterReplace[node._link].length > 1
       ) {

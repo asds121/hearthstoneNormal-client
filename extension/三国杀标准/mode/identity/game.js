@@ -257,7 +257,8 @@ export default {
       } else {
         var listc = list.slice(0, 2);
         for (var i = 0; i < listc.length; i++) {
-          var listx = lib.characterReplace[listc[i]];
+          // charcterreplace已废除，不再读取，添加安全检查
+          var listx = lib.characterReplace && lib.characterReplace[listc[i]];
           if (listx && listx.length) {
             listc[i] = listx.randomGet();
           }

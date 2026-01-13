@@ -8,85 +8,87 @@ import OnloadSplash from "./OnloadSplash.js";
  * @interface IOnloadSplash
  */
 export class DefaultSplash {
-	id = "style1";
-	name = "样式一";
+  id = "style1";
+  name = "样式一";
 
-	path = "image/splash/style1/";
-	resolve;
-	app;
-	clicked;
+  path = "image/splash/style1/";
+  resolve;
+  app;
+  clicked;
 
-	async init(node, resolve) {
-		this.resolve = resolve;
+  async init(node, resolve) {
+    this.resolve = resolve;
 
-		if (lib.config.touchscreen) {
-			node.classList.add("touch");
-			lib.setScroll(node);
-		}
-		if (lib.config.player_border !== "wide") {
-			node.classList.add("slim");
-		}
+    if (lib.config.touchscreen) {
+      node.classList.add("touch");
+      lib.setScroll(node);
+    }
+    if (lib.config.player_border !== "wide") {
+      node.classList.add("slim");
+    }
 
-		node.dataset.radius_size = lib.config.radius_size;
-		node.dataset.splash_style = lib.config.splash_style;
+    node.dataset.radius_size = lib.config.radius_size;
+    node.dataset.splash_style = lib.config.splash_style;
 
-		this.app = createApp(OnloadSplash, {
-			handle: this.handle.bind(this),
-			click: this.click.bind(this),
-		});
+    this.app = createApp(OnloadSplash, {
+      handle: this.handle.bind(this),
+      click: this.click.bind(this),
+    });
 
-		this.app.mount(node);
+    this.app.mount(node);
 
-		if (lib.config.mousewheel) {
-			node.addEventListener("wheel", ui.click.mousewheel, { passive: true });
-		}
-	}
+    if (lib.config.mousewheel) {
+      node.addEventListener("wheel", ui.click.mousewheel, { passive: true });
+    }
+  }
 
-	async dispose(node) {
-		node.delete(1000);
+  async dispose(node) {
+    node.delete(1000);
 
-		await new Promise(resolve => this.clicked.listenTransition(resolve, 500));
+    await new Promise((resolve) => this.clicked.listenTransition(resolve, 500));
 
-		return true;
-	}
+    return true;
+  }
 
-	preview(node) {
-		node.className = "button character";
-		node.style.width = "200px";
-		node.style.height = `${(node.offsetWidth * 1080) / 2400}px`;
-		node.style.display = "flex";
-		node.style.flexDirection = "column";
-		node.style.alignItems = "center";
-		node.style.backgroundSize = "100% 100%";
-		node.setBackgroundImage(`image/splash/${this.id}.jpg`);
-	}
+  preview(node) {
+    node.className = "button character";
+    node.style.width = "200px";
+    node.style.height = `${(node.offsetWidth * 1080) / 2400}px`;
+    node.style.display = "flex";
+    node.style.flexDirection = "column";
+    node.style.alignItems = "center";
+    node.style.backgroundSize = "100% 100%";
+    node.setBackgroundImage(`image/splash/${this.id}.jpg`);
+  }
 
-	handle(mode) {
-		if (mode === "hs_hearthstone") {
-			return `extension/炉石普通/resource/image/hs_hearthstone.jpg`;
-		}
-		return lib.path.join(this.path, `${mode}.jpg`);
-	}
+  handle(mode) {
+    // 使用AssetManager处理素材路径，移除硬编码
+    return lib.path.join(this.path, `${mode}.jpg`);
+  }
 
-	click(mode, node) {
-		node.classList.add("clicked");
+  click(mode, node) {
+    node.classList.add("clicked");
 
-		if (game.layout !== "mobile" && lib.layoutfixed.indexOf(mode) !== -1) {
-			game.layout = "mobile";
-			// @ts-expect-error ignore
-			ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`;
-		} else if (game.layout === "mobile" && lib.config.layout !== "mobile" && lib.layoutfixed.indexOf(mode) === -1) {
-			game.layout = lib.config.layout;
-			if (game.layout === "default") {
-				// @ts-expect-error ignore
-				ui.css.layout.href = "";
-			} else {
-				// @ts-expect-error ignore
-				ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`;
-			}
-		}
+    if (game.layout !== "mobile" && lib.layoutfixed.indexOf(mode) !== -1) {
+      game.layout = "mobile";
+      // @ts-expect-error ignore
+      ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`;
+    } else if (
+      game.layout === "mobile" &&
+      lib.config.layout !== "mobile" &&
+      lib.layoutfixed.indexOf(mode) === -1
+    ) {
+      game.layout = lib.config.layout;
+      if (game.layout === "default") {
+        // @ts-expect-error ignore
+        ui.css.layout.href = "";
+      } else {
+        // @ts-expect-error ignore
+        ui.css.layout.href = `${lib.assetURL}layout/${game.layout}/layout.css`;
+      }
+    }
 
-		this.clicked = node;
-		this.resolve(mode);
-	}
+    this.clicked = node;
+    this.resolve(mode);
+  }
 }

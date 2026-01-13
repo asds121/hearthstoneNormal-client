@@ -2,10 +2,10 @@
   "version": "1.0.0",
   "extensionName": "三国杀标准",
   "paths": {
-    "character": "extension/三国杀标准/resource/character/",
-    "card": "extension/三国杀标准/resource/card/",
-    "splash1": "extension/三国杀标准/resource/splash/style1/",
-    "splash2": "extension/三国杀标准/resource/splash/style2/"
+    "character": "ext:resource/character/",
+    "card": "ext:resource/card/",
+    "splash1": "ext:resource/splash/style1/",
+    "splash2": "ext:resource/splash/style2/"
   },
   "extensions": {
     "image": [".jpg", ".png"],

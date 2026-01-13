@@ -302,13 +302,10 @@ HTMLDivElement.prototype.setBackgroundImage = function (img) {
       try {
         // Get the assets.json for the current extension
         const assetsJsonPath = `extension/${extensionName}/assets.json`;
-        const assetsJson = lib.extensionAssets[extensionName] || {
-          paths: {
-            character: `extension/${extensionName}/resource/character/`,
-            card: `extension/${extensionName}/resource/card/`,
-            splash: `extension/${extensionName}/resource/splash/`,
-          },
-        };
+        const assetsJson = lib.extensionAssets[extensionName];
+        if (!assetsJson || !assetsJson.paths) {
+          return resourcePath;
+        }
 
         // Resolve path based on assets.json configuration
         // Handle splash paths specially based on current splash_style

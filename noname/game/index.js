@@ -6157,8 +6157,8 @@ export class Game extends GameCompatible {
         [
           _status.evaluatingExtension
             ? `db:extension-${extensionName}:character/${name}.jpg`
-            : `extension/${extensionName}/resource/character/${name}.jpg`,
-          `die:extension/${extensionName}/resource/character/${name}.mp3`,
+            : AssetManager.getPath("character", name),
+          `die:${AssetManager.getPath("character", name)}`,
         ],
       ];
     if (information.tags) {
@@ -6201,9 +6201,9 @@ export class Game extends GameCompatible {
           if (_status.evaluatingExtension) {
             imgsrc = `db:extension-${extname}:character/${j}.jpg`;
           } else {
-            imgsrc = `extension/${extname}/resource/character/${j}.jpg`;
+            imgsrc = AssetManager.getPath("character", j);
           }
-          const audiosrc = `die:extension/${extname}/resource/character/${j}.mp3`;
+          const audiosrc = `die:${AssetManager.getPath("character", j)}`;
           if (
             !pack[i][j][4].some(
               (str) =>
@@ -6283,13 +6283,17 @@ export class Game extends GameCompatible {
         if (_status.evaluatingExtension) {
           info.image = "db:extension-" + extname + ":" + name + ".png";
         } else {
-          info.image = `extension/${extname}/resource/${name}.png`;
+          // 使用AssetManager处理素材路径，移除硬编码
+          AssetManager.setExtension(extname);
+          info.image = AssetManager.getPath("card", name, ".png");
         }
       } else if (info.fullimage) {
         if (_status.evaluatingExtension) {
           info.image = "db:extension-" + extname + ":" + name + ".jpg";
         } else {
-          info.image = `extension/${extname}/resource/${name}.jpg`;
+          // 使用AssetManager处理素材路径，移除硬编码
+          AssetManager.setExtension(extname);
+          info.image = AssetManager.getPath("card", name, ".jpg");
         }
       }
     }
@@ -6349,13 +6353,17 @@ export class Game extends GameCompatible {
               if (_status.evaluatingExtension) {
                 pack[i][j].image = "db:extension-" + extname + ":" + j + ".png";
               } else {
-                pack[i][j].image = `extension/${extname}/resource/${j}.png`;
+                // 使用AssetManager处理素材路径，移除硬编码
+                AssetManager.setExtension(extname);
+                pack[i][j].image = AssetManager.getPath("card", j, ".png");
               }
             } else if (pack[i][j].fullimage) {
               if (_status.evaluatingExtension) {
                 pack[i][j].image = "db:extension-" + extname + ":" + j + ".jpg";
               } else {
-                pack[i][j].image = `extension/${extname}/resource/${j}.jpg`;
+                // 使用AssetManager处理素材路径，移除硬编码
+                AssetManager.setExtension(extname);
+                pack[i][j].image = AssetManager.getPath("card", j, ".jpg");
               }
             }
           }

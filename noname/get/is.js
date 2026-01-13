@@ -343,31 +343,21 @@ export class Is {
    * @param { Card | VCard } card
    */
   yingbianConditional(card) {
-    return (
-      get.is.complexlyYingbianConditional(card) ||
-      get.is.simplyYingbianConditional(card)
-    );
+    // yingbian相关机制已废除，直接返回false
+    return false;
   }
   /**
    * @param { Card | VCard } card
    */
   complexlyYingbianConditional(card) {
-    for (const key of lib.yingbian.condition.complex.keys()) {
-      if (get.cardtag(card, `yingbian_${key}`)) {
-        return true;
-      }
-    }
+    // yingbian相关机制已废除，直接返回false
     return false;
   }
   /**
    * @param { Card | VCard } card
    */
   simplyYingbianConditional(card) {
-    for (const key of lib.yingbian.condition.simple.keys()) {
-      if (get.cardtag(card, `yingbian_${key}`)) {
-        return true;
-      }
-    }
+    // yingbian相关机制已废除，直接返回false
     return false;
   }
   /**

@@ -324,16 +324,8 @@ export async function loadExtension(extension) {
         `Failed to load assets.json for extension ${extension[0]}:`,
         e
       );
-      // 使用默认配置
-      lib.extensionAssets[extension[0]] = {
-        paths: {
-            character: `extension/${extension[0]}/resource/character/`,
-            card: `extension/${extension[0]}/resource/card/`,
-            splash: `extension/${extension[0]}/resource/splash/`,
-            splash1: `extension/${extension[0]}/resource/splash/style1/`,
-            splash2: `extension/${extension[0]}/resource/splash/style2/`,
-          },
-      };
+      // 不再使用默认配置，要求所有扩展必须有assets.json
+    lib.extensionAssets[extension[0]] = {};
     }
     if (typeof extension[1] == "function") {
       try {
@@ -654,7 +646,8 @@ function extSkillInject(extName, skillInfo) {
     typeof skillInfo.audio == "number" ||
     typeof skillInfo.audio == "boolean"
   ) {
-    skillInfo.audio = `ext:${extName}:${Number(skillInfo.audio)}`;
+    // 不再使用ext:协议，直接设置为音频文件名
+    skillInfo.audio = Number(skillInfo.audio);
   }
 }
 
