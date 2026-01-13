@@ -4,7 +4,8 @@
   "paths": {
     "character": "extension/三国杀标准/resource/character/",
     "card": "extension/三国杀标准/resource/card/",
-    "splash": "extension/三国杀标准/resource/splash/"
+    "splash1": "extension/三国杀标准/resource/splash/style1/",
+    "splash2": "extension/三国杀标准/resource/splash/style2/"
   },
   "extensions": {
     "image": [".jpg", ".png"],

@@ -1012,13 +1012,17 @@ export class LibInit {
                 character: `extension/${extensionName}/resource/character/`,
                 card: `extension/${extensionName}/resource/card/`,
                 splash: `extension/${extensionName}/resource/splash/`,
+                splash1: `extension/${extensionName}/resource/splash/style1/`,
+                splash2: `extension/${extensionName}/resource/splash/style2/`,
               },
             };
 
       // 使用 splash 路径来构建正确的资源路径
-      let splashPath =
+      let splashStyle = lib.config?.splash_style || 'style1';
+      let splashPath = 
+        assetsConfig.paths[`splash${splashStyle.replace('style', '')}`] ||
         assetsConfig.paths.splash ||
-        `extension/${extensionName}/resource/splash/`;
+        `extension/${extensionName}/resource/splash/${splashStyle}/`;
       let resultLink = `${splashPath}${filename}`;
       resultUrl = new URL(resultLink, rootURL);
     } else if (URL.canParse(linkString)) {

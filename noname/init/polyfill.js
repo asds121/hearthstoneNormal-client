@@ -311,6 +311,16 @@ HTMLDivElement.prototype.setBackgroundImage = function (img) {
         };
 
         // Resolve path based on assets.json configuration
+        // Handle splash paths specially based on current splash_style
+        if (resourcePath.includes('splash/')) {
+          const splashStyle = lib.config?.splash_style || 'style1';
+          const splashKey = `splash${splashStyle.replace('style', '')}`;
+          if (assetsJson.paths[splashKey]) {
+            const splashPath = assetsJson.paths[splashKey];
+            return resourcePath.replace(/^image\/splash\/[^/]+\//, splashPath);
+          }
+        }
+        
         for (const [key, path] of Object.entries(assetsJson.paths)) {
           if (
             resourcePath.startsWith(`${key}/`) ||
