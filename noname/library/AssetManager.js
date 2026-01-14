@@ -44,8 +44,9 @@ class AssetManager {
       );
     }
 
-    const basePath = config.paths[category];
+    let basePath = config.paths[category];
     if (!basePath) {
+      // 如果找不到对应的category，抛出错误
       throw new Error(
         `Category "${category}" not found in extension "${this.#currentExtension}"`
       );
@@ -75,7 +76,7 @@ class AssetManager {
 
     // Handle ext: prefix
     let fullPath = basePath + finalFilename + finalExt;
-    if (fullPath.startsWith('ext:')) {
+    if (fullPath.startsWith("ext:")) {
       // 确保路径格式正确，避免URL编码问题
       const extPath = fullPath.substring(4);
       fullPath = `extension/${this.#currentExtension}/${extPath}`;
@@ -187,7 +188,7 @@ class AssetManager {
     }
 
     // Handle ext: prefix
-    if (basePath.startsWith('ext:')) {
+    if (basePath.startsWith("ext:")) {
       return `extension/${this.#currentExtension}/${basePath.substring(4)}`;
     }
     return basePath;

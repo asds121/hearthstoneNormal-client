@@ -3005,14 +3005,7 @@ export class Game extends GameCompatible {
         } else {
           extensionPackage.size = `${Math.round(size / 100000) / 10}MB`;
         }
-        zip.file(
-          "package.js",
-          Object.keys(extensionPackage).reduce(
-            (constructingData, key, currentIndex, keys) =>
-              `${constructingData}\t${key}:${JSON.stringify(extensionPackage[key])}${currentIndex < keys.length - 1 ? ",\n" : "\n};"}`,
-            `extension["${exportExtension}"]={\n`
-          )
-        );
+        // package.js 内容已合并到 assets.json 中，不再需要单独生成该文件
       }
       const blob = zip.generate({
           type: "blob",

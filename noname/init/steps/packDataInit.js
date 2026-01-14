@@ -12,8 +12,19 @@ import AssetManager from "../../library/AssetManager.js";
  * - 处理pack.font（字体）
  */
 export async function packDataInit() {
-  var pack = Reflect.get(window, "noname_package");
-  Reflect.deleteProperty(window, "noname_package");
+  // 从AssetManager获取当前扩展的配置，从中提取noname_package数据
+  var pack = null;
+  try {
+    const currentExtension = AssetManager.getCurrentExtension();
+    if (currentExtension) {
+      const config = AssetManager.getConfig(currentExtension);
+      if (config && config.noname_package) {
+        pack = config.noname_package;
+      }
+    }
+  } catch (error) {
+    console.error("获取pack数据失败:", error);
+  }
 
   if (!pack) {
     console.log("没有pack数据需要处理");

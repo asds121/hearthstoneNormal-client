@@ -269,13 +269,8 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
         return this;
       } else if (modeimage) {
         src = `image/mode/${modeimage}/character/${name}${ext}`;
-      } else if (
-        type === "character" &&
-        lib.config.skin[name] &&
-        arguments[2] !== "noskin"
-      ) {
-        src = `image/skin/${name}/${lib.config.skin[name]}${ext}`;
       } else if (type === "character") {
+        // 禁用皮肤功能，直接使用默认角色图片
         // 使用AssetManager获取正确的角色图片路径
         try {
           src = AssetManager.getPath(
@@ -284,20 +279,18 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
             ext
           );
         } catch (e) {
-          // 如果AssetManager获取失败，回退到原始路径
-          src = `image/character/${gzbool ? "gz_" : ""}${name}${ext}`;
+          throw new Error("AssetManager获取失败");
         }
       } else {
         // 使用AssetManager获取正确的图片路径
         try {
           src = AssetManager.getPath(type, `${subfolder}/${name}`, ext);
         } catch (e) {
-          // 如果AssetManager获取失败，回退到原始路径
-          src = `image/${type}/${subfolder}/${name}${ext}`;
+          throw new Error("AssetManager获取失败");
         }
       }
     } else {
-      src = `image/${name}${ext}`;
+      throw new Error("AssetManager获取失败");
     }
     this.style.backgroundPositionX = "center";
     this.style.backgroundSize = "cover";
@@ -374,17 +367,48 @@ HTMLDivElement.prototype.setBackgroundImage = function (img) {
         }
 
         if (type && filenameWithExt) {
+          // 特殊处理：禁用skin功能
+          if (type === "skin") {
+            return "";
+          }
+
           // 移除扩展名
-          const filename = filenameWithExt.replace(
-            /\.(jpg|jpeg|png|gif|svg)$/i,
-            ""
-          );
+          const extMatch = filenameWithExt.match(/\.(jpg|jpeg|png|gif|svg)$/i);
+          const ext = extMatch ? extMatch[0] : "";
+          const filename = extMatch
+            ? filenameWithExt.replace(ext, "")
+            : filenameWithExt;
+
+          // 特殊处理：card资源直接使用扩展路径
+          if (type === "card") {
+            try {
+              // 尝试使用AssetManager获取路径
+              return AssetManager.getPath(type, filename, ext);
+            } catch (e) {
+              // 如果失败，手动构建正确的路径
+              console.error(
+                `[setBackgroundImage] Failed to resolve card image path using AssetManager, building manually:`,
+                e
+              );
+              // 直接返回正确的扩展路径格式
+              return `extension/三国杀标准/image/card/${filename}${ext || ".png"}`;
+            }
+          }
 
           // 使用AssetManager获取正确的路径
-          return AssetManager.getPath(type, filename);
+          try {
+            return AssetManager.getPath(type, filename, ext);
+          } catch (e) {
+            // 如果AssetManager获取路径失败，返回原始路径
+            console.error(
+              `[setBackgroundImage] Failed to resolve image path using AssetManager, using original path:`,
+              e
+            );
+            return resourcePath;
+          }
         }
       } catch (e) {
-        console.warn(
+        console.error(
           `[setBackgroundImage] Failed to resolve image path using AssetManager:`,
           e
         );

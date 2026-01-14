@@ -137,7 +137,8 @@ export class Click {
       game.saveConfig("skin", lib.config.skin);
       avatar.setBackground(name, "character");
     };
-    img.src = lib.assetURL + "image/skin/" + name + "/" + num + ".jpg";
+    // 禁用皮肤功能，直接调用finish
+    finish(false);
   }
   touchpop(forced) {
     if (lib.config.touchscreen || forced) {
@@ -3215,34 +3216,35 @@ export class Click {
             }
           }
         };
-        var num = 1;
-        var loadImage = function () {
-          var img = new Image();
-          img.onload = function () {
-            num++;
-            loadImage();
-          };
-          img.onerror = function () {
-            num--;
-            createButtons(num);
-          };
-          img.src =
-            lib.assetURL + "image/skin/" + nameskin + "/" + num + ".jpg";
-        };
-        if (lib.config.change_skin) {
-          loadImage();
-        } else {
-          createButtons(lib.skin[nameskin]);
-        }
+        // 禁用皮肤功能
+        // var num = 1;
+        // var loadImage = function () {
+        //   var img = new Image();
+        //   img.onload = function () {
+        //     num++;
+        //     loadImage();
+        //   };
+        //   img.onerror = function () {
+        //     num--;
+        //     createButtons(num);
+        //   };
+        //   img.src = lib.assetURL + "image/skin/" + nameskin + "/" + num + ".jpg";
+        // };
+        // if (lib.config.change_skin) {
+        //   loadImage();
+        // } else {
+        //   createButtons(lib.skin[nameskin]);
+        // }
       };
     };
-    if (lib.config.change_skin) {
-      var img = new Image();
-      img.onload = changeskin;
-      img.src = lib.assetURL + "image/skin/" + nameskin + "/1.jpg";
-    } else if (lib.config.debug && lib.skin[nameskin]) {
-      changeskin();
-    }
+    // 禁用皮肤功能
+    // if (lib.config.change_skin) {
+    //   var img = new Image();
+    //   img.onload = changeskin;
+    //   img.src = lib.assetURL + "image/skin/" + nameskin + "/1.jpg";
+    // } else if (lib.config.debug && lib.skin[nameskin]) {
+    //   changeskin();
+    // }
     var ban = ui.create.div(
       ".menubutton.large.ban.character",
       uiintro,
@@ -3660,12 +3662,16 @@ export class Click {
             const imageName = `sex_${characterSex}`,
               information = lib.card[imageName];
             if (!information) {
-              resolve(`${lib.assetURL}image/card/${imageName}.png`);
+              resolve(
+                `${lib.assetURL}extension/三国杀标准/image/card/${imageName}.png`
+              );
               return;
             }
             const image = information.image;
             if (!image) {
-              resolve(`${lib.assetURL}image/card/${imageName}.png`);
+              resolve(
+                `${lib.assetURL}extension/三国杀标准/image/card/${imageName}.png`
+              );
             } else if (image.startsWith("db:")) {
               game.getDB("image", image.slice(3)).then(resolve, reject);
             } else if (image.startsWith("ext:")) {
@@ -3701,11 +3707,11 @@ export class Click {
               const imageName = `group_${characterGroup}`,
                 information = lib.card[imageName];
               if (!information) {
-                return `${lib.assetURL}image/card/${imageName}.png`;
+                return `${lib.assetURL}extension/三国杀标准/image/card/${imageName}.png`;
               }
               const image = information.image;
               if (!image) {
-                return `${lib.assetURL}image/card/${imageName}.png`;
+                return `${lib.assetURL}extension/三国杀标准/image/card/${imageName}.png`;
               }
               if (image.startsWith("db:")) {
                 return await game.getDB("image", image.slice(3));

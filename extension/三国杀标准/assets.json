@@ -2,19 +2,20 @@
   "version": "1.0.0",
   "extensionName": "三国杀标准",
   "paths": {
-    "character": "ext:image/character/",
-    "card": "ext:image/card/",
-    "background": "ext:image/background/",
-    "splash": "ext:image/splash/",
-    "splash1": "ext:image/splash/style1/",
-    "splash2": "ext:image/splash/style2/",
-    "font": "ext:font/",
-    "audio": "ext:audio/",
-    "audio_background": "ext:audio/background/",
-    "audio_card": "ext:audio/card/",
-    "audio_die": "ext:audio/die/",
-    "audio_effect": "ext:audio/effect/",
-    "audio_skill": "ext:audio/skill/"
+    "character": "extension/三国杀标准/image/character/",
+    "card": "extension/三国杀标准/image/card/",
+    "skin": "extension/三国杀标准/image/skin/",
+    "background": "extension/三国杀标准/image/background/",
+    "splash": "extension/三国杀标准/image/splash/",
+    "splash1": "extension/三国杀标准/image/splash/style1/",
+    "splash2": "extension/三国杀标准/image/splash/style2/",
+    "font": "extension/三国杀标准/font/",
+    "audio": "extension/三国杀标准/audio/",
+    "audio_background": "extension/三国杀标准/audio/background/",
+    "audio_card": "extension/三国杀标准/audio/card/",
+    "audio_die": "extension/三国杀标准/audio/die/",
+    "audio_effect": "extension/三国杀标准/audio/effect/",
+    "audio_skill": "extension/三国杀标准/audio/skill/"
   },
   "categoryTypes": {
     "card": "cardImage",
@@ -26,5 +27,31 @@
     "characterImage": [".jpg", ".png"],
     "audio": [".mp3", ".ogg"],
     "font": [".ttf", ".woff2"]
+  },
+  "noname_package": {
+    "background": {
+      "ol_bg": "龙纹"
+    },
+    "music": {
+      "music_phliosophy": "Philosophy of ours",
+      "music_diaochan": "貂蝉",
+      "music_shezhan": "舌战群儒",
+      "music_danji": "千里走单骑",
+      "music_jifeng": "祭风",
+      "music_jilve": "极略"
+    },
+    "font": {
+      "xiaozhuan": "方正小篆体",
+      "xinwei": "华文新魏_GBK",
+      "huangcao": "方正黄草_GBK",
+      "yuanli": "方正北魏楷书_GBK",
+      "xingkai": "方正行楷_GBK",
+      "shousha": "方正隶变_GBK"
+    },
+    "theme": {
+      "woodden": "木纹",
+      "music": "音乐",
+      "simple": "简约"
+    }
   }
 }
