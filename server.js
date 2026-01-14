@@ -46,11 +46,20 @@ const server = http.createServer((req, res) => {
 
       // 记录404和500错误
       if (res.statusCode === 404) {
-        // 记录JS文件和音频文件的404错误
-        const isJsFile = req.url.endsWith(".js") || req.url.endsWith(".ts");
-        const isAudioFile = req.url.endsWith(".mp3") || req.url.endsWith(".ogg") || req.url.endsWith(".wav");
-        
-        if (isJsFile || isAudioFile) {
+        // 记录所有资源文件的404错误
+        const isResourceFile =
+          req.url.endsWith(".js") ||
+          req.url.endsWith(".ts") ||
+          req.url.endsWith(".mp3") ||
+          req.url.endsWith(".ogg") ||
+          req.url.endsWith(".wav") ||
+          req.url.endsWith(".jpg") ||
+          req.url.endsWith(".jpeg") ||
+          req.url.endsWith(".png") ||
+          req.url.endsWith(".gif") ||
+          req.url.endsWith(".svg");
+
+        if (isResourceFile) {
           // 404错误去重
           const errorKey = req.url;
           if (!errorCache.http404.has(errorKey)) {
@@ -98,21 +107,21 @@ wss.on("connection", (ws) => {
   );
 
   ws.on("message", (message) => {
-        try {
-          const data = JSON.parse(message);
-          if (data.type === "error") {
-            const errorMsg = data.error;
+    try {
+      const data = JSON.parse(message);
+      if (data.type === "error") {
+        const errorMsg = data.error;
 
-            // 显示所有错误，包括音频和字体资源错误
-            console.error("\n🔴 前端错误:");
-            console.error("=".repeat(50));
-            console.error(errorMsg);
-            console.error("=".repeat(50));
-          }
-        } catch (e) {
-          console.error("❌ 消息解析失败:", message);
-        }
-      });
+        // 显示所有错误，包括音频和字体资源错误
+        console.error("\n🔴 前端错误:");
+        console.error("=".repeat(50));
+        console.error(errorMsg);
+        console.error("=".repeat(50));
+      }
+    } catch (e) {
+      console.error("❌ 消息解析失败:", message);
+    }
+  });
 
   ws.on("close", () => {
     connectionCount--;

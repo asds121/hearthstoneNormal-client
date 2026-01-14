@@ -325,7 +325,7 @@ export async function loadExtension(extension) {
         e
       );
       // 不再使用默认配置，要求所有扩展必须有assets.json
-    lib.extensionAssets[extension[0]] = {};
+      lib.extensionAssets[extension[0]] = {};
     }
     if (typeof extension[1] == "function") {
       try {
@@ -390,27 +390,6 @@ export async function loadExtension(extension) {
             }
 
             if (
-              !character[4].some(
-                (str) =>
-                  typeof str == "string" &&
-                  /^(?:db:extension-.+?|ext|img|character):.+/.test(str)
-              )
-            ) {
-              const img = extension[3]
-                ? `db:extension-${extension[0]}:character/${charaName}.jpg`
-                : `extension/${extension[0]}/image/character/${charaName}.jpg`;
-              character[4].add(img);
-            }
-            if (
-              !character[4].some(
-                (str) => typeof str == "string" && /^die:.+/.test(str)
-              )
-            ) {
-              const audio = `die:extension/${extension[0]}/image/character/${charaName}.mp3`;
-              character[4].add(audio);
-            }
-
-            if (
               character[4].includes("boss") ||
               character[4].includes("hiddenboss")
             ) {
@@ -420,15 +399,6 @@ export async function loadExtension(extension) {
               lib.skilllist.add(skill);
             }
           } else {
-            if (!character.img) {
-              const characterImage = `extension/${extension[0]}/image/character/${charaName}.jpg`;
-              character.img = characterImage;
-            }
-            if (!character.dieAudios) {
-              character.dieAudios = [];
-              const characterDieAudio = `extension/${extension[0]}/image/character/${charaName}.mp3`;
-              character.dieAudios.push(characterDieAudio);
-            }
             if (character.isBoss || character.isHiddenBoss) {
               lib.config.forbidai.add(charaName);
             }
@@ -472,20 +442,8 @@ export async function loadExtension(extension) {
         // ~~到最后，还得遍历一遍~~
         // 我就是被拷打，成为新的1103，受到白鼠群的嘲笑谩骂，我也绝不再次遍历！
         for (const [cardName, card] of Object.entries(content.card)) {
-          if (card.audio === true) {
-            card.audio = extension[0];
-          }
-          if (!card.image) {
-            if (card.fullskin || card.fullimage) {
-              const suffix = card.fullskin ? "png" : "jpg";
-
-              if (extension[3]) {
-                card.image = `db:extension-${extension[0]}:card/${cardName}.${suffix}`;
-              } else {
-                card.image = `extension/${extension[0]}/image/card/${cardName}.${suffix}`;
-              }
-            }
-          }
+          // 移除直接设置的默认资源路径，改为使用assets.json中的配置
+          // 只保留必要的处理逻辑
         }
         if (typeof content.skill == "object") {
           for (const skillInfo of Object.values(content.skill)) {

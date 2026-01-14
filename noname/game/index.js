@@ -2102,6 +2102,24 @@ export class Game extends GameCompatible {
         }
 
         // 处理音频路径，使用AssetManager获取正确的路径
+
+        // 如果是完整路径（如extension/...或http://...），直接使用
+        if (
+          audio.startsWith("extension/") ||
+          audio.startsWith("http://") ||
+          audio.startsWith("https://") ||
+          audio.startsWith("blob:") ||
+          audio.startsWith("data:") ||
+          audio.startsWith("db:")
+        ) {
+          return game.playAudio({
+            path: audio,
+            addVideo,
+            onCanPlay: () => (refresh = true),
+            onError: play,
+          });
+        }
+
         const pathParts = audio.split("/");
         let category, filename;
 
@@ -2125,17 +2143,43 @@ export class Game extends GameCompatible {
         }
 
         // 使用AssetManager获取正确的音频路径
-        const parsedPath = AssetManager.getPath(
+        let parsedPath = AssetManager.getPath(
           `audio_${category}`,
           filename,
           ".mp3"
         );
 
+        // 检查文件名是否带数字索引（如skill1.mp3），如果是则添加容错机制
+        const hasIndex = /\d+$/.test(filename);
+        const baseFilename = filename.replace(/\d+$/, "");
+        
         return game.playAudio({
           path: parsedPath,
           addVideo,
           onCanPlay: () => (refresh = true),
-          onError: play,
+          onError: () => {
+            // 如果带索引的文件播放失败，尝试播放不带索引的版本
+            if (hasIndex) {
+              try {
+                const basePath = AssetManager.getPath(
+                  `audio_${category}`,
+                  baseFilename,
+                  ".mp3"
+                );
+                return game.playAudio({
+                  path: basePath,
+                  addVideo,
+                  onCanPlay: () => (refresh = true),
+                  onError: play,
+                });
+              } catch (e) {
+                // 如果不带索引的版本也失败，继续尝试下一个音频
+                return play();
+              }
+            }
+            // 如果不带索引的文件播放失败，继续尝试下一个音频
+            return play();
+          },
         });
       } catch (e) {
         console.error("Failed to get audio path:", e);
@@ -2307,9 +2351,6 @@ export class Game extends GameCompatible {
     audio.addEventListener("ended", function () {
       this.remove();
     });
-    if (typeof index != "number") {
-      index = Math.ceil(Math.random() * 2);
-    }
     audio._changed = 1;
     audio.onerror = function () {
       try {
@@ -5292,232 +5333,8 @@ export class Game extends GameCompatible {
       }
     },
     flame: function (x, y, duration, type) {
-      var particles = [];
-      var particle_count = 50;
-      if (type == "thunder" || type == "recover") {
-        particle_count = 30;
-      } else if (type == "coin" || type == "dust") {
-        particle_count = 50;
-      } else if (type == "legend") {
-        particle_count = 120;
-      } else if (type == "epic") {
-        particle_count = 80;
-      } else if (type == "rare") {
-        particle_count = 50;
-      }
-      for (var i = 0; i < particle_count; i++) {
-        particles.push(new particle());
-      }
-      function particle() {
-        this.speed = { x: -1 + Math.random() * 2, y: -5 + Math.random() * 5 };
-        if (type == "thunder" || type == "coin" || type == "dust") {
-          this.speed.y = -3 + Math.random() * 5;
-          this.speed.x = -2 + Math.random() * 4;
-        }
-        if (type == "legend" || type == "rare" || type == "epic") {
-          this.speed.x *= 3;
-          this.speed.y *= 1.5;
-        }
-        this.location = { x: x, y: y };
-
-        this.radius = 0.5 + Math.random() * 1;
-
-        this.life = 10 + Math.random() * 10;
-        this.death = this.life;
-
-        switch (type) {
-          case "thunder": {
-            this.b = 255;
-            this.r = Math.round(Math.random() * 255);
-            this.g = Math.round(Math.random() * 255);
-            this.x += Math.random() * 20 - 10;
-            this.y += Math.random() * 20 - 10;
-
-            break;
-          }
-          case "fire": {
-            this.r = 255;
-            this.g = Math.round(Math.random() * 155);
-            this.b = 0;
-            break;
-          }
-          case "coin": {
-            this.r = 255;
-            this.g = Math.round(Math.random() * 25 + 230);
-            this.b = Math.round(Math.random() * 100 + 50);
-            this.location.x += Math.round(Math.random() * 60) - 30;
-            this.location.y += Math.round(Math.random() * 40) - 20;
-            if (this.location.x < x) {
-              this.speed.x = -Math.abs(this.speed.x);
-            } else if (this.location.x > x) {
-              this.speed.x = Math.abs(this.speed.x);
-            }
-            this.life *= 1.3;
-            this.death *= 1.3;
-            break;
-          }
-          case "dust": {
-            this.r = Math.round(Math.random() * 55) + 105;
-            this.g = Math.round(Math.random() * 55) + 150;
-            this.b = 255;
-            this.location.x += Math.round(Math.random() * 60) - 30;
-            this.location.y += Math.round(Math.random() * 40) - 20;
-            if (this.location.x < x) {
-              this.speed.x = -Math.abs(this.speed.x);
-            } else if (this.location.x > x) {
-              this.speed.x = Math.abs(this.speed.x);
-            }
-            this.life *= 1.3;
-            this.death *= 1.3;
-            break;
-          }
-          case "legend": {
-            this.r = 255;
-            this.g = Math.round(Math.random() * 100 + 155);
-            this.b = Math.round(Math.random() * 100 + 50);
-            this.location.x += Math.round(Math.random() * 60) - 30;
-            this.location.y += Math.round(Math.random() * 40) - 20;
-            if (this.location.x < x) {
-              this.speed.x = -Math.abs(this.speed.x);
-            } else if (this.location.x > x) {
-              this.speed.x = Math.abs(this.speed.x);
-            }
-            this.speed.x /= 2;
-            this.speed.y /= 2;
-            this.life *= 2;
-            this.death *= 2;
-            break;
-          }
-          case "epic": {
-            this.r = Math.round(Math.random() * 55) + 200;
-            this.g = Math.round(Math.random() * 100) + 55;
-            this.b = 255;
-            this.location.x += Math.round(Math.random() * 60) - 30;
-            this.location.y += Math.round(Math.random() * 40) - 20;
-            if (this.location.x < x) {
-              this.speed.x = -Math.abs(this.speed.x);
-            } else if (this.location.x > x) {
-              this.speed.x = Math.abs(this.speed.x);
-            }
-            this.speed.x /= 2;
-            this.speed.y /= 2;
-            this.life *= 2;
-            this.death *= 2;
-            break;
-          }
-          case "rare": {
-            this.r = Math.round(Math.random() * 55) + 105;
-            this.g = Math.round(Math.random() * 55) + 150;
-            this.b = 255;
-            this.location.x += Math.round(Math.random() * 60) - 30;
-            this.location.y += Math.round(Math.random() * 40) - 20;
-            if (this.location.x < x) {
-              this.speed.x = -Math.abs(this.speed.x);
-            } else if (this.location.x > x) {
-              this.speed.x = Math.abs(this.speed.x);
-            }
-            this.speed.x /= 2;
-            this.speed.y /= 2;
-            this.life *= 2;
-            this.death *= 2;
-            break;
-          }
-          case "recover": {
-            this.g = 255;
-            this.r = Math.round(Math.random() * 200 + 55);
-            this.b = Math.round(Math.random() * 155 + 55);
-            this.location.x += Math.round(Math.random() * 60) - 30;
-            this.location.y += Math.round(Math.random() * 40) - 20;
-            if (this.location.x < x) {
-              this.speed.x = -Math.abs(this.speed.x);
-            } else if (this.location.x > x) {
-              this.speed.x = Math.abs(this.speed.x);
-            }
-            this.speed.x /= 2;
-            this.speed.y /= 2;
-            this.life *= 2;
-            this.death *= 2;
-            break;
-          }
-          default: {
-            this.r = 255;
-            this.g = Math.round(Math.random() * 155);
-            this.b = 0;
-          }
-        }
-      }
-
-      game.draw(function (time, surface) {
-        surface.globalCompositeOperation = "source-over";
-        surface.globalCompositeOperation = "lighter";
-
-        for (var i = 0; i < particles.length; i++) {
-          var p = particles[i];
-
-          surface.beginPath();
-          var middle = 0.5;
-          var radius = p.radius;
-          if (
-            type == "recover" ||
-            type == "legend" ||
-            type == "rare" ||
-            type == "epic" ||
-            type == "coin" ||
-            type == "dust"
-          ) {
-            middle = 0.7;
-            radius /= 3;
-          }
-
-          p.opacity = Math.round((p.death / p.life) * 100) / 100;
-          var gradient = surface.createRadialGradient(
-            p.location.x,
-            p.location.y,
-            0,
-            p.location.x,
-            p.location.y,
-            p.radius
-          );
-          gradient.addColorStop(
-            0,
-            "rgba(" + p.r + ", " + p.g + ", " + p.b + ", " + p.opacity + ")"
-          );
-          gradient.addColorStop(
-            middle,
-            "rgba(" + p.r + ", " + p.g + ", " + p.b + ", " + p.opacity + ")"
-          );
-          gradient.addColorStop(
-            1,
-            "rgba(" + p.r + ", " + p.g + ", " + p.b + ", 0)"
-          );
-          surface.fillStyle = gradient;
-          surface.arc(p.location.x, p.location.y, radius, Math.PI * 2, false);
-          surface.fill();
-          p.death--;
-          if (type == "recover") {
-            p.radius += 0.5;
-          } else if (type == "coin" || type == "dust") {
-            p.radius += 0.7;
-          } else if (type == "legend" || type == "rare" || type == "epic") {
-            p.radius += 0.5;
-          } else {
-            p.radius++;
-          }
-          p.location.x += p.speed.x;
-          p.location.y += p.speed.y;
-
-          if (p.death < 0 || p.radius < 0) {
-            if (typeof duration == "number" && time + 500 >= duration) {
-              particles.splice(i--, 1);
-            } else {
-              particles[i] = new particle();
-            }
-          }
-        }
-        if (particles.length == 0) {
-          return false;
-        }
-      });
+      // 移除粒子特效，提高性能
+      return;
     },
   };
   /**
@@ -6280,7 +6097,7 @@ export class Game extends GameCompatible {
           } else {
             imgsrc = AssetManager.getPath("character", j);
           }
-          const audiosrc = `die:${AssetManager.getPath("character", j)}`;
+          const audiosrc = `die:${AssetManager.getPath("audio_die", j)}`;
           if (
             !pack[i][j][4].some(
               (str) =>

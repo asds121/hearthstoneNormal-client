@@ -16,8 +16,14 @@
     "audio_effect": "ext:audio/effect/",
     "audio_skill": "ext:audio/skill/"
   },
+  "categoryTypes": {
+    "card": "cardImage",
+    "character": "characterImage"
+  },
   "extensions": {
     "image": [".jpg", ".png"],
+    "cardImage": [".png"],
+    "characterImage": [".jpg", ".png"],
     "audio": [".mp3", ".ogg"],
     "font": [".ttf", ".woff2"]
   }

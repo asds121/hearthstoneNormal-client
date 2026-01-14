@@ -233,7 +233,33 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
         }
       }
       if (imgPrefixUrl) {
-        src = imgPrefixUrl;
+        // 如果imgPrefixUrl是完整路径（如extension/...或http://...），直接使用
+        if (
+          imgPrefixUrl.startsWith("extension/") ||
+          imgPrefixUrl.startsWith("http://") ||
+          imgPrefixUrl.startsWith("https://") ||
+          imgPrefixUrl.startsWith("blob:") ||
+          imgPrefixUrl.startsWith("data:") ||
+          imgPrefixUrl.startsWith("db:")
+        ) {
+          src = imgPrefixUrl;
+        } else {
+          // 否则，将imgPrefixUrl视为文件名，使用AssetManager获取正确路径
+          try {
+            if (type === "character") {
+              src = AssetManager.getPath(
+                "character",
+                `${gzbool ? "gz_" : ""}${name}`,
+                ext
+              );
+            } else {
+              src = AssetManager.getPath(type, `${subfolder}/${name}`, ext);
+            }
+          } catch (e) {
+            // 如果AssetManager获取失败，回退到原始路径
+            src = imgPrefixUrl;
+          }
+        }
       } else if (extimage) {
         throw new Error(
           `Invalid URL scheme: ext: is not allowed. Found: ${extimage}`
@@ -250,9 +276,25 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
       ) {
         src = `image/skin/${name}/${lib.config.skin[name]}${ext}`;
       } else if (type === "character") {
-        src = `image/character/${gzbool ? "gz_" : ""}${name}${ext}`;
+        // 使用AssetManager获取正确的角色图片路径
+        try {
+          src = AssetManager.getPath(
+            "character",
+            `${gzbool ? "gz_" : ""}${name}`,
+            ext
+          );
+        } catch (e) {
+          // 如果AssetManager获取失败，回退到原始路径
+          src = `image/character/${gzbool ? "gz_" : ""}${name}${ext}`;
+        }
       } else {
-        src = `image/${type}/${subfolder}/${name}${ext}`;
+        // 使用AssetManager获取正确的图片路径
+        try {
+          src = AssetManager.getPath(type, `${subfolder}/${name}`, ext);
+        } catch (e) {
+          // 如果AssetManager获取失败，回退到原始路径
+          src = `image/${type}/${subfolder}/${name}${ext}`;
+        }
       }
     } else {
       src = `image/${name}${ext}`;
@@ -265,10 +307,21 @@ Reflect.defineProperty(HTMLDivElement.prototype, "setBackground", {
         nameinfo && ["male", "female", "double"].includes(nameinfo[0])
           ? nameinfo[0]
           : "male";
-      this.setBackgroundImage([
-        src,
-        `${lib.characterDefaultPicturePath}${sex}${ext}`,
-      ]);
+
+      // 处理默认图片路径，使用AssetManager获取正确路径
+      let defaultImage;
+      try {
+        defaultImage = AssetManager.getPath(
+          "character",
+          `default_silhouette_${sex}`,
+          ext
+        );
+      } catch (e) {
+        // 如果AssetManager获取失败，回退到原始路径
+        defaultImage = `${lib.characterDefaultPicturePath}${sex}${ext}`;
+      }
+
+      this.setBackgroundImage([src, defaultImage]);
     } else {
       this.setBackgroundImage(src);
     }
@@ -296,6 +349,48 @@ HTMLDivElement.prototype.setBackgroundImage = function (img) {
       return resourcePath;
     }
 
+    // 处理所有以 image/ 开头的路径，包括 /image/ 和 image/ 格式
+    if (
+      resourcePath.startsWith("/image/") ||
+      resourcePath.startsWith("image/")
+    ) {
+      try {
+        // 从路径中提取资源类型和文件名
+        const pathParts = resourcePath.split("/");
+        let type, filenameWithExt;
+
+        if (resourcePath.startsWith("/image/")) {
+          // 路径格式：/image/type/filename.ext
+          if (pathParts.length >= 4) {
+            type = pathParts[2];
+            filenameWithExt = pathParts.slice(3).join("/");
+          }
+        } else {
+          // 路径格式：image/type/filename.ext
+          if (pathParts.length >= 3) {
+            type = pathParts[1];
+            filenameWithExt = pathParts.slice(2).join("/");
+          }
+        }
+
+        if (type && filenameWithExt) {
+          // 移除扩展名
+          const filename = filenameWithExt.replace(
+            /\.(jpg|jpeg|png|gif|svg)$/i,
+            ""
+          );
+
+          // 使用AssetManager获取正确的路径
+          return AssetManager.getPath(type, filename);
+        }
+      } catch (e) {
+        console.warn(
+          `[setBackgroundImage] Failed to resolve image path using AssetManager:`,
+          e
+        );
+      }
+    }
+
     // Check if this is an extension-specific resource from the old format
     const extensionName = _status.extension || _status.currentExtension;
     if (extensionName) {
@@ -304,25 +399,32 @@ HTMLDivElement.prototype.setBackgroundImage = function (img) {
         const assetsJson = lib.extensionAssets[extensionName];
         if (assetsJson && assetsJson.paths) {
           // Handle splash paths specially based on current splash_style
-          if (resourcePath.includes('splash/')) {
-            const splashStyle = lib.config?.splash_style || 'style1';
-            const splashKey = `splash${splashStyle.replace('style', '')}`;
+          if (resourcePath.includes("splash/")) {
+            const splashStyle = lib.config?.splash_style || "style1";
+            const splashKey = `splash${splashStyle.replace("style", "")}`;
             if (assetsJson.paths[splashKey]) {
               const splashPath = assetsJson.paths[splashKey];
               // Replace the old format path with the configured path
-              return resourcePath.replace(/extension\/[^/]+\/resource\/splash\/[^/]+\//, splashPath);
+              return resourcePath.replace(
+                /extension\/[^/]+\/resource\/splash\/[^/]+\//,
+                splashPath
+              );
             }
           }
-          
+
           // Handle other resource types
           for (const [key, path] of Object.entries(assetsJson.paths)) {
             // Check if this is the old format path with resource/ prefix
-            const oldPathRegex = new RegExp(`extension\\/[^/]+\\/resource\\/([^/]+)\\/`);
+            const oldPathRegex = new RegExp(
+              `extension\\/[^/]+\\/resource\\/([^/]+)\\/`
+            );
             const match = resourcePath.match(oldPathRegex);
             if (match) {
               const resourceType = match[1];
               // Find the corresponding key in assets.json for this resource type
-              for (const [configKey, configPath] of Object.entries(assetsJson.paths)) {
+              for (const [configKey, configPath] of Object.entries(
+                assetsJson.paths
+              )) {
                 if (configPath.includes(resourceType)) {
                   // Replace the old format path with the configured path
                   return resourcePath.replace(oldPathRegex, configPath);
