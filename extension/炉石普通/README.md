@@ -39,6 +39,7 @@
 炉石普通/
 ├── LICENSE
 ├── README.md
+├── assets.json          # 扩展资源配置
 ├── extension.js         # 扩展入口文件
 ├── info.json            # 扩展元信息
 ├── experiment/          # 实验性功能

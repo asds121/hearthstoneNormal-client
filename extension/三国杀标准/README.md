@@ -15,27 +15,29 @@
 
 ```
 extension/三国杀标准/
+├── assets.json          # 扩展资源配置
 ├── info.json            # 扩展元信息
 ├── LICENSE              # 扩展许可证
+├── package.js           # 扩展包配置
 ├── README.md            # 扩展说明文档
 ├── assembly/            # 应用程序组件
 │   └── application.js   # 应用程序类
+├── audio/               # 音频资源
 ├── card/                # 卡牌定义
 │   └── standard/        # 标准卡牌
 ├── character/           # 角色定义
 │   └── standard/        # 标准武将
-├── mode/                # 游戏模式定义
-│   ├── identity/        # 身份场模式
-│   ├── single.js        # 单挑模式
-│   └── doudizhu.js      # 斗地主模式
-└── skill/               # 技能定义
-    └── doudizhu.js      # 斗地主技能
+├── image/               # 图片资源
+└── mode/                # 游戏模式定义
+    ├── identity/        # 身份场模式
+    ├── single.js        # 单挑模式
+    └── doudizhu.js      # 斗地主模式
 ```
 
 ## 安装说明
 
 1. 将整个 `三国杀标准` 目录复制到项目的 `extension/` 目录下
-2. 在 `game/config.js` 中添加扩展配置
+2. 扩展会被自动加载，无需额外配置
 
 ## 使用说明
 

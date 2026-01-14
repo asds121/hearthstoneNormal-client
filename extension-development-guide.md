@@ -67,16 +67,19 @@
 
 ```
 扩展名称/
+├── assets.json          # 扩展资源配置
 ├── extension.js         # 扩展主入口文件
 ├── info.json            # 扩展元信息
 ├── LICENSE              # 扩展许可证
+├── package.js           # 扩展包配置
 ├── README.md            # 扩展说明文档
 ├── assembly/            # 应用程序组装代码
+├── audio/               # 音频资源
 ├── card/                # 卡牌定义
 ├── character/           # 角色定义
+├── image/               # 图片资源
 ├── mode/                # 游戏模式定义
 ├── skill/               # 技能定义
-├── resource/            # 资源文件（图片、音频等）
 └── experiment/          # 实验性功能（可选）
 ```
 
@@ -84,6 +87,7 @@
 
 ```
 扩展名称/
+├── assets.json          # 扩展资源配置
 ├── extension.js         # 扩展主入口文件
 ├── info.json            # 扩展元信息
 ├── LICENSE              # 扩展许可证
