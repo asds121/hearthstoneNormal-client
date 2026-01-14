@@ -2,6 +2,7 @@ import { lib, game, ui, get, ai, _status } from "../../../noname.js";
 import { modeModule as identity } from "./identity/index.js";
 import single from "./single.js";
 import doudizhu from "./doudizhu.js";
+import modeConfig from "./mode.js";
 
 // 统一导出所有模式
 export const type = "mode";
@@ -14,3 +15,6 @@ export const modeModule = {
   single: single,
   doudizhu: doudizhu,
 };
+
+// 导出模式配置
+export const modeMenu = modeConfig;

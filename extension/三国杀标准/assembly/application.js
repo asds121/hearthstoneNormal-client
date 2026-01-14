@@ -59,25 +59,30 @@ class Application {
       throw new Error("异步初始化失败！", { cause: initError });
     } finally {
       // 加载并注册所有模式（通过统一入口）
-      const { modeModule } = await import("../mode/index.js");
+      const { modeModule, modeMenu } = await import("../mode/index.js");
 
+      // 使用modeMenu中的配置注册身份模式
       game.addMode("identity", modeModule.identity, {
         extension: "三国杀标准",
-        translate: "身份",
+        translate: modeMenu.identity.name,
         connect: {},
+        config: modeMenu.identity.config,
       });
 
-      // 注册单个模式
+      // 注册单挑模式
       game.addMode("single", modeModule.single(), {
         extension: "三国杀标准",
-        translate: "单挑",
+        translate: modeMenu.single.name,
         connect: {},
+        config: modeMenu.single.config,
       });
 
+      // 注册斗地主模式
       game.addMode("doudizhu", modeModule.doudizhu(), {
         extension: "三国杀标准",
-        translate: "斗地主",
+        translate: modeMenu.doudizhu.name,
         connect: {},
+        config: modeMenu.doudizhu.config,
       });
     }
   }
