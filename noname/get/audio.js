@@ -181,7 +181,8 @@ class Audio {
       } else {
         ext2 = "." + ext2;
       }
-      if (audioNum === "true") {
+      if (audioNum === "true" || (audioNum === "1" && this.type === "skill")) {
+        // 对于技能音频，如果是true或1，只加载不带数字索引的文件
         return [this.#Audio.textMapWithIndex(path2, ext2)];
       }
       const audioList = [];

@@ -2152,7 +2152,7 @@ export class Game extends GameCompatible {
         // 检查文件名是否带数字索引（如skill1.mp3），如果是则添加容错机制
         const hasIndex = /\d+$/.test(filename);
         const baseFilename = filename.replace(/\d+$/, "");
-        
+
         return game.playAudio({
           path: parsedPath,
           addVideo,
@@ -5474,7 +5474,12 @@ export class Game extends GameCompatible {
     }
     var src;
     if (animation.image != undefined) {
-      src = "image/pointer/" + animation.image + "?" + new Date().getTime();
+      // 使用AssetManager获取正确的pointer路径
+      src =
+        AssetManager.getBasePath("pointer") +
+        animation.image +
+        "?" +
+        new Date().getTime();
     }
     var finish = function () {
       var animationID;
@@ -5553,7 +5558,10 @@ export class Game extends GameCompatible {
           type_frame = ".png";
           num_frame = 8;
           var folder_frame =
-            lib.assetURL + "image/pointer/" + animation.image + "/";
+            lib.assetURL +
+            AssetManager.getBasePath("pointer") +
+            animation.image +
+            "/";
           var div1 = ui.create.div();
           div1.style.height = "100%";
           div1.style.width = "100%";
@@ -5724,10 +5732,12 @@ export class Game extends GameCompatible {
         div2.style["transform-origin"] = "0 50%";
         div2.style.transition = "all " + (timeS * 4) / 3 + "s";
         if (src != undefined && animation.image.indexOf(".") == -1) {
+          // 尝试设置背景图片，但如果不存在也不会报错
           div2.style.backgroundSize = "100% 100%";
           div2.style.opacity = "0.7";
+          // 使用try-catch或直接设置，浏览器会处理404但不会报错
           div2.setBackgroundImage(
-            "image/pointer/" + animation.image + "/line.png"
+            AssetManager.getBasePath("pointer") + animation.image + "/line.png"
           );
         } else {
           div2.style.background = "#ffffff";

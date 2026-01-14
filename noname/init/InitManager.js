@@ -20,16 +20,13 @@ export class InitManager {
       { name: "platformDetection", priority: 40 },
       { name: "windowListenerSetup", priority: 50 },
       { name: "configLoad", priority: 60 },
-
       { name: "sandboxInit", priority: 70 },
       { name: "securityInit", priority: 80 },
       { name: "extensionManagerInit", priority: 90 },
       { name: "touchDeviceDetection", priority: 100 },
       { name: "layoutSetup", priority: 110 },
       { name: "cssLoad", priority: 120 },
-      { name: "extensionLoad", priority: 125 }, // 先加载扩展
-      { name: "packDataInit", priority: 130 }, // 再处理package.js数据
-
+      { name: "extensionLoad", priority: 125 },
       { name: "gameModeInit", priority: 160 },
       { name: "gameDataLoad", priority: 170 },
     ];
@@ -68,30 +65,58 @@ export class InitManager {
    * 加载并注册所有初始化步骤
    */
   async loadInitSteps() {
-    // 加载所有初始化步骤
+    // 并行加载所有初始化步骤模块
+    const [
+      environmentSetupModule,
+      polyfillLoadModule,
+      coreModuleInitModule,
+      platformDetectionModule,
+      windowListenerSetupModule,
+      configLoadModule,
+      cssLoadModule,
+      sandboxInitModule,
+      securityInitModule,
+      extensionManagerInitModule,
+      touchDeviceDetectionModule,
+      layoutSetupModule,
+      extensionLoadModule,
+      gameModeInitModule,
+      gameDataLoadModule,
+    ] = await Promise.all([
+      import("./steps/environmentSetup.js"),
+      import("./steps/polyfillLoad.js"),
+      import("./steps/coreModuleInit.js"),
+      import("./steps/platformDetection.js"),
+      import("./steps/windowListenerSetup.js"),
+      import("./steps/configLoad.js"),
+      import("./steps/cssLoad.js"),
+      import("./steps/sandboxInit.js"),
+      import("./steps/securityInit.js"),
+      import("./steps/extensionManagerInit.js"),
+      import("./steps/touchDeviceDetection.js"),
+      import("./steps/layoutSetup.js"),
+      import("./steps/extensionLoad.js"),
+      import("./steps/gameModeInit.js"),
+      import("./steps/gameDataLoad.js"),
+    ]);
+
+    // 构建步骤对象
     const steps = {
-      environmentSetup: (await import("./steps/environmentSetup.js"))
-        .environmentSetup,
-      polyfillLoad: (await import("./steps/polyfillLoad.js")).polyfillLoad,
-      coreModuleInit: (await import("./steps/coreModuleInit.js"))
-        .coreModuleInit,
-      platformDetection: (await import("./steps/platformDetection.js"))
-        .platformDetection,
-      windowListenerSetup: (await import("./steps/windowListenerSetup.js"))
-        .windowListenerSetup,
-      configLoad: (await import("./steps/configLoad.js")).configLoad,
-      cssLoad: (await import("./steps/cssLoad.js")).cssLoad,
-      sandboxInit: (await import("./steps/sandboxInit.js")).sandboxInit,
-      securityInit: (await import("./steps/securityInit.js")).securityInit,
-      extensionManagerInit: (await import("./steps/extensionManagerInit.js"))
-        .extensionManagerInit,
-      touchDeviceDetection: (await import("./steps/touchDeviceDetection.js"))
-        .touchDeviceDetection,
-      layoutSetup: (await import("./steps/layoutSetup.js")).layoutSetup,
-      packDataInit: (await import("./steps/packDataInit.js")).packDataInit,
-      extensionLoad: (await import("./steps/extensionLoad.js")).extensionLoad,
-      gameModeInit: (await import("./steps/gameModeInit.js")).gameModeInit,
-      gameDataLoad: (await import("./steps/gameDataLoad.js")).gameDataLoad,
+      environmentSetup: environmentSetupModule.environmentSetup,
+      polyfillLoad: polyfillLoadModule.polyfillLoad,
+      coreModuleInit: coreModuleInitModule.coreModuleInit,
+      platformDetection: platformDetectionModule.platformDetection,
+      windowListenerSetup: windowListenerSetupModule.windowListenerSetup,
+      configLoad: configLoadModule.configLoad,
+      cssLoad: cssLoadModule.cssLoad,
+      sandboxInit: sandboxInitModule.sandboxInit,
+      securityInit: securityInitModule.securityInit,
+      extensionManagerInit: extensionManagerInitModule.extensionManagerInit,
+      touchDeviceDetection: touchDeviceDetectionModule.touchDeviceDetection,
+      layoutSetup: layoutSetupModule.layoutSetup,
+      extensionLoad: extensionLoadModule.extensionLoad,
+      gameModeInit: gameModeInitModule.gameModeInit,
+      gameDataLoad: gameDataLoadModule.gameDataLoad,
     };
 
     // 注册所有步骤
@@ -118,34 +143,32 @@ export class InitManager {
       let extensionlist = [];
       let promiseErrorHandler = null;
 
-      // 执行所有初始化步骤
-      for (let i = 0; i < this.initSteps.length; i++) {
-        const step = this.initSteps[i];
-        this.initStatus.currentStep = step.name;
-        this.initStatus.progress = (i / this.initSteps.length) * 100;
+      // 将步骤按名称映射，方便后续调用
+      const stepMap = new Map();
+      for (const step of this.initSteps) {
+        stepMap.set(step.name, step);
+      }
 
+      // 更新进度的辅助函数
+      const updateProgress = (progress) => {
+        this.initStatus.progress = progress;
+      };
+
+      // 执行单个步骤的辅助函数
+      const executeStep = async (stepName, params = []) => {
+        const step = stepMap.get(stepName);
+        if (!step) return;
+
+        this.initStatus.currentStep = step.name;
         try {
           let result;
-
-          // 特殊处理需要参数的步骤
-          if (step.name === "gameModeInit") {
-            // gameModeInit 需要 show_splash 参数
-            result = await step.initFunction(true);
-          } else if (step.name === "windowListenerSetup") {
-            // windowListenerSetup 返回 promiseErrorHandler
-            promiseErrorHandler = await step.initFunction();
-          } else if (step.name === "layoutSetup") {
-            // layoutSetup 返回 extensionlist
-            extensionlist = await step.initFunction();
-          } else if (step.name === "extensionLoad") {
-            // extensionLoad 需要 extensionlist 和 promiseErrorHandler 参数
-            await step.initFunction(extensionlist, promiseErrorHandler);
+          if (params.length > 0) {
+            result = await step.initFunction(...params);
           } else {
             result = await step.initFunction();
           }
-
-          // 存储步骤结果
           stepResults[step.name] = result;
+          return result;
         } catch (error) {
           console.error(`初始化步骤 ${step.name} 失败:`, error);
           this.initStatus.errors.push({
@@ -153,7 +176,52 @@ export class InitManager {
             error,
           });
         }
-      }
+      };
+
+      // 第一阶段：基础环境设置（并行执行）
+      updateProgress(5);
+      await Promise.all([
+        executeStep("environmentSetup"),
+        executeStep("polyfillLoad"),
+        executeStep("platformDetection"),
+        executeStep("touchDeviceDetection"),
+      ]);
+
+      // 第二阶段：核心模块初始化（并行执行）
+      updateProgress(15);
+      await Promise.all([
+        executeStep("coreModuleInit"),
+        executeStep("sandboxInit"),
+        executeStep("securityInit"),
+      ]);
+
+      // 第三阶段：配置和监听器设置（并行执行）
+      updateProgress(30);
+      const [windowListenerResult, configLoadResult] = await Promise.all([
+        executeStep("windowListenerSetup"),
+        executeStep("configLoad"),
+      ]);
+      promiseErrorHandler = windowListenerResult;
+
+      // 第四阶段：扩展管理器和布局设置（并行执行）
+      updateProgress(45);
+      const [extensionManagerResult, layoutResult, cssResult] =
+        await Promise.all([
+          executeStep("extensionManagerInit"),
+          executeStep("layoutSetup"),
+          executeStep("cssLoad"),
+        ]);
+      extensionlist = layoutResult;
+
+      // 第五阶段：扩展加载和数据包初始化
+      updateProgress(60);
+      await executeStep("extensionLoad", [extensionlist, promiseErrorHandler]);
+
+      // 第六阶段：游戏模式和数据加载（按顺序执行，因为gameDataLoad依赖gameModeInit）
+      updateProgress(75);
+      await executeStep("gameModeInit", [true]);
+      updateProgress(90);
+      await executeStep("gameDataLoad");
 
       this.initStatus.progress = 100;
       this.initStatus.completed = true;
