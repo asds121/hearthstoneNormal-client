@@ -31,7 +31,11 @@
   },
   "noname_package": {
     "background": {
-      "ol_bg": "龙纹"
+      "ol_bg": "龙纹",
+      "wuming_bg": "无名",
+      "huangtian_bg": "黄天",
+      "lingju_bg": "灵雎",
+      "xinsha_bg": "新杀"
     },
     "music": {
       "music_phliosophy": "Philosophy of ours",
